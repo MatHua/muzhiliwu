@@ -7,7 +7,7 @@ import org.nutz.mvc.annotation.At;
 import com.alibaba.fastjson.JSONObject;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.service.UserService;
-
+//xxx
 @IocBean
 @At("user")
 public class UserModule {
