@@ -22,7 +22,7 @@ public class UserModule {//我是敏姐事实上
 			json.put("id", user.getId());
 			json.put("name", user.getName());
 			json.put("pass", user.getPass());
-			json.put("mess", "�Ұ�����");
+			json.put("mess", "这是敏姐");
 		}
 		return json;
 	}
