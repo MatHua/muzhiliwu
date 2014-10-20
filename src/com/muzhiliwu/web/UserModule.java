@@ -10,7 +10,7 @@ import com.muzhiliwu.service.UserService;
 
 @IocBean
 @At("user")
-public class UserModule {//我是敏姐事实上
+public class UserModule {
 	@Inject
 	private UserService userService;
 
