@@ -23,7 +23,5 @@ public class MyUrlMapImpl extends UrlMappingImpl {
 
 		super.add(maker, ai, config);
 
-		
-
 	}
 }
