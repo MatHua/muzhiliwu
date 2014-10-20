@@ -6,7 +6,7 @@ import org.nutz.dao.entity.annotation.Name;
 public abstract class IdEntity {
 	@Name
 	@Column
-	protected String id;
+	public String id;
 	@Column
 	protected String date;// 时间(注册时间,发表时间,回复时间)
 

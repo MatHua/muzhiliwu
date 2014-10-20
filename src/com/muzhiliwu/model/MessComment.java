@@ -3,23 +3,31 @@ package com.muzhiliwu.model;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_mess_comment")
+@TableIndexes(value = { @Index(fields = { "messCommentId" }, unique = false, name = "otherMessComment") })
 public class MessComment extends IdEntity {
 	@Column
 	private String messId;// 留言id,用于联结"t_message"表的messageId(id)
 	@Column
 	private String commenterId;// 评论者id,用于联结"t_user"表的userId(id)
-	
+
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 评论内容
 
-	@One(target = User.class, field = "id")
+	@Column
+	private String userId;
+	@One(target = User.class, field = "userId")
 	private User commenter;// 便于记录评论者信息
-	@One(target = MessComment.class, field = "id")
+
+	@Column
+	private String messCommentId;
+	@One(target = MessComment.class, field = "messCommentId")
 	private MessComment father;// 父级评论id,便于找到该评论的父级评论
 
 	public String getMessId() {
@@ -60,6 +68,22 @@ public class MessComment extends IdEntity {
 
 	public void setCommenterId(String commenterId) {
 		this.commenterId = commenterId;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getMessCommentId() {
+		return messCommentId;
+	}
+
+	public void setMessCommentId(String messCommentId) {
+		this.messCommentId = messCommentId;
 	}
 
 }

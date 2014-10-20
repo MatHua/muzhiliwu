@@ -5,11 +5,14 @@ import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_wish_praise")
-public class WishPraise {
+public class WishPraise extends IdEntity {
 	@Column
 	private String wishId;// 联结"t_wish"表
 
-	@One(target = User.class, field = "id")
+	@Column
+	private String userId;
+
+	@One(target = User.class, field = "userId")
 	private User praiser;// 便于记录点赞者信息
 
 	public String getWishId() {
@@ -28,4 +31,11 @@ public class WishPraise {
 		this.praiser = praiser;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 }

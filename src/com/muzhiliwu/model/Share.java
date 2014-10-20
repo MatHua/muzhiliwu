@@ -23,7 +23,10 @@ public class Share extends IdEntity {
 	private List<SharePraise> praisers;// 便于找到该分享的所有点赞者
 	@Many(target = ShareCollect.class, field = "shareId")
 	private List<ShareCollect> collectes;// 便于记录分享的收藏者
-	@One(target = User.class, field = "id")
+
+	@Column
+	private String userId;
+	@One(target = User.class, field = "userId")
 	private User sharer;// 用于记录该分享的发布者
 
 	public String getSharerId() {
@@ -58,12 +61,28 @@ public class Share extends IdEntity {
 		this.praisers = praisers;
 	}
 
+	public List<ShareCollect> getCollectes() {
+		return collectes;
+	}
+
+	public void setCollectes(List<ShareCollect> collectes) {
+		this.collectes = collectes;
+	}
+
 	public User getSharer() {
 		return sharer;
 	}
 
 	public void setSharer(User sharer) {
 		this.sharer = sharer;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 }

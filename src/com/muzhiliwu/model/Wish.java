@@ -28,7 +28,11 @@ public class Wish extends IdEntity {
 	private List<WishPraise> praisers;// 便于记录点赞记录
 	@Many(target = WishCollect.class, field = "wishId")
 	private List<WishCollect> collectes;// 便于记录愿望的收集者
-	@One(target = User.class, field = "id")
+
+	@Column
+	private String userId;
+
+	@One(target = User.class, field = "userId")
 	private User wisher;// 用于记录许愿者
 
 	public String getWisherId() {
@@ -87,4 +91,12 @@ public class Wish extends IdEntity {
 		this.wisher = wisher;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	
 }

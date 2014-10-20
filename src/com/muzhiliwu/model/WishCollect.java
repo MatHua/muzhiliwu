@@ -11,9 +11,12 @@ public class WishCollect extends IdEntity {
 	@Column
 	private String collecterId;// 联结"t_user"表
 
-	@One(target = User.class, field = "id")
+	@Column
+	private String userId;
+	@One(target = User.class, field = "userId")
 	private User collecter;// 便于保存许愿收藏者的信息
-	@One(target = Wish.class, field = "id")
+	
+	@One(target = Wish.class, field = "wishId")
 	private Wish wish;// 一个愿望,便于保存用户查找所收藏的愿望
 
 	public String getWishId() {
@@ -32,13 +35,13 @@ public class WishCollect extends IdEntity {
 		this.collecterId = collecterId;
 	}
 
-	public User getCollecter() {
-		return collecter;
-	}
-
-	public void setCollecter(User collecter) {
-		this.collecter = collecter;
-	}
+	 public User getCollecter() {
+	 return collecter;
+	 }
+	
+	 public void setCollecter(User collecter) {
+	 this.collecter = collecter;
+	 }
 
 	public Wish getWish() {
 		return wish;
@@ -47,5 +50,14 @@ public class WishCollect extends IdEntity {
 	public void setWish(Wish wish) {
 		this.wish = wish;
 	}
+	
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 
 }

@@ -5,11 +5,13 @@ import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_share_praise")
-public class SharePraise {
+public class SharePraise extends IdEntity {
 	@Column
 	private String shareId;// 联结"t_share"表
 
-	@One(target = User.class, field = "id")
+	@Column
+	private String userId;
+	@One(target = User.class, field = "userId")
 	private User praiser;// 便于记录点赞者信息
 
 	public String getShareId() {
@@ -27,5 +29,15 @@ public class SharePraise {
 	public void setPraiser(User praiser) {
 		this.praiser = praiser;
 	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	
+	
 
 }

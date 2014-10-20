@@ -9,7 +9,9 @@ public class MessPraise extends IdEntity {
 	@Column
 	private String messId;// 所点赞的评论的id,用于联结"t_message"的messageId(id)
 
-	@One(target = User.class, field = "id")
+	@Column
+	private String userId;
+	@One(target = User.class, field = "userId")
 	private User praiser;// 便于记录点赞者
 
 	public String getMessId() {
@@ -26,6 +28,14 @@ public class MessPraise extends IdEntity {
 
 	public void setPraiser(User praiser) {
 		this.praiser = praiser;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 }
