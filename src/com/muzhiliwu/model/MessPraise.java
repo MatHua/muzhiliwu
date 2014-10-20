@@ -1,0 +1,31 @@
+package com.muzhiliwu.model;
+
+import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.One;
+import org.nutz.dao.entity.annotation.Table;
+
+@Table("t_mess_praise")
+public class MessPraise extends IdEntity {
+	@Column
+	private String messId;// 所点赞的评论的id,用于联结"t_message"的messageId(id)
+
+	@One(target = User.class, field = "id")
+	private User praiser;// 便于记录点赞者
+
+	public String getMessId() {
+		return messId;
+	}
+
+	public void setMessId(String messId) {
+		this.messId = messId;
+	}
+
+	public User getPraiser() {
+		return praiser;
+	}
+
+	public void setPraiser(User praiser) {
+		this.praiser = praiser;
+	}
+
+}
