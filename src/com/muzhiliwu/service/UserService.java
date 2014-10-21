@@ -38,14 +38,16 @@ public class UserService {
 						convert ? md5.getMD5ofStr(pass) : pass));
 
 		// dao.fetchLinks(user, "myMessages");
-		dao.fetchLinks(user, "myMessComments", Cnd.orderBy().desc("date"));// 评论按时间降序
+		// dao.fetchLinks(user, "myMessComments", Cnd.orderBy().desc("date"));//
+		// 评论按时间降序
 
 		// dao.fetchLinks(user, "myWishes");
 		// dao.fetchLinks(user, "myWishCollectes");
 
 		// dao.fetchLinks(user, "myShares");
 		// dao.fetchLinks(user, "myShareCollectes");
-		dao.fetchLinks(user, "myShareComments", Cnd.orderBy().desc("date"));// 评论按时间降序
+		// dao.fetchLinks(user, "myShareComments",
+		// Cnd.orderBy().desc("date"));// 评论按时间降序
 		return user;
 	}
 
@@ -56,12 +58,13 @@ public class UserService {
 	 * @param pass
 	 * @return
 	 */
-	public boolean registOrUpdateUser(User user, String pass) {
+	public boolean registOrEditUser(User user, String pass) {
 		if (Strings.isBlank(user.getId())) {// 注册
 			// 账号已被注册
 			if (!checkRepeat(user.getCode())) {
 				return false;
 			}
+			// 一些系统自修改的信息
 			user.setId(NumGenerator.getUuid());// 生成id
 			user.setPass(MD5.toMD5(pass));// 密码加密
 			user.setDate(DateUtils.now());// 注册时间
@@ -128,7 +131,7 @@ public class UserService {
 
 		// 如果对应的文件夹不存在,就创建该文件夹
 		Files.createDirIfNoExists(template);
-		
+
 		// 获取文件后缀名
 		int beginIndex = tfs.getFile().getAbsolutePath().lastIndexOf(".");
 		String fileExt = tfs.getFile().getAbsolutePath().substring(beginIndex);

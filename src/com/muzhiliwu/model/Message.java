@@ -16,6 +16,8 @@ public class Message extends IdEntity {// 留言墙
 	private String content;// 留言内容
 	@Column
 	private String type;// 留言类型
+	@Column
+	private String title;// 标题
 
 	@Column
 	private String publisherId;// 发表者id,用于联结"t_user"的userId(id)
@@ -73,6 +75,14 @@ public class Message extends IdEntity {// 留言墙
 
 	public void setPublisherId(String publisherId) {
 		this.publisherId = publisherId;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }

@@ -14,6 +14,8 @@ public class Share extends IdEntity {
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 分享内容
+	@Column
+	private String title;// 标题
 
 	@Many(target = ShareComment.class, field = "shareId")
 	private List<ShareComment> comments;// 该分享的所有评论
@@ -73,6 +75,14 @@ public class Share extends IdEntity {
 
 	public void setSharer(User sharer) {
 		this.sharer = sharer;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }

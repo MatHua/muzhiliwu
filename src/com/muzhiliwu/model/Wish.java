@@ -22,6 +22,8 @@ public class Wish extends IdEntity {
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 许愿内容
 	@Column
+	private String title;// 标题
+	@Column
 	private String state;// 许愿状态
 
 	@Many(target = WishPraise.class, field = "wishId")
@@ -97,6 +99,14 @@ public class Wish extends IdEntity {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }
