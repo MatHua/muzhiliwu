@@ -11,7 +11,7 @@ public class SharePraise extends IdEntity {
 
 	@Column
 	private String praiserId;
-	@One(target = User.class, field = "praiser")
+	@One(target = User.class, field = "praiserId")
 	private User praiser;// 便于记录点赞者信息
 
 	public String getShareId() {

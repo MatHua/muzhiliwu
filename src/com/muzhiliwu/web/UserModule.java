@@ -1,11 +1,13 @@
 package com.muzhiliwu.web;
 
+import javax.servlet.http.HttpSession;
+
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.mvc.annotation.At;
+import org.nutz.mvc.annotation.Ok;
 
-import com.alibaba.fastjson.JSONObject;
-import com.muzhiliwu.model.User;
 import com.muzhiliwu.service.UserService;
 
 @IocBean
@@ -27,7 +29,9 @@ public class UserModule {
 	// return json;
 	// }
 	
-//	@At
-//	@Ok("json")
-//	public public 
+	// @At
+	// @Ok("json")
+	// public Object login(String code, String pass,HttpSession session) {
+	// // if(Strings.isEmpty(code) || Strings.isEmail(input))
+	// }
 }
