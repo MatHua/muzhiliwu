@@ -62,7 +62,18 @@ public class MessageService {
 				Message.class,
 				Cnd.where("publisherId", "=", user.getId()).orderBy()
 						.desc("date"), page);
-		// for()
+		for (int i = 0; i < msgs.size(); i++) {
+			// 加载发表者
+			dao.fetchLinks(msgs.get(i), "publisher");
+			// 加载点赞者
+			dao.fetchLinks(msgs.get(i), "praises", Cnd.orderBy().desc("date"));
+			// 加载评论者
+			dao.fetchLinks(msgs.get(i), "comments", Cnd.orderBy().desc("date"));
+			// 加载每条评论的父评论
+			for (int j = 0; j < msgs.get(i).getComments().size(); j++) {
+				dao.fetchLinks(msgs.get(i).getComments().get(j), "");
+			}
+		}
 		// pr.setResults();
 		pr.setPage(page);
 		return pr;
@@ -108,7 +119,7 @@ public class MessageService {
 	 * @return
 	 */
 	public boolean commentMessage(Message msg, User commenter, String content,
-			String fatherId) {
+			String fatherCommenterId) {
 		MessComment comment = new MessComment();
 		comment.setId(NumGenerator.getUuid());
 		comment.setCommenter(commenter);
@@ -129,17 +140,10 @@ public class MessageService {
 		dao.insertLinks(comment, "commenter");// 插入评论者信息
 
 		// 如果父评论存在,则为父评论插入子评论
-		if (!Strings.isBlank(fatherId)) {
+		if (!Strings.isBlank(fatherCommenterId)) {
 			// 获取父评论
-			MessComment father = dao.fetch(MessComment.class, fatherId);
-			List<MessComment> sons = new ArrayList<MessComment>();
-			sons.add(comment);
-
-			father.setSons(sons);// 父亲新添一个儿子
-			comment.setFather(father);// 为儿子设置父亲
-
-			// 因为comment已经存在,所以执行的是更新操作而不是插入操作
-			dao.updateLinks(father, "sons");
+			User father = dao.fetch(User.class, fatherCommenterId);
+			comment.setFatherCommenter(father);// 为儿子设置父亲
 			// 因为comment已经存在,所以执行的是更新操作而不是插入操作
 			dao.updateLinks(comment, "father");
 		}

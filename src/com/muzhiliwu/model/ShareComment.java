@@ -28,14 +28,9 @@ public class ShareComment extends IdEntity {
 	private User commenter;// 便于记录评论者
 
 	@Column
-	private String shareCommentId;
-	@One(target = ShareComment.class, field = "shareCommentId")
-	private ShareComment father;// 父级评论id,便于找到该评论的父级评论
-
-	@Column
-	private String fatherCommentId;
-	@Many(target = ShareComment.class, field = "fatherCommentId")
-	private List<ShareComment> sons;// 所有子评论
+	private String fatherCommenterId;
+	@One(target = User.class, field = "fatherCommenterId")
+	private User fatherCommenter;// 父级评论者id,便于找到该评论的父级评论者
 
 	public String getShareId() {
 		return shareId;
@@ -53,28 +48,12 @@ public class ShareComment extends IdEntity {
 		this.commenter = commenter;
 	}
 
-	public ShareComment getFather() {
-		return father;
-	}
-
-	public void setFather(ShareComment father) {
-		this.father = father;
-	}
-
 	public String getCommenterId() {
 		return commenterId;
 	}
 
 	public void setCommenterId(String commenterId) {
 		this.commenterId = commenterId;
-	}
-
-	public String getShareCommentId() {
-		return shareCommentId;
-	}
-
-	public void setShareCommentId(String shareCommentId) {
-		this.shareCommentId = shareCommentId;
 	}
 
 	public String getContent() {
@@ -85,20 +64,21 @@ public class ShareComment extends IdEntity {
 		this.content = content;
 	}
 
-	public String getFatherCommentId() {
-		return fatherCommentId;
+	public String getFatherCommenterId() {
+		return fatherCommenterId;
 	}
 
-	public void setFatherCommentId(String fatherCommentId) {
-		this.fatherCommentId = fatherCommentId;
+	public void setFatherCommenterId(String fatherCommenterId) {
+		this.fatherCommenterId = fatherCommenterId;
 	}
 
-	public List<ShareComment> getSons() {
-		return sons;
+	public User getFatherCommenter() {
+		return fatherCommenter;
 	}
 
-	public void setSons(List<ShareComment> sons) {
-		this.sons = sons;
+	public void setFatherCommenter(User fatherCommenter) {
+		this.fatherCommenter = fatherCommenter;
 	}
 
+	
 }

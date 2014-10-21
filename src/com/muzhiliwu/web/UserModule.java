@@ -14,16 +14,20 @@ public class UserModule {
 	@Inject
 	private UserService userService;
 
-	@At
-	public JSONObject login(String name, String pass) {
-		User user = userService.checkUser(name, pass, true);
-		JSONObject json = new JSONObject();
-		if (user != null) {
-			json.put("id", user.getId());
-			json.put("name", user.getName());
-			json.put("pass", user.getPass());
-			json.put("mess", "这是敏姐");
-		}
-		return json;
-	}
+	// @At
+	// public JSONObject login(String name, String pass) {
+	// User user = userService.checkUser(name, pass, true);
+	// JSONObject json = new JSONObject();
+	// if (user != null) {
+	// json.put("id", user.getId());
+	// json.put("name", user.getName());
+	// json.put("pass", user.getPass());
+	// json.put("mess", "这是敏姐");
+	// }
+	// return json;
+	// }
+	
+//	@At
+//	@Ok("json")
+//	public public 
 }
