@@ -9,7 +9,7 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import com.muzhiliwu.model.TestDemo;
 
 @IocBean
-public class TestDemoService {
+public class TestDemoService {//
 	@Inject
 	private Dao dao;
 
