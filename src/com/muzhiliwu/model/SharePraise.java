@@ -10,8 +10,8 @@ public class SharePraise extends IdEntity {
 	private String shareId;// 联结"t_share"表
 
 	@Column
-	private String userId;
-	@One(target = User.class, field = "userId")
+	private String praiserId;
+	@One(target = User.class, field = "praiser")
 	private User praiser;// 便于记录点赞者信息
 
 	public String getShareId() {
@@ -30,14 +30,12 @@ public class SharePraise extends IdEntity {
 		this.praiser = praiser;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getPraiserId() {
+		return praiserId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setPraiserId(String praiserId) {
+		this.praiserId = praiserId;
 	}
-	
-	
 
 }

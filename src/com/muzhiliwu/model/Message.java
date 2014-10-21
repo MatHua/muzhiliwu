@@ -12,20 +12,18 @@ import org.nutz.dao.entity.annotation.Table;
 @Table("t_mess")
 public class Message extends IdEntity {// 留言墙
 	@Column
-	private String publisherId;// 发表者id,用于联结"t_user"的userId(id)
-	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 留言内容
 	@Column
 	private String type;// 留言类型
 
 	@Column
-	private String userId;
-	@One(target = User.class, field = "userId")
+	private String publisherId;// 发表者id,用于联结"t_user"的userId(id)
+	@One(target = User.class, field = "publisherId")
 	private User publisher;// 便于记录留言的 发表者
 
 	@Many(target = MessPraise.class, field = "messId")
-	private List<MessPraise> praisers;// 便于记录点赞记录
+	private List<MessPraise> praises;// 便于记录点赞记录
 	@Many(target = MessComment.class, field = "messId")
 	private List<MessComment> comments;// 留言评论,便于找到留言对应的所有评论
 
@@ -53,12 +51,12 @@ public class Message extends IdEntity {// 留言墙
 		this.comments = comments;
 	}
 
-	public List<MessPraise> getPraisers() {
-		return praisers;
+	public List<MessPraise> getPraises() {
+		return praises;
 	}
 
-	public void setPraisers(List<MessPraise> praisers) {
-		this.praisers = praisers;
+	public void setPraises(List<MessPraise> praises) {
+		this.praises = praises;
 	}
 
 	public User getPublisher() {
@@ -75,14 +73,6 @@ public class Message extends IdEntity {// 留言墙
 
 	public void setPublisherId(String publisherId) {
 		this.publisherId = publisherId;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 }

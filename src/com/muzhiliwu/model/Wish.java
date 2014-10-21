@@ -25,7 +25,7 @@ public class Wish extends IdEntity {
 	private String state;// 许愿状态
 
 	@Many(target = WishPraise.class, field = "wishId")
-	private List<WishPraise> praisers;// 便于记录点赞记录
+	private List<WishPraise> praises;// 便于记录点赞记录
 	@Many(target = WishCollect.class, field = "wishId")
 	private List<WishCollect> collectes;// 便于记录愿望的收集者
 
@@ -67,12 +67,12 @@ public class Wish extends IdEntity {
 		this.state = state;
 	}
 
-	public List<WishPraise> getPraisers() {
-		return praisers;
+	public List<WishPraise> getPraises() {
+		return praises;
 	}
 
-	public void setPraisers(List<WishPraise> praisers) {
-		this.praisers = praisers;
+	public void setPraises(List<WishPraise> praises) {
+		this.praises = praises;
 	}
 
 	public List<WishCollect> getCollectes() {
@@ -98,5 +98,5 @@ public class Wish extends IdEntity {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
+
 }

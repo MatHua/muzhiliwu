@@ -24,9 +24,7 @@ public class ShareComment extends IdEntity {
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 评论内容
 
-	@Column
-	private String userId;
-	@One(target = User.class, field = "userId")
+	@One(target = User.class, field = "commenterId")
 	private User commenter;// 便于记录评论者
 
 	@Column
@@ -69,14 +67,6 @@ public class ShareComment extends IdEntity {
 
 	public void setCommenterId(String commenterId) {
 		this.commenterId = commenterId;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String getShareCommentId() {
