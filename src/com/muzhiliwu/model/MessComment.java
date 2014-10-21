@@ -1,9 +1,12 @@
 package com.muzhiliwu.model;
 
+import java.util.List;
+
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Index;
+import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
@@ -29,6 +32,11 @@ public class MessComment extends IdEntity {
 	private String messCommentId;
 	@One(target = MessComment.class, field = "messCommentId")
 	private MessComment father;// 父级评论id,便于找到该评论的父级评论
+
+	@Column
+	private String fatherCommentId;
+	@Many(target = ShareComment.class, field = "fatherCommentId")
+	private List<ShareComment> sons;// 所有子评论
 
 	public String getMessId() {
 		return messId;
@@ -84,6 +92,22 @@ public class MessComment extends IdEntity {
 
 	public void setMessCommentId(String messCommentId) {
 		this.messCommentId = messCommentId;
+	}
+
+	public String getFatherCommentId() {
+		return fatherCommentId;
+	}
+
+	public void setFatherCommentId(String fatherCommentId) {
+		this.fatherCommentId = fatherCommentId;
+	}
+
+	public List<ShareComment> getSons() {
+		return sons;
+	}
+
+	public void setSons(List<ShareComment> sons) {
+		this.sons = sons;
 	}
 
 }

@@ -19,7 +19,7 @@ public class User extends IdEntity {
 	private String mood;// 心情
 	@Column
 	private String photo;// 头像
-	@Column
+	@Column 
 	private String name;// 姓名
 	@Column
 	private int age;// 年龄

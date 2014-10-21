@@ -16,7 +16,7 @@ public class UserModule {
 
 	@At
 	public JSONObject login(String name, String pass) {
-		User user = userService.checkUser(name, pass);
+		User user = userService.checkUser(name, pass, true);
 		JSONObject json = new JSONObject();
 		if (user != null) {
 			json.put("id", user.getId());
