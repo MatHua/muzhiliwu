@@ -141,7 +141,7 @@ public class UserService {
 			Files.deleteFile(file);
 		}
 
-		// 上传头像文件
+		// 上传新的头像文件
 		File f = new File(template + code + fileExt);
 		try {
 			Files.move(tfs.getFile(), f);

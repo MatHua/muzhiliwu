@@ -12,7 +12,8 @@ import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_share_comment")
-@TableIndexes(value = { @Index(fields = { "shareCommentId" }, unique = false, name = "otherShareComment") })
+// @TableIndexes(value = { @Index(fields = { "shareCommentId" }, unique = false,
+// name = "otherShareComment") })//创建索引
 public class ShareComment extends IdEntity {
 	@Column
 	private String shareId;// 分享id,用于联结"t_share"表的shareId(id)
