@@ -11,8 +11,12 @@ import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_wish")
 public class Wish extends IdEntity {
+	// state
 	public static final String UNREALIZED = "unrealized";// 为实现愿望
 	public static final String REALIZED = "realized";// 已实现愿望
+	// type
+	public static final String Wish_Gift = "wish_gift";// 许愿要礼物
+	public static final String WIsh_Other = "wish_other";// 许愿非要礼物
 
 	@Column
 	private String wisherId;// 许愿者id
@@ -28,13 +32,12 @@ public class Wish extends IdEntity {
 
 	@Many(target = WishPraise.class, field = "wishId")
 	private List<WishPraise> praises;// 便于记录点赞记录
+	@Column
+	private int praiseNum;// 点赞数
 	@Many(target = WishCollect.class, field = "wishId")
 	private List<WishCollect> collectes;// 便于记录愿望的收集者
 
-	@Column
-	private String userId;
-
-	@One(target = User.class, field = "userId")
+	@One(target = User.class, field = "wisherId")
 	private User wisher;// 用于记录许愿者
 
 	public String getWisherId() {
@@ -93,20 +96,20 @@ public class Wish extends IdEntity {
 		this.wisher = wisher;
 	}
 
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
 	public String getTitle() {
 		return title;
 	}
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public int getPraiseNum() {
+		return praiseNum;
+	}
+
+	public void setPraiseNum(int praiseNum) {
+		this.praiseNum = praiseNum;
 	}
 
 }

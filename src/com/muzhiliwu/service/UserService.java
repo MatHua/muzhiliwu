@@ -11,6 +11,8 @@ import org.nutz.lang.Files;
 import org.nutz.lang.Strings;
 import org.nutz.mvc.upload.TempFile;
 
+import com.muzhiliwu.model.MessUnreadReply;
+import com.muzhiliwu.model.ShareUnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
@@ -37,6 +39,35 @@ public class UserService {
 				Cnd.where("code", "=", code).and("pass", "=",
 						convert ? md5.getMD5ofStr(pass) : pass));
 
+		// 获取未读的回复
+		getReply(user);
+		return user;
+	}
+
+	/**
+	 * 获取用户未读回复
+	 * 
+	 * @param user
+	 */
+	public void getReply(User user) {
+
+		// 获取未读的留言墙回复
+		dao.fetchLinks(user, "myMessUnreadReplies", Cnd.orderBy().desc("date"));
+		MessUnreadReply messReply;
+		for (int i = 0; i < user.getMyMessUnreadReplies().size(); i++) {
+			// 获取回复者信息
+			dao.fetchLinks(user.getMyMessUnreadReplies().get(i), "replier");
+		}
+		// 获取未读的分享墙回复
+		dao.fetchLinks(user, "myShareUnreadReplies");
+		ShareUnreadReply shareReply;
+		for (int i = 0; i < user.getMyShareUnreadReplies().size(); i++) {
+			// 获取回复者信息
+			dao.fetchLinks(user.getMyShareUnreadReplies().get(i), "replier");
+			// shareReply = user.getMyShareUnreadReplies().get(i);
+			// shareReply.setReplier(getUserById(shareReply.getReplierId()));
+		}
+
 		// dao.fetchLinks(user, "myMessages");
 		// dao.fetchLinks(user, "myMessComments", Cnd.orderBy().desc("date"));//
 		// 评论按时间降序
@@ -48,7 +79,6 @@ public class UserService {
 		// dao.fetchLinks(user, "myShareCollectes");
 		// dao.fetchLinks(user, "myShareComments",
 		// Cnd.orderBy().desc("date"));// 评论按时间降序
-		return user;
 	}
 
 	/**
@@ -65,8 +95,9 @@ public class UserService {
 				return false;
 			}
 			// 一些系统自修改的信息
+			user.setCode(user.getCode().trim());
 			user.setId(NumGenerator.getUuid());// 生成id
-			user.setPass(MD5.toMD5(pass));// 密码加密
+			user.setPass(MD5.toMD5(pass.trim()));// 密码加密
 			user.setDate(DateUtils.now());// 注册时间
 			user.setPoints(Integral.INTEGRAL_FOR_NEW_USER);// 积分初始化
 			dao.insert(user);
@@ -126,7 +157,7 @@ public class UserService {
 	 * @param template
 	 * @param code
 	 */
-	public void uploadPhoto(TempFile tfs, String template, String code) {
+	public void uploadPhoto(String code, TempFile tfs, String template) {
 		template += "/WEB-INF/userphoto/";
 
 		// 如果对应的文件夹不存在,就创建该文件夹
@@ -160,6 +191,11 @@ public class UserService {
 
 	private User getUserByCode(String code) {
 		User user = dao.fetch(User.class, Cnd.where("code", "=", code));
+		return user;
+	}
+
+	public User getUserById(String id) {
+		User user = dao.fetch(User.class, id);
 		return user;
 	}
 }

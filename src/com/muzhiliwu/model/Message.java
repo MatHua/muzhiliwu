@@ -24,8 +24,11 @@ public class Message extends IdEntity {// 留言墙
 	@One(target = User.class, field = "publisherId")
 	private User publisher;// 便于记录留言的 发表者
 
+	@Column
+	private int praiseNum;// 点赞数
 	@Many(target = MessPraise.class, field = "messId")
 	private List<MessPraise> praises;// 便于记录点赞记录
+
 	@Many(target = MessComment.class, field = "messId")
 	private List<MessComment> comments;// 留言评论,便于找到留言对应的所有评论
 
@@ -83,6 +86,14 @@ public class Message extends IdEntity {// 留言墙
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public int getPraiseNum() {
+		return praiseNum;
+	}
+
+	public void setPraiseNum(int praiseNum) {
+		this.praiseNum = praiseNum;
 	}
 
 }

@@ -19,7 +19,7 @@ public class User extends IdEntity {
 	private String mood;// 心情
 	@Column
 	private String photo;// 头像
-	@Column 
+	@Column
 	private String name;// 姓名
 	@Column
 	private int age;// 年龄
@@ -50,6 +50,8 @@ public class User extends IdEntity {
 	private List<Message> myMessages;// 我的留言,便于找出用户自己发表的留言
 	@Many(target = MessComment.class, field = "commenterId")
 	private List<MessComment> myMessComments;// 便于找到我在留言墙的评论及对应的回复
+	@Many(target = MessUnreadReply.class, field = "receiverId")
+	private List<MessUnreadReply> myMessUnreadReplies;// 便于找出我在留言墙的未读回复
 
 	@Many(target = Wish.class, field = "wisherId")
 	private List<Wish> myWishes;// 我的许愿,便于找出用户自己许的愿
@@ -58,10 +60,12 @@ public class User extends IdEntity {
 
 	@Many(target = Share.class, field = "sharerId")
 	private List<Share> myShares;// 我的分享,便于找出用户自己发表的分享
-	@Many(target = ShareCollect.class, field = "collecterId")
-	private List<ShareCollect> myShareCollectes;// 我收集的分享,便于找到用户所收集的分享
+	// @Many(target = ShareCollect.class, field = "collecterId")
+	// private List<ShareCollect> myShareCollectes;// 我收集的分享,便于找到用户所收集的分享
 	@Many(target = ShareComment.class, field = "commenterId")
 	private List<MessComment> myShareComments;// 便于找到我在分享墙的评论及对应的回复
+	@Many(target = ShareUnreadReply.class, field = "receiverId")
+	private List<ShareUnreadReply> myShareUnreadReplies;// 便于找出我在分享墙的未读回复
 
 	public List<MessComment> getMyMessComments() {
 		return myMessComments;
@@ -247,12 +251,29 @@ public class User extends IdEntity {
 		this.myWishCollectes = myWishCollectes;
 	}
 
-	public List<ShareCollect> getMyShareCollectes() {
-		return myShareCollectes;
+	// public List<ShareCollect> getMyShareCollectes() {
+	// return myShareCollectes;
+	// }
+	//
+	// public void setMyShareCollectes(List<ShareCollect> myShareCollectes) {
+	// this.myShareCollectes = myShareCollectes;
+	// }
+
+	public List<MessUnreadReply> getMyMessUnreadReplies() {
+		return myMessUnreadReplies;
 	}
 
-	public void setMyShareCollectes(List<ShareCollect> myShareCollectes) {
-		this.myShareCollectes = myShareCollectes;
+	public void setMyMessUnreadReplies(List<MessUnreadReply> myMessUnreadReplies) {
+		this.myMessUnreadReplies = myMessUnreadReplies;
+	}
+
+	public List<ShareUnreadReply> getMyShareUnreadReplies() {
+		return myShareUnreadReplies;
+	}
+
+	public void setMyShareUnreadReplies(
+			List<ShareUnreadReply> myShareUnreadReplies) {
+		this.myShareUnreadReplies = myShareUnreadReplies;
 	}
 
 }

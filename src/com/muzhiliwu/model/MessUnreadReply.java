@@ -12,14 +12,12 @@ public class MessUnreadReply extends IdEntity {
 	public static final String READ = "read";// 已读
 
 	@Column
+	private String receiverId;// 接收者id,用于联结"t_user"表
+
+	@Column
 	private String replierId;// 回复者id
 	@One(target = User.class, field = "replierId")
 	private User replier;// 便于记录回复者
-
-	@Column
-	private String receiverId;// 接收者id
-	@One(target = User.class, field = "receiverId")
-	private User receiver;// 便于记录接收者
 
 	@Column
 	@ColDefine(type = ColType.TEXT)
@@ -52,14 +50,6 @@ public class MessUnreadReply extends IdEntity {
 		this.receiverId = receiverId;
 	}
 
-	public User getReceiver() {
-		return receiver;
-	}
-
-	public void setReceiver(User receiver) {
-		this.receiver = receiver;
-	}
-
 	public String getContent() {
 		return content;
 	}
@@ -76,5 +66,4 @@ public class MessUnreadReply extends IdEntity {
 		this.state = state;
 	}
 
-	
 }

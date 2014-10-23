@@ -1,5 +1,6 @@
 package com.muzhiliwu.web;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -7,12 +8,15 @@ import javax.servlet.http.HttpSession;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
+import org.nutz.mvc.annotation.AdaptBy;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
+import org.nutz.mvc.upload.TempFile;
+import org.nutz.mvc.upload.UploadAdaptor;
 
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.service.UserService;
@@ -22,7 +26,7 @@ import com.muzhiliwu.utils.ActionMessage;
 @At("user")
 public class UserModule {
 	@Inject
-	private UserService userService;// = new UserService();
+	private UserService userService;
 
 	// @At
 	// public JSONObject login(String name, String pass) {
@@ -73,15 +77,39 @@ public class UserModule {
 		return am;
 	}
 
+	// 几时检查用户输入的用户名是否已被注册
+	@At
+	@Ok("json")
+	public Object checkRepeat(String code) {
+		ActionMessage am = new ActionMessage();
+		if (userService.checkRepeat(code)) {
+			am.setType(ActionMessage.success);
+		} else {
+			am.setType(ActionMessage.fail);
+			am.setMessage("用户已存在,请选择其他账号~");
+		}
+		return am;
+	}
+
+	// 注册
 	@At
 	@Ok("json")
 	public Object regist(@Param("::user.") User user) {
 		ActionMessage am = new ActionMessage();
+		// if (user == null) {
+		// am.setMessage("null");
+		// return am;
+		// }
+		if (Strings.isBlank(user.getCode()) || Strings.isBlank(user.getPass())) {
+			am.setMessage("注册失败,账号或密码不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
 		if (userService.registOrEditUser(user, user.getPass())) {
-			am.setMessage("注册成功");
+			am.setMessage("注册成功~");
 			am.setType(ActionMessage.success);
 		} else {
-			am.setMessage("注册失败,账号已被注册");
+			am.setMessage("注册失败,账号已被注册~");
 			am.setType(ActionMessage.fail);
 		}
 		return am;
@@ -91,7 +119,7 @@ public class UserModule {
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object editSelf(User user, HttpSession session) {
+	public Object editSelf(@Param("::user.") User user, HttpSession session) {
 		ActionMessage am = new ActionMessage();
 		if (userService.registOrEditUser(user, user.getPass())) {
 			am.setType(ActionMessage.success);
@@ -103,10 +131,35 @@ public class UserModule {
 		return am;
 	}
 
+	// 退出登录
 	@At
 	@Ok("json")
 	public Object logout(HttpSession session) {
-		session.invalidate();
+		session.removeAttribute("t_user");
+		ActionMessage am = new ActionMessage();
+		am.setType(ActionMessage.success);
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object me(HttpSession session) {
+		ActionMessage am = new ActionMessage();
+		am.setType(ActionMessage.success);
+		am.setObject(userService.getUserById(((User) session
+				.getAttribute("t_user")).getId()));
+		return am;
+	}
+
+	// 上传用户头像
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
+	public Object uploadUserPhoto(@Param("userpic") TempFile tfs, String code,
+			ServletContext context) {
+		userService.uploadPhoto(code, tfs, context.getRealPath("/"));
 		ActionMessage am = new ActionMessage();
 		am.setType(ActionMessage.success);
 		return am;
