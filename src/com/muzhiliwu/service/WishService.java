@@ -222,4 +222,19 @@ public class WishService {
 		// }
 		return wish;
 	}
+
+	/**
+	 * 获取收藏的愿望的详细内容
+	 * 
+	 * @param collect
+	 *            一个收藏
+	 * @return
+	 */
+	public WishCollect getDetail(WishCollect collect) {
+		collect = dao.fetch(WishCollect.class, collect.getId());
+		dao.fetchLinks(collect, "collecter");
+		dao.fetchLinks(collect, "wish");
+		dao.fetchLinks(collect.getWish(), "wisher");
+		return collect;
+	}
 }

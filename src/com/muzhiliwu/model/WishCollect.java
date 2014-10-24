@@ -15,7 +15,7 @@ public class WishCollect extends IdEntity {
 	private User collecter;// 便于保存许愿收藏者的信息
 
 	@One(target = Wish.class, field = "wishId")
-	private Wish collect;// 一个愿望,便于保存用户查找所收藏的愿望
+	private Wish wish;// 一个愿望,便于保存用户查找所收藏的愿望
 
 	public String getWishId() {
 		return wishId;
@@ -41,12 +41,12 @@ public class WishCollect extends IdEntity {
 		this.collecter = collecter;
 	}
 
-	public Wish getCollect() {
-		return collect;
+	public Wish getWish() {
+		return wish;
 	}
 
-	public void setCollect(Wish collect) {
-		this.collect = collect;
+	public void setWish(Wish wish) {
+		this.wish = wish;
 	}
 
 }
