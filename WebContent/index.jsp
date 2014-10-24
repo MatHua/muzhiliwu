@@ -11,5 +11,6 @@
 <input type="text" name="email"/>
 <input type="submit">
 </form>
+<img alt="" src="http://localhost:8080/muzhiliwu/userphoto/ppp.jpg">
 </body>
 </html>

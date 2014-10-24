@@ -212,7 +212,7 @@ public class UserService {
 	 */
 	public boolean okIntegral(User user, long increment, HttpSession session) {
 		user = dao.fetch(User.class, user.getId());
-		if (user.getIntegral() + increment < 0) {// 积分足够
+		if (user.getIntegral() + increment >= 0) {// 积分足够
 			user.setIntegral(user.getIntegral() + increment);
 			dao.update(user);
 			session.setAttribute("t_user", user);
