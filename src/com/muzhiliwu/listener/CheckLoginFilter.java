@@ -23,7 +23,7 @@ import com.muzhiliwu.utils.MD5;
 @IocBean
 public class CheckLoginFilter implements ActionFilter {
 
-	private String name = "user";// session中存储用户信息的parameter
+	private String name = "t_user";// session中存储用户信息的parameter
 	@Inject
 	private UserService userService;
 
@@ -62,7 +62,7 @@ public class CheckLoginFilter implements ActionFilter {
 				return null;
 			}
 			am.setMessage("用户没有登陆");
-			am.setType(ActionMessage.NOT_LOGIN);
+			am.setType(ActionMessage.Not_Login);
 			v.setData(am);
 			return v;
 		}

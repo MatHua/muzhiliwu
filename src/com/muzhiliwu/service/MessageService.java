@@ -3,6 +3,8 @@ package com.muzhiliwu.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.QueryResult;
@@ -17,13 +19,17 @@ import com.muzhiliwu.model.MessUnreadReply;
 import com.muzhiliwu.model.Message;
 import com.muzhiliwu.model.Share;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
+import com.muzhiliwu.utils.Integral;
 import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
 public class MessageService {
 	@Inject
 	private Dao dao;
+	@Inject
+	private UserService userService;
 
 	/**
 	 * 发布一条留言
@@ -32,20 +38,28 @@ public class MessageService {
 	 *            发布者
 	 * @param msg
 	 *            一条留言
+	 * @param session
+	 *            修改积分
 	 * @return
 	 */
-	public boolean publishOrUpdateMessage(User publisher, Message msg) {
+	public String publishOrUpdateMessage(User publisher, Message msg,
+			HttpSession session) {
 		if (Strings.isBlank(msg.getId())) {// 发布一条留言
+			if (!userService.okIntegral(publisher,
+					Integral.Integral_For_Publish_Message, session)) {
+				return ActionMessage.Not_Integral;// 不够积分
+			}
 			msg.setId(NumGenerator.getUuid());
 			msg.setDate(DateUtils.now());
 			msg.setPublisherId(publisher.getId());
+			msg.setPraiseNum(0);// 点赞数为0
+			msg.setCommentNum(0);// 评论数
 			dao.insert(msg);
 		} else {// 修改一条留言
 			msg.setDate(DateUtils.now());
-			msg.setPublisherId(publisher.getId());
 			dao.update(msg);
 		}
-		return true;
+		return ActionMessage.success;
 	}
 
 	/**
@@ -64,15 +78,24 @@ public class MessageService {
 			praise.setDate(DateUtils.now());
 			praise.setMessId(msg.getId());// 这是联结的id
 			praise.setPraiserId(praiser.getId());// 这是联结id
+			changePraiseNumber(msg, 1);// 点赞数+1
 			dao.insert(praise);
 			return true;
 		} else {// 取消点赞
-			MessPraise praise = dao.fetch(
-					MessPraise.class,
-					Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
-							praiser.getId()));
-			dao.delete(MessPraise.class, praise.getId());
+			deletePraise(msg, praiser);// 删除点赞记录
+			changePraiseNumber(msg, -1);// 点赞数-1
 			return false;
+		}
+	}
+
+	// 删除点赞记录
+	private void deletePraise(Message msg, User praiser) {
+		MessPraise praise = dao.fetch(
+				MessPraise.class,
+				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
+						praiser.getId()));
+		if (praise != null) {
+			dao.delete(MessPraise.class, praise.getId());
 		}
 	}
 
@@ -113,8 +136,12 @@ public class MessageService {
 	 *            该评论的父评论(因为该评论可能是一条回复别人评论的评论)
 	 * @return
 	 */
-	public boolean commentMessage(Message msg, User commenter,
-			MessComment comment, User fatherCommenter) {
+	public String commentMessage(Message msg, User commenter,
+			MessComment comment, User fatherCommenter, HttpSession session) {
+		if (!userService.okIntegral(commenter,
+				Integral.Integral_For_Comment_Message, session)) {
+			return ActionMessage.Not_Integral;// 不够积分
+		}
 		comment.setId(NumGenerator.getUuid());
 		comment.setCommenterId(commenter.getId());// 联结id
 		comment.setDate(DateUtils.now());
@@ -124,8 +151,16 @@ public class MessageService {
 			comment.setFatherCommenterId(fatherCommenter.getId());
 			createUnreadReply(commenter, fatherCommenter, comment);
 		}
+		changeCommentNumber(msg, 1);// 评论数+1
 		dao.insert(comment);// 插入一条评论
-		return true;
+		return ActionMessage.success;
+	}
+
+	// 改变评论数
+	private void changeCommentNumber(Message msg, int i) {
+		msg = dao.fetch(Message.class, msg.getId());
+		msg.setCommentNum(msg.getCommentNum() + i);
+		dao.update(msg);
 	}
 
 	/**
@@ -146,7 +181,7 @@ public class MessageService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(fatherCommenter.getId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(MessUnreadReply.NUREAD);
+		unread.setState(MessUnreadReply.Nuread);
 		dao.insert(unread);
 	}
 
@@ -163,15 +198,21 @@ public class MessageService {
 		Message msg;
 		List<Message> results = new ArrayList<Message>();
 		for (int i = 0; i < msgs.size(); i++) {
+			// 加载发表者
+			dao.fetchLinks(msgs.get(i), "publisher");
+
+			// **********下面是详情~~~~~~~~~~~~~~~~
 			// 加载点赞者
-			dao.fetchLinks(msgs.get(i), "praises", Cnd.orderBy().desc("date"));
+			// dao.fetchLinks(msgs.get(i), "praises",
+			// Cnd.orderBy().desc("date"));
 			// 加载评论者
-			dao.fetchLinks(msgs.get(i), "comments", Cnd.orderBy().desc("date"));
+			// dao.fetchLinks(msgs.get(i), "comments",
+			// Cnd.orderBy().desc("date"));
 			// 加载每条评论的父评论
-			for (int j = 0; j < msgs.get(i).getComments().size(); j++) {
-				dao.fetchLinks(msgs.get(i).getComments().get(j),
-						"fatherCommenter");
-			}
+			// for (int j = 0; j < msgs.get(i).getComments().size(); j++) {
+			// dao.fetchLinks(msgs.get(i).getComments().get(j),
+			// "fatherCommenter");
+			// }
 		}
 		return new QueryResult(msgs, page);
 	}
@@ -193,20 +234,48 @@ public class MessageService {
 		// dao.fetchLinks(user, "myMessages", Cnd.orderBy().desc("date"));
 		page.setRecordCount(dao.count(Message.class,
 				Cnd.where("publisherId", "=", user.getId())));
-		Message msg;
-		List<Message> results = new ArrayList<Message>();
-		for (int i = 0; i < msgs.size(); i++) {
-			// 加载点赞者
-			dao.fetchLinks(msgs.get(i), "praises", Cnd.orderBy().desc("date"));
-			// 加载评论者
-			dao.fetchLinks(msgs.get(i), "comments", Cnd.orderBy().desc("date"));
-			// 加载每条评论的父评论
-			for (int j = 0; j < msgs.get(i).getComments().size(); j++) {
-				dao.fetchLinks(msgs.get(i).getComments().get(j),
-						"fatherCommenter");
+
+		// **********下面是详情~~~~~~~~~~~~~~~~
+		// for (int i = 0; i < msgs.size(); i++) {
+		// 加载点赞者
+		// dao.fetchLinks(msgs.get(i), "praises",
+		// Cnd.orderBy().desc("date"));
+		// 加载评论者
+		// dao.fetchLinks(msgs.get(i), "comments",
+		// Cnd.orderBy().desc("date"));
+		// 加载每条评论的父评论
+		// for (int j = 0; j < msgs.get(i).getComments().size(); j++) {
+		// dao.fetchLinks(msgs.get(i).getComments().get(j),
+		// "fatherCommenter");
+		// }
+		// }
+		return new QueryResult(msgs, page);
+	}
+
+	/**
+	 * 获取留言详情
+	 * 
+	 * @param msg
+	 * @return
+	 */
+	public Message getDetails(Message msg) {
+		msg = dao.fetch(Message.class, msg.getId());
+		dao.fetchLinks(msg, "publisher");// 加载发表者信息
+		dao.fetchLinks(msg, "praises");// 加载点赞信息
+		for (int i = 0; i < msg.getPraises().size(); i++) {
+			// 加载点赞的点赞者信息
+			dao.fetchLinks(msg.getPraises().get(i), "praiser");
+		}
+		dao.fetchLinks(msg, "comments");// 加载评论
+		for (int i = 0; i < msg.getComments().size(); i++) {
+			// 加载评论者的信息
+			dao.fetchLinks(msg.getComments().get(i), "commenter");
+			if (!Strings.isBlank(msg.getComments().get(i)
+					.getFatherCommenterId())) {// 加载父评论者的信息
+				dao.fetchLinks(msg.getComments().get(i), "fatherCommenter");
 			}
 		}
-		return new QueryResult(msgs, page);
+		return msg;
 	}
 
 }

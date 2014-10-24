@@ -48,7 +48,7 @@ public class UserModule {
 		if (Strings.isBlank(code) || Strings.isBlank(pass)) {
 			ActionMessage am = new ActionMessage();
 			am.setMessage("用户不存在或者密码错误");
-			am.setType(ActionMessage.ACCOUNT_FAIL);
+			am.setType(ActionMessage.Account_Fail);
 			return am;
 		}
 		code = code.trim();
@@ -57,7 +57,7 @@ public class UserModule {
 		if (user == null) {
 			ActionMessage am = new ActionMessage();
 			am.setMessage("用户名不存在或者密码错误");
-			am.setType(ActionMessage.ACCOUNT_FAIL);
+			am.setType(ActionMessage.Account_Fail);
 			return am;
 		}
 		session.setAttribute("t_user", user);// 登录用户信息

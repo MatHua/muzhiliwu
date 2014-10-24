@@ -26,6 +26,8 @@ public class Share extends IdEntity {
 	@One(target = User.class, field = "fromerId")
 	private User fromer;// 收藏来源者
 
+	@Column
+	private int commentNum;// 评论数
 	@Many(target = ShareComment.class, field = "shareId")
 	private List<ShareComment> comments;// 该分享的所有评论
 
@@ -149,6 +151,14 @@ public class Share extends IdEntity {
 
 	public void setCollectNum(int collectNum) {
 		this.collectNum = collectNum;
+	}
+
+	public int getCommentNum() {
+		return commentNum;
+	}
+
+	public void setCommentNum(int commentNum) {
+		this.commentNum = commentNum;
 	}
 
 }

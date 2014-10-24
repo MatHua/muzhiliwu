@@ -8,8 +8,8 @@ import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_mess_unread_reply")
 public class MessUnreadReply extends IdEntity {
-	public static final String NUREAD = "unread";// 未读
-	public static final String READ = "read";// 已读
+	public static final String Nuread = "unread";// 未读
+	public static final String Read = "read";// 已读
 
 	@Column
 	private String receiverId;// 接收者id,用于联结"t_user"表

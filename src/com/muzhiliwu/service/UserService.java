@@ -3,6 +3,8 @@ package com.muzhiliwu.service;
 import java.io.File;
 import java.io.IOException;
 
+import javax.servlet.http.HttpSession;
+
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -99,7 +101,7 @@ public class UserService {
 			user.setId(NumGenerator.getUuid());// 生成id
 			user.setPass(MD5.toMD5(pass.trim()));// 密码加密
 			user.setDate(DateUtils.now());// 注册时间
-			user.setPoints(Integral.INTEGRAL_FOR_NEW_USER);// 积分初始化
+			user.setIntegral(Integral.Integral_For_New_User);// 积分初始化
 			dao.insert(user);
 		} else {
 			User u = dao.fetch(User.class, Cnd.where("id", "=", user.getId()));
@@ -197,5 +199,25 @@ public class UserService {
 	public User getUserById(String id) {
 		User user = dao.fetch(User.class, id);
 		return user;
+	}
+
+	/**
+	 * 积分处理方法
+	 * 
+	 * @param user
+	 *            处理的用户
+	 * @param increment
+	 *            积分增量
+	 * @return
+	 */
+	public boolean okIntegral(User user, long increment, HttpSession session) {
+		user = dao.fetch(User.class, user.getId());
+		if (user.getIntegral() + increment < 0) {// 积分足够
+			user.setIntegral(user.getIntegral() + increment);
+			dao.update(user);
+			session.setAttribute("t_user", user);
+			return true;
+		}
+		return false;
 	}
 }

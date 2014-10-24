@@ -38,9 +38,15 @@ public class MessageModule {
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");//用来测试
-		if (messageService.publishOrUpdateMessage(publisher, msg)) {
+
+		String result = messageService.publishOrUpdateMessage(publisher, msg,
+				session);
+		if (ActionMessage.success.equals(result)) {// 发表成功
 			am.setMessage("留言发表成功~");
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.Not_Integral.equals(result)) {// 积分不够
+			am.setMessage("积分不够~");
+			am.setType(ActionMessage.Not_Integral);
 		}
 		return am;
 	}
@@ -118,10 +124,14 @@ public class MessageModule {
 		User commenter = (User) session.getAttribute("t_user");
 		// User commenter = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		if (messageService.commentMessage(msg, commenter, comment,
-				fatherCommenter)) {
+		String result = messageService.commentMessage(msg, commenter, comment,
+				fatherCommenter, session);
+		if (ActionMessage.success.equals(result)) {
 			am.setMessage("评论成功~");
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.Not_Integral.equals(result)) {
+			am.setMessage("积分不够~");
+			am.setType(ActionMessage.Not_Integral);
 		}
 		return am;
 	}

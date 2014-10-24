@@ -38,9 +38,14 @@ public class ShareModule {
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		if (shareService.publishOrUpdateShare(publisher, share)) {
+		String result = shareService.publishOrUpdateShare(publisher, share,
+				session);
+		if (ActionMessage.success.equals(result)) {
 			am.setMessage("分享发表成功~");
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.Not_Integral.equals(result)) {
+			am.setMessage("积分不够,不能发表~");
+			am.setType(ActionMessage.Not_Integral);
 		}
 		return am;
 	}
@@ -55,12 +60,17 @@ public class ShareModule {
 		// User collecter = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 		ActionMessage am = new ActionMessage();
-		if (shareService.collectShare(collecter, share, fromer)) {
+		String result = shareService.collectShare(collecter, share, fromer,
+				session);
+		if (ActionMessage.success.equals(result)) {
 			am.setMessage("收藏成功~");
 			am.setType(ActionMessage.success);
-		} else {
+		} else if (ActionMessage.fail.equals(result)) {
 			am.setMessage("已收藏,请不要重复操作~");
 			am.setType(ActionMessage.fail);
+		} else if (ActionMessage.Not_Integral.equals(result)) {
+			am.setMessage("积分不够,不能收藏~");
+			am.setType(ActionMessage.Not_Integral);
 		}
 		return am;
 	}
@@ -117,10 +127,14 @@ public class ShareModule {
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		ActionMessage am = new ActionMessage();
-		if (shareService.commentShare(share, commenter, comment,
-				fatherCommenter)) {
+		String result = shareService.commentShare(share, commenter, comment,
+				fatherCommenter, session);
+		if (ActionMessage.success.equals(result)) {
 			am.setMessage("评论成功~");
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.Not_Integral.equals(result)) {
+			am.setMessage("评论失败,积分不够~");
+			am.setType(ActionMessage.Not_Integral);
 		}
 		return am;
 	}

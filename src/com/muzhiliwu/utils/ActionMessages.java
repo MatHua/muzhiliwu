@@ -1,11 +1,13 @@
 package com.muzhiliwu.utils;
 
 public class ActionMessages {
-	public static final String fail = "0";
 	public static final String success = "1";
-	public static final String AUTH_CODE_FAIL = "2";// 验证码错误
-	public static final String ACCOUNT_FAIL = "3";// 用户名或密码错误
-	public static final String NOT_LOGIN = "4";// 没有登陆
+	public static final String fail = "0";
+	public static final String cancel = "2";// 取消
+	public static final String Not_Integral = "3";// 不够积分
+	public static final String Auth_Code_Fail = "4";// 验证码错误
+	public static final String Account_Fail = "5";// 用户名或密码错误
+	public static final String Not_Login = "6";// 没有登陆
 
 	private String type;
 	private String message;

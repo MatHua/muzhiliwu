@@ -14,6 +14,7 @@ public class Wish extends IdEntity {
 	// state
 	public static final String UNREALIZED = "unrealized";// 为实现愿望
 	public static final String REALIZED = "realized";// 已实现愿望
+
 	// type
 	public static final String Wish_Gift = "wish_gift";// 许愿要礼物
 	public static final String WIsh_Other = "wish_other";// 许愿非要礼物
@@ -30,10 +31,13 @@ public class Wish extends IdEntity {
 	@Column
 	private String state;// 许愿状态
 
-	@Many(target = WishPraise.class, field = "wishId")
-	private List<WishPraise> praises;// 便于记录点赞记录
 	@Column
 	private int praiseNum;// 点赞数
+	@Many(target = WishPraise.class, field = "wishId")
+	private List<WishPraise> praises;// 便于记录点赞记录
+
+	@Column
+	private int collectNum;// 收藏数
 	@Many(target = WishCollect.class, field = "wishId")
 	private List<WishCollect> collectes;// 便于记录愿望的收集者
 
@@ -110,6 +114,14 @@ public class Wish extends IdEntity {
 
 	public void setPraiseNum(int praiseNum) {
 		this.praiseNum = praiseNum;
+	}
+
+	public int getCollectNum() {
+		return collectNum;
+	}
+
+	public void setCollectNum(int collectNum) {
+		this.collectNum = collectNum;
 	}
 
 }
