@@ -51,6 +51,25 @@ public class MessageModule {
 		return am;
 	}
 
+	// 更新一条留言
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object update(@Param("::msg.") Message msg, HttpSession session) {
+		ActionMessage am = new ActionMessage();
+		User publisher = (User) session.getAttribute("t_user");
+		// User publisher = dao.fetch(User.class,
+		// "360c732435c84ab48ea16fe02b9ba420");//用来测试
+
+		String result = messageService.publishOrUpdateMessage(publisher, msg,
+				session);
+		if (ActionMessage.success.equals(result)) {// 发表成功
+			am.setMessage("留言修改成功~");
+			am.setType(ActionMessage.success);
+		}
+		return am;
+	}
+
 	// 获取某一页留言
 	@At
 	@Ok("json")
@@ -133,6 +152,17 @@ public class MessageModule {
 			am.setMessage("积分不够~");
 			am.setType(ActionMessage.Not_Integral);
 		}
+		return am;
+	}
+
+	// 获取留言的详细信息
+	@At
+	@Ok("json")
+	public Object detail(@Param("::msg.") Message msg) {
+		ActionMessage am = new ActionMessage();
+		am.setMessage("获取留言的详细信息~");
+		am.setObject(messageService.getDetails(msg));
+		am.setType(ActionMessage.success);
 		return am;
 	}
 }

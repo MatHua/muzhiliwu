@@ -34,7 +34,7 @@ public class Share extends IdEntity {
 	@Column
 	private int praiseNum;// 点赞数
 	@Many(target = SharePraise.class, field = "shareId")
-	private List<SharePraise> praisers;// 便于找到该分享的所有点赞者
+	private List<SharePraise> praises;// 便于找到该分享的所有点赞者
 
 	@Column
 	private int collectNum;// 被收藏数
@@ -71,14 +71,6 @@ public class Share extends IdEntity {
 
 	public void setComments(List<ShareComment> comments) {
 		this.comments = comments;
-	}
-
-	public List<SharePraise> getPraisers() {
-		return praisers;
-	}
-
-	public void setPraisers(List<SharePraise> praisers) {
-		this.praisers = praisers;
 	}
 
 	// public List<ShareCollect> getCollectes() {
@@ -159,6 +151,14 @@ public class Share extends IdEntity {
 
 	public void setCommentNum(int commentNum) {
 		this.commentNum = commentNum;
+	}
+
+	public List<SharePraise> getPraises() {
+		return praises;
+	}
+
+	public void setPraises(List<SharePraise> praises) {
+		this.praises = praises;
 	}
 
 }

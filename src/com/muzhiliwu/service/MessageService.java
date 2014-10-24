@@ -72,7 +72,7 @@ public class MessageService {
 	 * @return
 	 */
 	public boolean praiseMessage(Message msg, User praiser) {
-		if (okPraise(msg.getId(), praiser.getId())) {// 点赞
+		if (okPraise(msg, praiser)) {// 点赞
 			MessPraise praise = new MessPraise();
 			praise.setId(NumGenerator.getUuid());
 			praise.setDate(DateUtils.now());
@@ -106,20 +106,12 @@ public class MessageService {
 		dao.update(msg);
 	}
 
-	/**
-	 * 检查是否已点赞
-	 * 
-	 * @param messId
-	 *            留言的id
-	 * @param pariserId
-	 *            点赞者的id
-	 * @return
-	 */
-	public boolean okPraise(String messId, String praiserId) {
+	// 检查是否已点赞
+	public boolean okPraise(Message msg, User praiser) {
 		MessPraise praise = dao.fetch(
 				MessPraise.class,
-				Cnd.where("messId", "=", messId).and("praiserId", "=",
-						praiserId));
+				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
+						praiser.getId()));
 		return praise == null ? true : false;
 	}
 

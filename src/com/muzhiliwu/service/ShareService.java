@@ -74,13 +74,13 @@ public class ShareService {
 	 *            分享来源者
 	 * @return
 	 */
-	public String collectShare(User collecter, Share share, User fromer,
-			HttpSession session) {
+	public String collectShare(User collecter, Share share, HttpSession session) {
 		if (!userService.okIntegral(collecter,
 				Integral.Integral_For_Collect_Share, session)) {
 			return ActionMessage.Not_Integral;// 不够积分
 		}
 		if (okCollect(collecter, share)) {
+			// 模拟一次转载收藏
 			share = dao.fetch(Share.class, share.getId());
 			Share collect = new Share();
 			collect.setId(NumGenerator.getUuid());// 主键
@@ -90,7 +90,7 @@ public class ShareService {
 			collect.setContent(share.getContent());// 收藏的内容
 			collect.setType(Share.From_Other);// 分享的类型:来自收藏
 
-			collect.setFromerId(fromer.getId());// 收藏的来源者
+			collect.setFromerId(share.getSharerId());// 收藏的来源者
 			collect.setSharerId(collecter.getId());// 收藏者
 			collect.setCollectId(share.getId());// 收藏的分享对应的id
 
@@ -113,16 +113,8 @@ public class ShareService {
 		dao.update(share);
 	}
 
-	/**
-	 * 检查是否已经收藏
-	 * 
-	 * @param share
-	 *            一个分享
-	 * @param fromer
-	 *            分享来源
-	 * @return
-	 */
-	public boolean okCollect(User collecter, Share share) {
+	// 检查是否已经收藏
+	private boolean okCollect(User collecter, Share share) {
 		Share tmp = dao.fetch(
 				Share.class,
 				Cnd.where("sharerId", "=", collecter.getId()).and("collectId",
@@ -140,7 +132,7 @@ public class ShareService {
 	 * @return
 	 */
 	public boolean praiseShare(Share share, User praiser) {
-		if (okPraise(share.getId(), praiser.getId())) {// 点赞
+		if (okPraise(share, praiser)) {// 点赞
 			SharePraise praise = new SharePraise();
 			praise.setId(NumGenerator.getUuid());
 			praise.setDate(DateUtils.now());
@@ -175,20 +167,12 @@ public class ShareService {
 		dao.update(share);
 	}
 
-	/**
-	 * 检查是否已点赞
-	 * 
-	 * @param shareId
-	 *            留言的id
-	 * @param pariserId
-	 *            点赞者的id
-	 * @return
-	 */
-	public boolean okPraise(String shareId, String praiserId) {
+	// 检查是否已点赞
+	private boolean okPraise(Share share, User praiser) {
 		SharePraise praise = dao.fetch(
 				SharePraise.class,
-				Cnd.where("shareId", "=", shareId).and("praiserId", "=",
-						praiserId));
+				Cnd.where("shareId", "=", share.getId()).and("praiserId", "=",
+						praiser.getId()));
 		return praise == null ? true : false;
 	}
 
@@ -329,6 +313,36 @@ public class ShareService {
 	}
 
 	/**
+	 * 分享详情
+	 * 
+	 * @param share
+	 * @return
+	 */
+	public Share getDetail(Share share) {
+		share = dao.fetch(Share.class, share.getId());
+		dao.fetchLinks(share, "sharer");
+		if (!Strings.isBlank(share.getFromerId())) {
+			// 如果是收藏的,加载收藏的来源者
+			dao.fetchLinks(share, "fromer");
+		}
+		dao.fetchLinks(share, "praises");// 加载点赞信息
+		for (int i = 0; i < share.getPraises().size(); i++) {
+			// 加载点赞的点赞者信息
+			dao.fetchLinks(share.getPraises().get(i), "praiser");
+		}
+		dao.fetchLinks(share, "comments");// 加载评论
+		for (int i = 0; i < share.getComments().size(); i++) {
+			// 加载评论者的信息
+			dao.fetchLinks(share.getComments().get(i), "commenter");
+			if (!Strings.isBlank(share.getComments().get(i)
+					.getFatherCommenterId())) {// 加载父评论者的信息
+				dao.fetchLinks(share.getComments().get(i), "fatherCommenter");
+			}
+		}
+		return share;
+	}
+
+	/**
 	 * 取消收藏
 	 * 
 	 * @param collecter
@@ -336,7 +350,7 @@ public class ShareService {
 	 * @return
 	 */
 	public boolean cancelCollectShare(User collecter, Share share) {
-		if (okCancelCollect(collecter.getId(), share.getId())) {
+		if (okCancelCollect(collecter, share)) {
 			dao.delete(Share.class, share.getId());
 			return true;
 		}
@@ -344,13 +358,12 @@ public class ShareService {
 	}
 
 	// 判断这个是否为收藏的分享
-	private boolean okCancelCollect(String collecterId, String shareId) {
-		Share share = dao.fetch(Share.class, shareId);// 获取这条分享
+	private boolean okCancelCollect(User collecter, Share share) {
+		share = dao.fetch(Share.class, share.getId());// 获取这条分享
 		if (share != null && !Strings.isBlank(share.getCollectId())
-				&& share.getSharerId().equals(collecterId)) {
-			// 被收藏数-1
+				&& share.getSharerId().equals(collecter.getId())) {
 			Share collect = dao.fetch(Share.class, share.getCollectId());
-			collect.setCollectNum(collect.getCollectNum() - 1);
+			collect.setCollectNum(collect.getCollectNum() - 1);// 被收藏数-1
 			dao.update(collect);
 			return true;
 		}

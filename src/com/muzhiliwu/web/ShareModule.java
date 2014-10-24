@@ -50,18 +50,34 @@ public class ShareModule {
 		return am;
 	}
 
+	// 更新留言信息
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object update(@Param("::share.") Share share, HttpSession session) {
+		ActionMessage am = new ActionMessage();
+		User publisher = (User) session.getAttribute("t_user");
+		// User publisher = dao.fetch(User.class,
+		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+		String result = shareService.publishOrUpdateShare(publisher, share,
+				session);
+		if (ActionMessage.success.equals(result)) {
+			am.setMessage("留言更改成功~");
+			am.setType(ActionMessage.success);
+		}
+		return am;
+	}
+
 	// 收藏别人的的分享
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object collect(@Param("::share.") Share share,
-			@Param("::fromer.") User fromer, HttpSession session) {
+	public Object collect(@Param("::share.") Share share, HttpSession session) {
 		User collecter = (User) session.getAttribute("t_user");
 		// User collecter = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 		ActionMessage am = new ActionMessage();
-		String result = shareService.collectShare(collecter, share, fromer,
-				session);
+		String result = shareService.collectShare(collecter, share, session);
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("收藏成功~");
 			am.setType(ActionMessage.success);
@@ -183,5 +199,16 @@ public class ShareModule {
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
 		return ams;
+	}
+
+	// 获取分享详细内容
+	@At
+	@Ok("json")
+	public Object detail(@Param("::share.") Share share) {
+		ActionMessage am = new ActionMessage();
+		am.setMessage("获取分享详细内容~");
+		am.setObject(shareService.getDetail(share));
+		am.setType(ActionMessage.success);
+		return am;
 	}
 }

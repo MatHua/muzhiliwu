@@ -12,8 +12,8 @@ import org.nutz.dao.entity.annotation.Table;
 @Table("t_wish")
 public class Wish extends IdEntity {
 	// state
-	public static final String UNREALIZED = "unrealized";// 为实现愿望
-	public static final String REALIZED = "realized";// 已实现愿望
+	public static final String Unrealized = "unrealized";// 为实现愿望
+	public static final String Realized = "realized";// 已实现愿望
 
 	// type
 	public static final String Wish_Gift = "wish_gift";// 许愿要礼物
