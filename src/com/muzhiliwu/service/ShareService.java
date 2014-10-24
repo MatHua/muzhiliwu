@@ -250,6 +250,7 @@ public class ShareService {
 		page.setRecordCount(dao.count(Share.class));
 
 		for (int i = 0; i < shares.size(); i++) {
+			// 判断用户有没有收藏该分享
 			// 加载分享发表者
 			dao.fetchLinks(shares.get(i), "sharer");
 			// 如果该分享是收藏别人的,加载收藏的来源

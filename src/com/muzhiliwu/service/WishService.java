@@ -1,9 +1,13 @@
 package com.muzhiliwu.service;
 
+import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.QueryResult;
+import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
@@ -221,6 +225,56 @@ public class WishService {
 		// }
 		// }
 		return wish;
+	}
+
+	/**
+	 * 获取我的所有许愿
+	 * 
+	 * @param user
+	 * @param page
+	 * @return
+	 */
+	public QueryResult getMyWishes(User user, Pager page) {
+		List<Wish> wishes = dao
+				.query(Wish.class, Cnd.where("wisherId", "=", user.getId())
+						.orderBy().desc("date"), page);
+		page.setRecordCount(dao.count(Wish.class,
+				Cnd.where("wisherId", "=", user.getId())));
+
+		for (int i = 0; i < wishes.size(); i++) {
+			dao.fetchLinks(wishes.get(i), "wisher");
+
+			// **********下面是详情~~~~~~~~~~~~~~~~
+			// 加载点赞者
+			// 加载收藏者
+		}
+		return new QueryResult(wishes, page);
+	}
+
+	/**
+	 * 获取某一页许愿
+	 * 
+	 * @param page
+	 * @return
+	 */
+	public QueryResult getWishes(Pager page, User user) {
+		List<Wish> wishes = dao.query(Wish.class, Cnd.orderBy().desc("date"),
+				page);
+		page.setRecordCount(dao.count(Wish.class));
+
+		for (int i = 0; i < wishes.size(); i++) {
+			// 判断用户有没有收藏该分享
+			// 加载分享发表者
+			dao.fetchLinks(wishes.get(i), "wisher");
+
+			wishes.get(i).setCollected(false);
+			if (user != null) {// 还要判断该用户是否收藏过该分享
+				if (okCollect(user, wishes.get(i))) {
+					wishes.get(i).setCollected(true);
+				}
+			}
+		}
+		return new QueryResult(wishes, page);
 	}
 
 	/**

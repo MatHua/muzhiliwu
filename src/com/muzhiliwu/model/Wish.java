@@ -44,6 +44,8 @@ public class Wish extends IdEntity {
 	@One(target = User.class, field = "wisherId")
 	private User wisher;// 用于记录许愿者
 
+	private boolean collected;
+
 	public String getWisherId() {
 		return wisherId;
 	}
@@ -122,6 +124,14 @@ public class Wish extends IdEntity {
 
 	public void setCollectNum(int collectNum) {
 		this.collectNum = collectNum;
+	}
+
+	public boolean isCollected() {
+		return collected;
+	}
+
+	public void setCollected(boolean collected) {
+		this.collected = collected;
 	}
 
 }
