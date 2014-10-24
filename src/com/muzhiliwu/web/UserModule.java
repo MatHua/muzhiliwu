@@ -18,6 +18,7 @@ import org.nutz.mvc.filter.CheckSession;
 import org.nutz.mvc.upload.TempFile;
 import org.nutz.mvc.upload.UploadAdaptor;
 
+import com.alibaba.fastjson.JSONObject;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.service.UserService;
 import com.muzhiliwu.utils.ActionMessage;
@@ -28,18 +29,19 @@ public class UserModule {
 	@Inject
 	private UserService userService;
 
-	// @At
-	// public JSONObject login(String name, String pass) {
-	// User user = userService.checkUser(name, pass, true);
-	// JSONObject json = new JSONObject();
-	// if (user != null) {
-	// json.put("id", user.getId());
-	// json.put("name", user.getName());
-	// json.put("pass", user.getPass());
-	// json.put("mess", "这是敏姐");
-	// }
-	// return json;
-	// }
+	// 用来测试
+	@At
+	public JSONObject test(String name, String pass) {
+		User user = userService.checkUser(name, pass, true);
+		JSONObject json = new JSONObject();
+		if (user != null) {
+			json.put("id", user.getId());
+			json.put("name", user.getName());
+			json.put("pass", user.getPass());
+			json.put("mess", "这是敏姐");
+		}
+		return json;
+	}
 
 	@At
 	@Ok("json")

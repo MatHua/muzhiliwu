@@ -49,6 +49,8 @@ public class Share extends IdEntity {
 	@Column
 	private String collectId;// 记录收藏的分享id
 
+	public boolean collected;// 标记是否被当前用户收藏
+
 	public String getSharerId() {
 		return sharerId;
 	}
@@ -159,6 +161,14 @@ public class Share extends IdEntity {
 
 	public void setPraises(List<SharePraise> praises) {
 		this.praises = praises;
+	}
+
+	public boolean isCollected() {
+		return collected;
+	}
+
+	public void setCollected(boolean collected) {
+		this.collected = collected;
 	}
 
 }

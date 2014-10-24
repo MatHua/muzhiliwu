@@ -199,6 +199,7 @@ public class WishService {
 	 */
 	public Wish getDetail(Wish wish) {
 		wish = dao.fetch(Wish.class, wish.getId());
+		// 还要判断一下是否已经收藏~~~~~~~~~~~~~~~
 		dao.fetchLinks(wish, "wisher");
 		dao.fetchLinks(wish, "praises");// 加载点赞信息
 		for (int i = 0; i < wish.getPraises().size(); i++) {

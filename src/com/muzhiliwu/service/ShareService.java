@@ -256,6 +256,12 @@ public class ShareService {
 			if (Share.From_Other.equals(shares.get(i).getType())) {
 				dao.fetchLinks(shares.get(i), "fromer");
 			}
+			shares.get(i).setCollected(false);
+			if (user != null) {// 还要判断该用户是否收藏过该分享
+				if (okCollect(user, shares.get(i))) {
+					shares.get(i).setCollected(true);
+				}
+			}
 
 			// **********下面是详情~~~~~~~~~~~~~~~~
 			// 加载点赞者

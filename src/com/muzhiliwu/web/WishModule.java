@@ -65,4 +65,33 @@ public class WishModule {
 		return am;
 	}
 
+	// 获取愿望的详细信息
+	@At
+	@Ok("json")
+	public Object detail(@Param("::wish.") Wish wish) {
+		ActionMessage am = new ActionMessage();
+		am.setMessage("获取愿望的详细信息");
+		am.setObject(wishService.getDetail(wish));
+		am.setType(ActionMessage.success);
+		return am;
+	}
+
+	// 点赞或取消点赞
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object praise(@Param("::wish.") Wish wish, HttpSession session) {
+		ActionMessage am = new ActionMessage();
+		User praiser = (User) session.getAttribute("t_user");
+		// User praiser = dao
+		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+		if (wishService.praiseWish(wish, praiser)) {
+			am.setMessage("点赞成功~");
+			am.setType(ActionMessage.success);
+		} else {
+			am.setMessage("点赞取消成功~");
+			am.setType(ActionMessage.cancel);
+		}
+		return am;
+	}
 }
