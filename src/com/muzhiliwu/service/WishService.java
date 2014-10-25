@@ -12,10 +12,6 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 
-import com.muzhiliwu.model.MessPraise;
-import com.muzhiliwu.model.Message;
-import com.muzhiliwu.model.Share;
-import com.muzhiliwu.model.SharePraise;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.WishCollect;
@@ -45,7 +41,7 @@ public class WishService {
 	 */
 	public String publishOrUpdateWish(User publisher, Wish wish,
 			HttpSession session) {
-		if (Strings.isBlank(wish.getId())) {
+		if (Strings.isBlank(wish.getId())) {// 许愿
 			long increment = Wish.Wish_Gift.equals(wish.getType()) ? Integral.Integral_For_Publish_Gift_Wish
 					: Integral.Integral_For_Publish_No_Gift_Wish;
 			if (!userService.okIntegral(publisher, increment, session)) {
@@ -60,7 +56,7 @@ public class WishService {
 			wish.setCollectNum(0);// 被收藏数为0
 
 			dao.insert(wish);
-		} else {
+		} else {// 修改愿望
 			wish.setDate(DateUtils.now());
 			dao.update(wish);
 		}
@@ -100,7 +96,7 @@ public class WishService {
 				Cnd.where("wishId", "=", wish.getId()).and("praiserId", "=",
 						praiser.getId()));
 		if (praise != null) {
-			dao.delete(WishPraise.class, praise.getId());
+			dao.delete(praise);
 		}
 	}
 
@@ -201,9 +197,16 @@ public class WishService {
 	 * @param wish
 	 * @return
 	 */
-	public Wish getDetail(Wish wish) {
+	public Wish getDetail(Wish wish, User user) {
 		wish = dao.fetch(Wish.class, wish.getId());
 		// 还要判断一下是否已经收藏~~~~~~~~~~~~~~~
+		wish.setCollected(false);
+		// 判断用户有没有收藏该分享
+		if (user != null) {
+			if (!okCollect(user, wish)) {
+				wish.setCollected(true);
+			}
+		}
 		dao.fetchLinks(wish, "wisher");
 		dao.fetchLinks(wish, "praises");// 加载点赞信息
 		for (int i = 0; i < wish.getPraises().size(); i++) {
@@ -215,15 +218,10 @@ public class WishService {
 			// 获取所有收藏者信息
 			dao.fetchLinks(wish.getCollectes().get(i), "collecter");
 		}
-		// dao.fetchLinks(wish, "comments");// 加载评论
-		// for (int i = 0; i < wish.getComments().size(); i++) {
-		// // 加载评论者的信息
-		// dao.fetchLinks(wish.getComments().get(i), "commenter");
-		// if (!Strings.isBlank(wish.getComments().get(i)
-		// .getFatherCommenterId())) {// 加载父评论者的信息
-		// dao.fetchLinks(wish.getComments().get(i), "fatherCommenter");
-		// }
-		// }
+		// 还有一些详细信息
+		// 加载评论
+		// 加载评论者的信息
+		// 加载父评论者的信息
 		return wish;
 	}
 
@@ -234,7 +232,7 @@ public class WishService {
 	 * @param page
 	 * @return
 	 */
-	public QueryResult getMyWishes(User user, Pager page) {
+	public QueryResult getMyWishes(Pager page, User user) {
 		List<Wish> wishes = dao.query(Wish.class,
 				Cnd.where("wisherId", "=", user.getId()).desc("date"), page);
 		page.setRecordCount(dao.count(Wish.class,
@@ -242,12 +240,31 @@ public class WishService {
 
 		for (int i = 0; i < wishes.size(); i++) {
 			dao.fetchLinks(wishes.get(i), "wisher");
-
 			// **********下面是详情~~~~~~~~~~~~~~~~
 			// 加载点赞者
 			// 加载收藏者
 		}
 		return new QueryResult(wishes, page);
+	}
+
+	/**
+	 * 获取我收藏的愿望
+	 * 
+	 * @param page
+	 * @param user
+	 * @return
+	 */
+	public QueryResult getMyCollectWishes(Pager page, User user) {
+		List<WishCollect> collectes = dao.query(WishCollect.class,
+				Cnd.where("collecterId", "=", user.getId()), page);
+		page.setRecordCount(dao.count(WishCollect.class,
+				Cnd.where("collecterId", "=", user.getId())));
+		for (int i = 0; i < collectes.size(); i++) {
+			dao.fetchLinks(collectes.get(i), "collecter");
+			dao.fetchLinks(collectes.get(i), "wish");
+			dao.fetchLinks(collectes.get(i).getWish(), "wisher");
+		}
+		return new QueryResult(collectes, page);
 	}
 
 	/**
@@ -263,15 +280,14 @@ public class WishService {
 
 		for (int i = 0; i < wishes.size(); i++) {
 			// 判断用户有没有收藏该分享
-			// 加载分享发表者
-			dao.fetchLinks(wishes.get(i), "wisher");
-
 			wishes.get(i).setCollected(false);
-			if (user != null) {// 还要判断该用户是否收藏过该分享
-				if (okCollect(user, wishes.get(i))) {
+			if (user != null) {
+				if (!okCollect(user, wishes.get(i))) {
 					wishes.get(i).setCollected(true);
 				}
 			}
+			// 加载分享发表者
+			dao.fetchLinks(wishes.get(i), "wisher");
 		}
 		return new QueryResult(wishes, page);
 	}

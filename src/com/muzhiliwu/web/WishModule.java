@@ -3,6 +3,8 @@ package com.muzhiliwu.web;
 import javax.servlet.http.HttpSession;
 
 import org.nutz.dao.Dao;
+import org.nutz.dao.QueryResult;
+import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.mvc.annotation.At;
@@ -12,12 +14,12 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 
-import com.muzhiliwu.model.Share;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.WishCollect;
 import com.muzhiliwu.service.WishService;
 import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.ActionMessages;
 
 @IocBean
 @At("wish")
@@ -27,7 +29,7 @@ public class WishModule {
 	@Inject
 	private Dao dao;// 用于测试而已
 
-	// 许愿
+	// 许愿~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -49,7 +51,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 修改愿望
+	// 修改愿望~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -67,18 +69,19 @@ public class WishModule {
 		return am;
 	}
 
-	// 获取愿望的详细信息
+	// 获取愿望的详细信息~已测试
 	@At
 	@Ok("json")
-	public Object detail(@Param("::wish.") Wish wish) {
+	public Object detail(@Param("::wish.") Wish wish, HttpSession session) {
 		ActionMessage am = new ActionMessage();
 		am.setMessage("获取愿望的详细信息");
-		am.setObject(wishService.getDetail(wish));
+		User user = (User) session.getAttribute("t_user");
+		am.setObject(wishService.getDetail(wish, user));
 		am.setType(ActionMessage.success);
 		return am;
 	}
 
-	// 获取收藏的愿望的详细信息
+	// 获取收藏的愿望的详细信息~已测试
 	@At
 	@Ok("json")
 	public Object detail(@Param("::collect.") WishCollect collect) {
@@ -89,7 +92,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 点赞或取消点赞
+	// 点赞或取消点赞~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -108,7 +111,72 @@ public class WishModule {
 		return am;
 	}
 
-	// 收藏愿望
+	// 获取某一页许愿
+	@At
+	@Ok("json")
+	public Object list(int pageNum, HttpSession session) {
+		Pager page = new Pager();
+		pageNum = (pageNum <= 0) ? 1 : pageNum;
+		page.setPageNumber(pageNum);
+		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+
+		User user = (User) session.getAttribute("t_user");
+		QueryResult result = wishService.getWishes(page, user);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+
+		return ams;
+	}
+
+	// 获取我的许愿
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object mylist(int pageNum, HttpSession session) {
+		Pager page = new Pager();
+		pageNum = (pageNum <= 0) ? 1 : pageNum;
+		page.setPageNumber(pageNum);
+		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+
+		User user = (User) session.getAttribute("t_user");
+		QueryResult result = wishService.getMyWishes(page, user);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+
+		return ams;
+	}
+	
+	//获取我收藏的愿望
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object myCollectList(int pageNum, HttpSession session) {
+		Pager page = new Pager();
+		pageNum = (pageNum <= 0) ? 1 : pageNum;
+		page.setPageNumber(pageNum);
+		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+
+		User user = (User) session.getAttribute("t_user");
+		QueryResult result = wishService.getMyCollectWishes(page, user);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+
+		return ams;
+	}
+
+	// 收藏愿望~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -131,7 +199,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 取消收藏
+	// 取消收藏~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))

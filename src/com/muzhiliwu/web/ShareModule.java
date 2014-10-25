@@ -29,7 +29,7 @@ public class ShareModule {
 	@Inject
 	private Dao dao;// 用于测试而已
 
-	// 发表一条留言
+	// 发表一条留言~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -50,7 +50,7 @@ public class ShareModule {
 		return am;
 	}
 
-	// 更新留言信息
+	// 更新留言信息~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -68,7 +68,7 @@ public class ShareModule {
 		return am;
 	}
 
-	// 收藏别人的的分享
+	// 收藏别人的的分享~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -91,7 +91,7 @@ public class ShareModule {
 		return am;
 	}
 
-	// 取消收藏
+	// 取消收藏~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -111,7 +111,7 @@ public class ShareModule {
 		return am;
 	}
 
-	// 点赞或取消点赞
+	// 点赞或取消点赞~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -130,7 +130,7 @@ public class ShareModule {
 		return am;
 	}
 
-	// 评论一个分享或者评论别人的评论
+	// 评论一个分享或者评论别人的评论~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -155,7 +155,7 @@ public class ShareModule {
 		return am;
 	}
 
-	// 获取某一页留言
+	// 获取某一页留言~已测试
 	@At
 	@Ok("json")
 	public Object list(int pageNum, HttpSession session) {
@@ -175,7 +175,7 @@ public class ShareModule {
 		return ams;
 	}
 
-	// 获取用户的留言
+	// 获取用户的留言~已测试
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -201,13 +201,14 @@ public class ShareModule {
 		return ams;
 	}
 
-	// 获取分享详细内容
+	// 获取分享详细内容~已测试
 	@At
 	@Ok("json")
-	public Object detail(@Param("::share.") Share share) {
+	public Object detail(@Param("::share.") Share share, HttpSession session) {
 		ActionMessage am = new ActionMessage();
 		am.setMessage("获取分享详细内容~");
-		am.setObject(shareService.getDetail(share));
+		User user = (User) session.getAttribute("t_user");
+		am.setObject(shareService.getDetail(share, user));
 		am.setType(ActionMessage.success);
 		return am;
 	}
