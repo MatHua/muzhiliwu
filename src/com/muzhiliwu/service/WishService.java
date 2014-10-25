@@ -235,9 +235,8 @@ public class WishService {
 	 * @return
 	 */
 	public QueryResult getMyWishes(User user, Pager page) {
-		List<Wish> wishes = dao
-				.query(Wish.class, Cnd.where("wisherId", "=", user.getId())
-						.orderBy().desc("date"), page);
+		List<Wish> wishes = dao.query(Wish.class,
+				Cnd.where("wisherId", "=", user.getId()).desc("date"), page);
 		page.setRecordCount(dao.count(Wish.class,
 				Cnd.where("wisherId", "=", user.getId())));
 

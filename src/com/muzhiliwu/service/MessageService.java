@@ -155,16 +155,7 @@ public class MessageService {
 		dao.update(msg);
 	}
 
-	/**
-	 * 创建一条未读信息
-	 * 
-	 * @param commenter
-	 *            评论发表者
-	 * @param fatherCommenter
-	 *            被评论者
-	 * @param comment
-	 *            发表的评论
-	 */
+	// 创建一条未读信息
 	private void createUnreadReply(User commenter, User fatherCommenter,
 			MessComment comment) {
 		MessUnreadReply unread = new MessUnreadReply();
@@ -195,16 +186,8 @@ public class MessageService {
 
 			// **********下面是详情~~~~~~~~~~~~~~~~
 			// 加载点赞者
-			// dao.fetchLinks(msgs.get(i), "praises",
-			// Cnd.orderBy().desc("date"));
 			// 加载评论者
-			// dao.fetchLinks(msgs.get(i), "comments",
-			// Cnd.orderBy().desc("date"));
 			// 加载每条评论的父评论
-			// for (int j = 0; j < msgs.get(i).getComments().size(); j++) {
-			// dao.fetchLinks(msgs.get(i).getComments().get(j),
-			// "fatherCommenter");
-			// }
 		}
 		return new QueryResult(msgs, page);
 	}
@@ -219,28 +202,22 @@ public class MessageService {
 	 * @return
 	 */
 	public QueryResult getMyMessages(User user, Pager page) {
-		List<Message> msgs = dao.query(
-				Message.class,
-				Cnd.where("publisherId", "=", user.getId()).orderBy()
-						.desc("date"), page);
+		List<Message> msgs = dao.query(Message.class,
+				Cnd.where("publisherId", "=", user.getId()).desc("date"), page);
+		// .orderBy()
+		// .desc("date"), page
 		// dao.fetchLinks(user, "myMessages", Cnd.orderBy().desc("date"));
 		page.setRecordCount(dao.count(Message.class,
 				Cnd.where("publisherId", "=", user.getId())));
 
+		for (int i = 0; i < msgs.size(); i++) {
+			// 加载发表者
+			dao.fetchLinks(msgs.get(i), "publisher");
+		}
 		// **********下面是详情~~~~~~~~~~~~~~~~
-		// for (int i = 0; i < msgs.size(); i++) {
 		// 加载点赞者
-		// dao.fetchLinks(msgs.get(i), "praises",
-		// Cnd.orderBy().desc("date"));
 		// 加载评论者
-		// dao.fetchLinks(msgs.get(i), "comments",
-		// Cnd.orderBy().desc("date"));
 		// 加载每条评论的父评论
-		// for (int j = 0; j < msgs.get(i).getComments().size(); j++) {
-		// dao.fetchLinks(msgs.get(i).getComments().get(j),
-		// "fatherCommenter");
-		// }
-		// }
 		return new QueryResult(msgs, page);
 	}
 

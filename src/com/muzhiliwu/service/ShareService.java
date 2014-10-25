@@ -290,9 +290,8 @@ public class ShareService {
 	 * @return
 	 */
 	public QueryResult getMyShares(User user, Pager page) {
-		List<Share> shares = dao
-				.query(Share.class, Cnd.where("sharerId", "=", user.getId())
-						.orderBy().desc("date"), page);
+		List<Share> shares = dao.query(Share.class,
+				Cnd.where("sharerId", "=", user.getId()).desc("date"), page);
 		page.setRecordCount(dao.count(Share.class,
 				Cnd.where("sharerId", "=", user.getId())));
 
