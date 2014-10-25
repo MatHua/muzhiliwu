@@ -1,6 +1,12 @@
 package com.muzhiliwu.web;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,10 +24,10 @@ import org.nutz.mvc.filter.CheckSession;
 import org.nutz.mvc.upload.TempFile;
 import org.nutz.mvc.upload.UploadAdaptor;
 
-import com.alibaba.fastjson.JSONObject;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.service.UserService;
 import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.FileFilter;
 
 @IocBean
 @At("user")
@@ -30,19 +36,20 @@ public class UserModule {
 	private UserService userService;
 
 	// 用来测试
-	@At
-	public JSONObject test(String name, String pass) {
-		User user = userService.checkUser(name, pass, true);
-		JSONObject json = new JSONObject();
-		if (user != null) {
-			json.put("id", user.getId());
-			json.put("name", user.getName());
-			json.put("pass", user.getPass());
-			json.put("mess", "这是敏姐");
-		}
-		return json;
-	}
+	// @At
+	// public JSONObject test(String name, String pass) {
+	// User user = userService.checkUser(name, pass, true);
+	// JSONObject json = new JSONObject();
+	// if (user != null) {
+	// json.put("id", user.getId());
+	// json.put("name", user.getName());
+	// json.put("pass", user.getPass());
+	// json.put("mess", "这是敏姐");
+	// }
+	// return json;
+	// }
 
+	// 测试~测试通过
 	@At
 	@Ok("json")
 	public Object login(String code, String pass, HttpSession session,
@@ -79,12 +86,13 @@ public class UserModule {
 		return am;
 	}
 
-	// 几时检查用户输入的用户名是否已被注册
+	// 几时检查用户输入的用户名是否已被注册 ~测试通过
 	@At
 	@Ok("json")
-	public Object checkRepeat(String code) {
+	public Object checkRepeat(@Param("::user.") User user) {
 		ActionMessage am = new ActionMessage();
-		if (userService.checkRepeat(code)) {
+		if (userService.checkRepeat(user.getCode())) {
+			am.setMessage("该账号可用^_^");
 			am.setType(ActionMessage.success);
 		} else {
 			am.setType(ActionMessage.fail);
@@ -93,15 +101,11 @@ public class UserModule {
 		return am;
 	}
 
-	// 注册
+	// 注册 ~测试通过
 	@At
 	@Ok("json")
 	public Object regist(@Param("::user.") User user) {
 		ActionMessage am = new ActionMessage();
-		// if (user == null) {
-		// am.setMessage("null");
-		// return am;
-		// }
 		if (Strings.isBlank(user.getCode()) || Strings.isBlank(user.getPass())) {
 			am.setMessage("注册失败,账号或密码不能为空~");
 			am.setType(ActionMessage.fail);
@@ -117,7 +121,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 修改个人资料
+	// 修改个人资料 ~测试通过
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -133,16 +137,39 @@ public class UserModule {
 		return am;
 	}
 
-	// 退出登录
+	// 修改密码 ~测试通过
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object changePass(String oldPass, String newPass, HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+		// User user = new User();// 测试用的
+		// user.setId("673e21df955d4da5930910282fbfeaf2");
+		ActionMessage am = new ActionMessage();
+		if (userService.changePass(user, oldPass, newPass)) {
+			am.setMessage("密码修改成功~");
+			am.setType(ActionMessage.success);
+		} else {
+			am.setMessage("旧密码填写错误,修改密码未成功~");
+			am.setType(ActionMessage.fail);
+		}
+		return am;
+	}
+
+	// 退出登录 ~测试通过
 	@At
 	@Ok("json")
 	public Object logout(HttpSession session) {
-		session.removeAttribute("t_user");
+		if (session.getAttribute("t_user") != null) {
+			session.removeAttribute("t_user");
+		}
 		ActionMessage am = new ActionMessage();
+		am.setMessage("成功退出登录~");
 		am.setType(ActionMessage.success);
 		return am;
 	}
 
+	// 获取个人信息~测试通过
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -154,16 +181,59 @@ public class UserModule {
 		return am;
 	}
 
-	// 上传用户头像
+	// 上传用户头像~测试通过
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadUserPhoto(@Param("userpic") TempFile tfs, String code,
-			ServletContext context) {
-		userService.uploadPhoto(code, tfs, context.getRealPath("/"));
+	public Object uploadUserPhoto(@Param("userpic") TempFile tfs,
+			ServletContext context, HttpSession session) {
+		// User user = new User();
+		// user.setCode("xxx");// 用于测试
+		User user = (User) session.getAttribute("t_user");
+		boolean result = userService.uploadPhoto(user.getCode(), tfs,
+				context.getRealPath("/"));
 		ActionMessage am = new ActionMessage();
-		am.setType(ActionMessage.success);
+		if (result) {
+			am.setMessage("头像上传成功^_^");
+			am.setType(ActionMessage.success);
+			// am.setObject(context.getRealPath("/"));
+		} else {
+			am.setMessage("头像上传失败,原因可能由于用户不存在~");
+			am.setType(ActionMessage.fail);
+		}
 		return am;
+	}
+
+	// 获取用户头像~测试通过
+	@At
+	@Ok("void")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public void getUserPic(HttpServletResponse response, String code,
+			ServletContext context) throws IOException {
+		ServletOutputStream out = response.getOutputStream();// 获取输出流
+		response.setContentType("image/gif");
+		response.setHeader("Pragma", "No-cache");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setDateHeader("Expires", 0);
+
+		// 通过过滤查找图片
+		String regx = code + ".*";
+		File f2 = new File(context.getRealPath("/") + "/WEB-INF/userphoto/");
+
+		File[] s = f2.listFiles(new FileFilter(regx));
+		if (s == null || s.length <= 0) {
+			return;
+		}
+
+		InputStream fis = new FileInputStream(s[0]);
+		int i = fis.available();// 得到文件大小
+		byte buf[] = new byte[i];
+		int len = 0;
+		while ((len = fis.read(buf)) != -1) {
+			out.write(buf, 0, len);
+		}
+		out.close();
+		fis.close();
 	}
 }

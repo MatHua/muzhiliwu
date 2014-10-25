@@ -42,16 +42,13 @@ public class UserService {
 						convert ? md5.getMD5ofStr(pass) : pass));
 
 		// 获取未读的回复
-		getReply(user);
+		if (user != null)
+			getReply(user);
 		return user;
 	}
 
-	/**
-	 * 获取用户未读回复
-	 * 
-	 * @param user
-	 */
-	public void getReply(User user) {
+	// 获取用户未读回复
+	private void getReply(User user) {
 
 		// 获取未读的留言墙回复
 		dao.fetchLinks(user, "myMessUnreadReplies", Cnd.orderBy().desc("date"));
@@ -127,29 +124,25 @@ public class UserService {
 	 * @param newPass
 	 * @return
 	 */
-	public boolean updatePass(User user, String newPass) {
-		User u = dao.fetch(User.class, user.getId());
-		u.setPass(MD5.toMD5(newPass));
-		dao.update(u);
-		return true;
+	public boolean changePass(User user, String oldPass, String newPass) {
+		user = dao.fetch(User.class, user.getId());
+		if (checkPass(user, oldPass)) {
+			user.setPass(MD5.toMD5(newPass));
+			dao.update(user);
+			return true;
+		}
+		return false;
 	}
 
-	/**
-	 * 检查密码
-	 * 
-	 * @param user
-	 * @param olePass
-	 * @return
-	 */
-	public boolean checkPass(User user, String olePass) {
+	// 检查密码
+	private boolean checkPass(User user, String oldPass) {
 		MD5 md5 = new MD5();
-		User u = dao.fetch(User.class, user.getId());
 		if (user != null) {
-			if (md5.getMD5ofStr(olePass).equals(u.getPass())) {
+			if (md5.getMD5ofStr(oldPass).equals(user.getPass())) {
 				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	/**
@@ -159,36 +152,42 @@ public class UserService {
 	 * @param template
 	 * @param code
 	 */
-	public void uploadPhoto(String code, TempFile tfs, String template) {
-		template += "/WEB-INF/userphoto/";
-
-		// 如果对应的文件夹不存在,就创建该文件夹
-		Files.createDirIfNoExists(template);
-
-		// 获取文件后缀名
-		int beginIndex = tfs.getFile().getAbsolutePath().lastIndexOf(".");
-		String fileExt = tfs.getFile().getAbsolutePath().substring(beginIndex);
-
-		// 删除原来存在的头像
-		String regx = code + ".*";
-		File f2 = new File(template);
-		File[] s = f2.listFiles(new FileFilter(regx));
-		for (File file : s) {
-			Files.deleteFile(file);
-		}
-
-		// 上传新的头像文件
-		File f = new File(template + code + fileExt);
-		try {
-			Files.move(tfs.getFile(), f);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+	public boolean uploadPhoto(String code, TempFile tfs, String template) {
 		// 更新数据库信息
 		User u = getUserByCode(code);
-		u.setPhoto(code + fileExt);
-		dao.update(u);
+		if (u != null) {
+			template += "/WEB-INF/userphoto/";
+
+			// 如果对应的文件夹不存在,就创建该文件夹
+			Files.createDirIfNoExists(template);
+
+			// 获取文件后缀名
+			int beginIndex = tfs.getFile().getAbsolutePath().lastIndexOf(".");
+			String fileExt = tfs.getFile().getAbsolutePath()
+					.substring(beginIndex);
+
+			// 删除原来存在的头像
+			String regx = code + ".*";
+			File f2 = new File(template);
+			File[] s = f2.listFiles(new FileFilter(regx));
+			for (File file : s) {
+				Files.deleteFile(file);
+			}
+
+			// 上传新的头像文件
+			File f = new File(template + code + fileExt);
+			try {
+				Files.move(tfs.getFile(), f);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			u.setPhoto(code + fileExt);
+			dao.update(u);
+			return true;
+		}
+		return false;
+
 	}
 
 	private User getUserByCode(String code) {
