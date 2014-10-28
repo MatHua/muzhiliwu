@@ -158,11 +158,8 @@ public class ShareModule {
 	// 获取某一页留言~已测试
 	@At
 	@Ok("json")
-	public Object list(int pageNum, HttpSession session) {
-		Pager page = new Pager();
-		pageNum = (pageNum <= 0) ? 1 : pageNum;
-		page.setPageNumber(pageNum);
-		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+	public Object list(@Param("::page.") Pager page, HttpSession session) {
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
 		QueryResult result = shareService.getShares(page, user);
@@ -179,16 +176,13 @@ public class ShareModule {
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object mylist(int pageNum, HttpSession session) {
+	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
 		// User user = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		// 分页参数
-		Pager page = new Pager();
-		pageNum = (pageNum <= 0) ? 1 : pageNum;
-		page.setPageNumber(pageNum);
-		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 
 		QueryResult result = shareService.getMyShares(user, page);
 

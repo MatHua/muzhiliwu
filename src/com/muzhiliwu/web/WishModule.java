@@ -114,11 +114,8 @@ public class WishModule {
 	// 获取某一页许愿
 	@At
 	@Ok("json")
-	public Object list(int pageNum, HttpSession session) {
-		Pager page = new Pager();
-		pageNum = (pageNum <= 0) ? 1 : pageNum;
-		page.setPageNumber(pageNum);
-		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+	public Object list(@Param("::page.") Pager page, HttpSession session) {
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
 		QueryResult result = wishService.getWishes(page, user);
@@ -136,11 +133,8 @@ public class WishModule {
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object mylist(int pageNum, HttpSession session) {
-		Pager page = new Pager();
-		pageNum = (pageNum <= 0) ? 1 : pageNum;
-		page.setPageNumber(pageNum);
-		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
 		QueryResult result = wishService.getMyWishes(page, user);
@@ -153,16 +147,13 @@ public class WishModule {
 
 		return ams;
 	}
-	
-	//获取我收藏的愿望
+
+	// 获取我收藏的愿望
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object myCollectList(int pageNum, HttpSession session) {
-		Pager page = new Pager();
-		pageNum = (pageNum <= 0) ? 1 : pageNum;
-		page.setPageNumber(pageNum);
-		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+	public Object myCollectList(@Param("::page.") Pager page, HttpSession session) {
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
 		QueryResult result = wishService.getMyCollectWishes(page, user);

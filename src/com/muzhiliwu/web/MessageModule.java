@@ -73,11 +73,9 @@ public class MessageModule {
 	// 获取某一页留言~已测试
 	@At
 	@Ok("json")
-	public Object list(int pageNum) {
-		Pager page = new Pager();
-		pageNum = (pageNum <= 0) ? 1 : pageNum;
-		page.setPageNumber(pageNum);
-		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+	public Object list(@Param("::page.") Pager page) {
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+		// page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
 
 		QueryResult result = messageService.getMessages(page);
 
@@ -93,15 +91,12 @@ public class MessageModule {
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object mylist(int pageNum, HttpSession session) {
+	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
 		// User user = dao.fetch(User.class,
 		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
-		Pager page = new Pager();
-		pageNum = (pageNum <= 0) ? 1 : pageNum;
-		page.setPageNumber(pageNum);
-		page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 
 		QueryResult result = messageService.getMyMessages(user, page);
 
