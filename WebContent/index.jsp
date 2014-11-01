@@ -1,16 +1,48 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>Testing websockets</title>
 </head>
 <body>
-雅美蝶！
-<form action="http://localhost:8080/muzhiliwu/demo/saveDemo" method="post">
-<input type="text" name="name" />
-<input type="text" name="email"/>
-<input type="submit">
-</form>
-<img alt="" src="http://localhost:8080/muzhiliwu/user/getUserPic?code=xxx">
+  <div>
+    <input type="submit" value="Start" onclick="start()" />
+  </div>
+  <div id="messages"></div>
+  <script type="text/javascript">
+    var webSocket =
+      new WebSocket('ws://localhost:8080/muzhiliwu/websocket');
+    
+ 
+    webSocket.onerror = function(event) {
+      onError(event)
+    };
+ 
+    webSocket.onopen = function(event) {
+      onOpen(event)
+    };
+ 
+    webSocket.onmessage = function(event) {
+      onMessage(event)
+    };
+   
+    function onMessage(event) {
+      document.getElementById('messages').innerHTML
+        += '<br />' + event.data;
+    }
+    
+    function onOpen(event) {
+      document.getElementById('messages').innerHTML
+        = 'Connection established';
+    }
+   
+    function onError(event) {
+      alert(event.data);
+    }
+    
+    function start() {
+      webSocket.send('hello');
+      return true;
+    }
+  </script>
 </body>
 </html>

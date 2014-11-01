@@ -9,7 +9,7 @@ import org.nutz.dao.entity.annotation.Table;
 import com.muzhiliwu.model.User;
 
 @Table("t_receive_contact_way")
-public class ReceiveContactWay {
+public class ReceiveContactWay extends IdEntity {
 	@Column
 	private String creatorId;// 创建者id
 	@One(target = User.class, field = "creatorId")

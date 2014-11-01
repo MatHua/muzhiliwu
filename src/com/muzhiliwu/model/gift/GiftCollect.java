@@ -13,7 +13,7 @@ public class GiftCollect extends IdEntity {
 	@Column
 	private String collecterId;// 收藏者id
 
-	@One(target = User.class, field = "collectId")
+	@One(target = User.class, field = "collecterId")
 	private User collecter;// 收藏者
 
 	@One(target = Gift.class, field = "giftId")

@@ -5,7 +5,7 @@ import org.nutz.dao.entity.annotation.Table;
 
 //商品的一些具体参数,用户可以任意创建
 @Table("t_gift_param")
-public class GiftParam {
+public class GiftParam extends IdEntity {
 	@Column
 	private String giftId;// 商品id
 	@Column

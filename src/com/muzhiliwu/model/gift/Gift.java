@@ -12,7 +12,7 @@ import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_gift")
-public class Gift {
+public class Gift extends IdEntity {
 	private static final DecimalFormat df = new DecimalFormat("0.00");
 
 	@Column
