@@ -10,8 +10,13 @@ import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_shop")
 public class Shop extends IdEntity {
+	public static final String Entity_Shop = "entity_shop";// 实体店
+	public static final String Online_Store = "online_store";// 网店
+
 	@Column
 	private String shop_name;// 店名
+	@Column
+	private String shop_type;// 店类型
 	@Column
 	private String shop_boss;// 店主(负责人)
 	@Column
