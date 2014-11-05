@@ -161,4 +161,44 @@ public class MessageModule {
 		am.setType(ActionMessage.success);
 		return am;
 	}
+
+	// 获取@我的消息
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
+			HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+
+		QueryResult result = messageService.getMyUnreadPraiseReply(user, page);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+		return ams;
+	}
+
+	// 获取@我的评论类的消息
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
+			HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+
+		QueryResult result = messageService.getMyUnreadCommentReply(user, page);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+		return ams;
+	}
 }

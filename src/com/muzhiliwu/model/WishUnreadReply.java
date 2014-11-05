@@ -6,21 +6,16 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
-//分享的未读回复
-@Table("t_share_unread_reply")
-public class ShareUnreadReply extends IdEntity {
+@Table("t_wish_unread_reply")
+public class WishUnreadReply extends IdEntity {
 	public static final String Nuread = "unread";// 未读
 	public static final String Read = "read";// 已读
 
-	public static final String Comment = "comment";// 评论类未读信息
-	public static final String Praise = "praise";// 点赞类未读信息
 	public static final String Collect = "collect";// 收藏类未读信息
+	public static final String Praise = "praise";// 点赞类未读信息
 
 	@Column
 	private String receiverId;// 接收者id,用于联结"t_user"表
-	@Column
-	private String shareId;// 对应的分享的id
-	private String shareTitle;// 对应分享的标题
 
 	@Column
 	private String replierId;// 回复者id
@@ -83,22 +78,6 @@ public class ShareUnreadReply extends IdEntity {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public String getShareId() {
-		return shareId;
-	}
-
-	public void setShareId(String shareId) {
-		this.shareId = shareId;
-	}
-
-	public String getShareTitle() {
-		return shareTitle;
-	}
-
-	public void setShareTitle(String shareTitle) {
-		this.shareTitle = shareTitle;
 	}
 
 }
