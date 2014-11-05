@@ -69,6 +69,7 @@ public class AhoCorasick {
 			if (ch[u][c] == 0) {// 结点不存在
 				val[sz] = "";// 中间结点的附加信息为"",即为空
 				ch[u][c] = sz++;// 新建结点
+				// tmpStep++;
 			}
 			u = ch[u][c];
 		}
@@ -127,8 +128,9 @@ public class AhoCorasick {
 
 	public void lookStep() {
 		System.out.println(result);
+		System.out.println("关键词个数:" + result.size());
 		// System.out.println("插入步数:" + tmpStep);
-		// System.out.println("step:" + step + "\n" + result);
+		// System.out.println("step:" + step + "\n");
 	}
 
 	public Object[] lookResult() {
@@ -173,12 +175,18 @@ public class AhoCorasick {
 
 	public static void main(String[] args) {
 		AhoCorasick ac = new AhoCorasick();
-		String[] keys = { "男生", "女生", "运动型", "可爱型", "闷骚型", "天秤座", "处女座", "射手座",
-				"双鱼座", "狮子座", "巨蟹座", "摩羯座", "双子座", "金牛座", "水瓶座", "天蝎座", "白羊座",
-				"20岁", "30岁", "情人节" };
-		ac.insert(keys);
+		// String[] keys = { "男生", "女生", "运动型", "可爱型", "闷骚型", "天秤座", "处女座",
+		// "射手座",
+		// "双鱼座", "狮子座", "巨蟹座", "摩羯座", "双子座", "金牛座", "水瓶座", "天蝎座", "白羊座",
+		// "20岁", "30岁", "情人节" };
+		for (int i = 0; i < 1000; i++) {
+			ac.insert(String.valueOf(i).toCharArray(), "关键词" + i);
+		}
+		// ac.insert(keys);
 		ac.getFail();
-		ac.find("20岁双鱼座运动型男生情人节");
+		ac.find("122331898391743817812781738371".toCharArray());
+		System.out.println("122331898391743817812781738371".length());
+		// ac.find("20岁双鱼座运动型男生情人节");
 		ac.lookStep();
 	}
 }
