@@ -24,4 +24,53 @@ public class GiftCollectComment extends IdEntity {
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 评论内容
+
+	public String getCollectId() {
+		return collectId;
+	}
+
+	public void setCollectId(String collectId) {
+		this.collectId = collectId;
+	}
+
+	public String getCommenterId() {
+		return commenterId;
+	}
+
+	public void setCommenterId(String commenterId) {
+		this.commenterId = commenterId;
+	}
+
+	public User getCommenter() {
+		return commenter;
+	}
+
+	public void setCommenter(User commenter) {
+		this.commenter = commenter;
+	}
+
+	public String getFatherCommenterId() {
+		return fatherCommenterId;
+	}
+
+	public void setFatherCommenterId(String fatherCommenterId) {
+		this.fatherCommenterId = fatherCommenterId;
+	}
+
+	public User getFatherCommenter() {
+		return fatherCommenter;
+	}
+
+	public void setFatherCommenter(User fatherCommenter) {
+		this.fatherCommenter = fatherCommenter;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
 }

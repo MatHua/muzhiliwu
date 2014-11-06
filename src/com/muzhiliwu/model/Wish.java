@@ -41,10 +41,13 @@ public class Wish extends IdEntity {
 	@Many(target = WishCollect.class, field = "wishId")
 	private List<WishCollect> collectes;// 便于记录愿望的收集者
 
+	@Column
+	private int shareNum;// 分享数
+
 	@One(target = User.class, field = "wisherId")
 	private User wisher;// 用于记录许愿者
 
-	private boolean collected;
+	private boolean collected;// 标记是否已被收藏
 
 	public String getWisherId() {
 		return wisherId;
@@ -132,6 +135,14 @@ public class Wish extends IdEntity {
 
 	public void setCollected(boolean collected) {
 		this.collected = collected;
+	}
+
+	public int getShareNum() {
+		return shareNum;
+	}
+
+	public void setShareNum(int shareNum) {
+		this.shareNum = shareNum;
 	}
 
 }

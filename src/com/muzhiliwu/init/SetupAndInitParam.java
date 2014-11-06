@@ -27,6 +27,11 @@ public class SetupAndInitParam implements Setup {
 				dao.create(klass, false);
 			}
 		}
+		for (Class<?> klass : Scans.me().scanPackage("com.muzhiliwu.model.gift")) {
+			if (null != klass.getAnnotation(Table.class)) {
+				dao.create(klass, false);
+			}
+		}
 	}
 
 }

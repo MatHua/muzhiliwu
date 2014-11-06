@@ -29,4 +29,69 @@ public class GiftCollect extends IdEntity {
 	private int praiseNum;// 点赞数
 	@Many(target = GiftCollectPraise.class, field = "collectId")
 	private List<GiftCollectPraise> praises;// 点赞
+
+	public String getCollectorId() {
+		return collectorId;
+	}
+
+	public void setCollectorId(String collectorId) {
+		this.collectorId = collectorId;
+	}
+
+	public User getCollector() {
+		return collector;
+	}
+
+	public void setCollector(User collector) {
+		this.collector = collector;
+	}
+
+	public String getGiftId() {
+		return giftId;
+	}
+
+	public void setGiftId(String giftId) {
+		this.giftId = giftId;
+	}
+
+	public Gift getCollect() {
+		return collect;
+	}
+
+	public void setCollect(Gift collect) {
+		this.collect = collect;
+	}
+
+	public int getCommentNum() {
+		return commentNum;
+	}
+
+	public void setCommentNum(int commentNum) {
+		this.commentNum = commentNum;
+	}
+
+	public List<GiftCollectComment> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<GiftCollectComment> comments) {
+		this.comments = comments;
+	}
+
+	public int getPraiseNum() {
+		return praiseNum;
+	}
+
+	public void setPraiseNum(int praiseNum) {
+		this.praiseNum = praiseNum;
+	}
+
+	public List<GiftCollectPraise> getPraises() {
+		return praises;
+	}
+
+	public void setPraises(List<GiftCollectPraise> praises) {
+		this.praises = praises;
+	}
+
 }

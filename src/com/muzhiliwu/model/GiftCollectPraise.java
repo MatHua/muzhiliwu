@@ -13,4 +13,29 @@ public class GiftCollectPraise extends IdEntity {
 	private String praiserId;
 	@One(target = User.class, field = "praiserId")
 	private User praiser;// 便于记录点赞者信息
+
+	public String getCollectId() {
+		return collectId;
+	}
+
+	public void setCollectId(String collectId) {
+		this.collectId = collectId;
+	}
+
+	public String getPraiserId() {
+		return praiserId;
+	}
+
+	public void setPraiserId(String praiserId) {
+		this.praiserId = praiserId;
+	}
+
+	public User getPraiser() {
+		return praiser;
+	}
+
+	public void setPraiser(User praiser) {
+		this.praiser = praiser;
+	}
+
 }

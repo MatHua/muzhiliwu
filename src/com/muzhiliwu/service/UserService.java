@@ -47,39 +47,6 @@ public class UserService {
 		return user;
 	}
 
-	// 获取用户未读回复
-	private void getReply(User user) {
-
-		// 获取未读的留言墙回复
-		dao.fetchLinks(user, "myMessUnreadReplies", Cnd.orderBy().desc("date"));
-		MessUnreadReply messReply;
-		for (int i = 0; i < user.getMyMessUnreadReplies().size(); i++) {
-			// 获取回复者信息
-			dao.fetchLinks(user.getMyMessUnreadReplies().get(i), "replier");
-		}
-		// 获取未读的分享墙回复
-		dao.fetchLinks(user, "myShareUnreadReplies");
-		ShareUnreadReply shareReply;
-		for (int i = 0; i < user.getMyShareUnreadReplies().size(); i++) {
-			// 获取回复者信息
-			dao.fetchLinks(user.getMyShareUnreadReplies().get(i), "replier");
-			// shareReply = user.getMyShareUnreadReplies().get(i);
-			// shareReply.setReplier(getUserById(shareReply.getReplierId()));
-		}
-
-		// dao.fetchLinks(user, "myMessages");
-		// dao.fetchLinks(user, "myMessComments", Cnd.orderBy().desc("date"));//
-		// 评论按时间降序
-
-		// dao.fetchLinks(user, "myWishes");
-		// dao.fetchLinks(user, "myWishCollectes");
-
-		// dao.fetchLinks(user, "myShares");
-		// dao.fetchLinks(user, "myShareCollectes");
-		// dao.fetchLinks(user, "myShareComments",
-		// Cnd.orderBy().desc("date"));// 评论按时间降序
-	}
-
 	/**
 	 * 注册或者更新用户信息
 	 * 
@@ -134,17 +101,6 @@ public class UserService {
 		return false;
 	}
 
-	// 检查密码
-	private boolean checkPass(User user, String oldPass) {
-		MD5 md5 = new MD5();
-		if (user != null) {
-			if (md5.getMD5ofStr(oldPass).equals(user.getPass())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * 上传头像
 	 * 
@@ -190,11 +146,6 @@ public class UserService {
 
 	}
 
-	private User getUserByCode(String code) {
-		User user = dao.fetch(User.class, Cnd.where("code", "=", code));
-		return user;
-	}
-
 	public User getUserById(String id) {
 		User user = dao.fetch(User.class, id);
 		return user;
@@ -218,5 +169,54 @@ public class UserService {
 			return true;
 		}
 		return false;
+	}
+
+	// 获取用户未读回复
+	private void getReply(User user) {
+
+		// 获取未读的留言墙回复
+		dao.fetchLinks(user, "myMessUnreadReplies", Cnd.orderBy().desc("date"));
+		MessUnreadReply messReply;
+		for (int i = 0; i < user.getMyMessUnreadReplies().size(); i++) {
+			// 获取回复者信息
+			dao.fetchLinks(user.getMyMessUnreadReplies().get(i), "replier");
+		}
+		// 获取未读的分享墙回复
+		dao.fetchLinks(user, "myShareUnreadReplies");
+		ShareUnreadReply shareReply;
+		for (int i = 0; i < user.getMyShareUnreadReplies().size(); i++) {
+			// 获取回复者信息
+			dao.fetchLinks(user.getMyShareUnreadReplies().get(i), "replier");
+			// shareReply = user.getMyShareUnreadReplies().get(i);
+			// shareReply.setReplier(getUserById(shareReply.getReplierId()));
+		}
+
+		// dao.fetchLinks(user, "myMessages");
+		// dao.fetchLinks(user, "myMessComments", Cnd.orderBy().desc("date"));//
+		// 评论按时间降序
+
+		// dao.fetchLinks(user, "myWishes");
+		// dao.fetchLinks(user, "myWishCollectes");
+
+		// dao.fetchLinks(user, "myShares");
+		// dao.fetchLinks(user, "myShareCollectes");
+		// dao.fetchLinks(user, "myShareComments",
+		// Cnd.orderBy().desc("date"));// 评论按时间降序
+	}
+
+	// 检查密码
+	private boolean checkPass(User user, String oldPass) {
+		MD5 md5 = new MD5();
+		if (user != null) {
+			if (md5.getMD5ofStr(oldPass).equals(user.getPass())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private User getUserByCode(String code) {
+		User user = dao.fetch(User.class, Cnd.where("code", "=", code));
+		return user;
 	}
 }

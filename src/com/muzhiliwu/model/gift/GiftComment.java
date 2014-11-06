@@ -9,8 +9,8 @@ import org.nutz.dao.entity.annotation.Table;
 import com.muzhiliwu.model.User;
 
 //商品评价表
-@Table("t_gift_evaluate")
-public class GiftEvaluate extends IdEntity {
+@Table("t_gift_comment")
+public class GiftComment extends IdEntity {
 	public static final String Good = "good";// 好评
 	public static final String Bad = "bad";// 差评
 	public static final String Middle = "mid";// 中评
@@ -31,4 +31,61 @@ public class GiftEvaluate extends IdEntity {
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String reply;// 商家回复内容
+
+	public String getGiftId() {
+		return giftId;
+	}
+
+	public void setGiftId(String giftId) {
+		this.giftId = giftId;
+	}
+
+	public Gift getGift() {
+		return gift;
+	}
+
+	public void setGift(Gift gift) {
+		this.gift = gift;
+	}
+
+	public String getValuatorId() {
+		return valuatorId;
+	}
+
+	public void setValuatorId(String valuatorId) {
+		this.valuatorId = valuatorId;
+	}
+
+	public User getValuator() {
+		return valuator;
+	}
+
+	public void setValuator(User valuator) {
+		this.valuator = valuator;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getReply() {
+		return reply;
+	}
+
+	public void setReply(String reply) {
+		this.reply = reply;
+	}
+
 }

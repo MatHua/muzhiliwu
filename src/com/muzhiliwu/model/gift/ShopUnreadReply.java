@@ -1,4 +1,4 @@
-package com.muzhiliwu.model;
+package com.muzhiliwu.model.gift;
 
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
@@ -6,20 +6,23 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
-@Table("t_wish_unread_reply")
-public class WishUnreadReply extends IdEntity {
+import com.muzhiliwu.model.User;
+
+@Table("t_shop_unread_reply")
+public class ShopUnreadReply extends IdEntity {
 	public static final String Nuread = "unread";// 未读
 	public static final String Read = "read";// 已读
 
 	public static final String Collect = "collect";// 收藏类未读信息
 	public static final String Praise = "praise";// 点赞类未读信息
+	public static final String Comment = "comment";// 商品评价类未读信息
 
 	@Column
-	private String receiverId;// 接收者id,用于联结"t_user"表
+	private String shopId;// 店铺id,用于联结"t_shop"表
 
 	@Column
-	private String wishId;// 对应的许愿id
-	private String wishTitle;// 许愿的标题
+	private String giftId;// 被评价/点赞的商品的id
+	private String giftName;// 商品名称
 
 	@Column
 	private String replierId;// 回复者id
@@ -36,6 +39,30 @@ public class WishUnreadReply extends IdEntity {
 	@Column
 	private String type;// 未读消息类型
 
+	public String getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(String shopId) {
+		this.shopId = shopId;
+	}
+
+	public String getGiftId() {
+		return giftId;
+	}
+
+	public void setGiftId(String giftId) {
+		this.giftId = giftId;
+	}
+
+	public String getGiftName() {
+		return giftName;
+	}
+
+	public void setGiftName(String giftName) {
+		this.giftName = giftName;
+	}
+
 	public String getReplierId() {
 		return replierId;
 	}
@@ -50,14 +77,6 @@ public class WishUnreadReply extends IdEntity {
 
 	public void setReplier(User replier) {
 		this.replier = replier;
-	}
-
-	public String getReceiverId() {
-		return receiverId;
-	}
-
-	public void setReceiverId(String receiverId) {
-		this.receiverId = receiverId;
 	}
 
 	public String getContent() {
@@ -82,22 +101,6 @@ public class WishUnreadReply extends IdEntity {
 
 	public void setType(String type) {
 		this.type = type;
-	}
-
-	public String getWishId() {
-		return wishId;
-	}
-
-	public void setWishId(String wishId) {
-		this.wishId = wishId;
-	}
-
-	public String getWishTitle() {
-		return wishTitle;
-	}
-
-	public void setWishTitle(String wishTitle) {
-		this.wishTitle = wishTitle;
 	}
 
 }

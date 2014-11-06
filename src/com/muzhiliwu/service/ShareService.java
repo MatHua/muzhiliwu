@@ -106,20 +106,6 @@ public class ShareService {
 		return ActionMessage.fail;
 	}
 
-	// 给分享的发表者发送一条收藏类未读信息
-	private void createUnreadCollectReply(User collecter, Share share) {
-		ShareUnreadReply unread = new ShareUnreadReply();
-		unread.setDate(DateUtils.now());
-		unread.setId(NumGenerator.getUuid());
-		unread.setReceiverId(share.getSharerId());
-		unread.setReplierId(collecter.getId());
-		unread.setState(ShareUnreadReply.Nuread);
-
-		unread.setType(ShareUnreadReply.Collect);
-		unread.setShareId(share.getId());
-		dao.insert(unread);
-	}
-
 	/**
 	 * 取消收藏
 	 * 
@@ -134,23 +120,6 @@ public class ShareService {
 			return true;
 		}
 		return false;
-	}
-
-	// 删除对应的点赞信息
-	private void deleteUnreadCollectReply(User collecter, Share share) {
-		ShareUnreadReply reply = dao.fetch(
-				ShareUnreadReply.class,
-				Cnd.where("replierId", "=", collecter.getId())
-						.and("shareId", "=", share.getId())
-						.and("type", "=", ShareUnreadReply.Collect));
-		dao.delete(reply);
-	}
-
-	// 修改被收藏数
-	private void changeCollectNumber(Share share, int increment) {
-		share = dao.fetch(Share.class, share.getId());
-		share.setCollectNum(share.getCollectNum() + increment);
-		dao.update(share);
 	}
 
 	/**
@@ -182,33 +151,6 @@ public class ShareService {
 			deleteUnreadPraiseReply(praiser, share);// 给分享的发表者发送一条未读的点赞信息
 			return false;
 		}
-	}
-
-	// 删除点赞记录
-	private void deletePraise(Share share, User praiser) {
-		MessPraise praise = dao.fetch(
-				MessPraise.class,
-				Cnd.where("shareId", "=", share.getId()).and("praiserId", "=",
-						praiser.getId()));
-		if (praise != null) {
-			dao.delete(MessPraise.class, praise.getId());
-		}
-	}
-
-	// 点赞数增减
-	private void changePraiseNumber(Share share, int i) {
-		share = dao.fetch(Share.class, share.getId());
-		share.setPraiseNum(share.getPraiseNum() + i);
-		dao.update(share);
-	}
-
-	// 检查是否已点赞
-	private boolean okPraise(Share share, User praiser) {
-		SharePraise praise = dao.fetch(
-				SharePraise.class,
-				Cnd.where("shareId", "=", share.getId()).and("praiserId", "=",
-						praiser.getId()));
-		return praise == null ? true : false;
 	}
 
 	/**
@@ -243,78 +185,6 @@ public class ShareService {
 		changeCommentNumber(share, 1);// 评论数+1
 		dao.insert(comment);// 插入一条评论
 		return ActionMessage.success;
-	}
-
-	// 改变评论数
-	private void changeCommentNumber(Share share, int i) {
-		share = dao.fetch(Share.class, share.getId());
-		share.setCommentNum(share.getCommentNum() + i);
-		dao.update(share);
-	}
-
-	// 给父评论者创建一条未读信息
-	private void createUnreadCommentReply(User commenter, User fatherCommenter,
-			ShareComment comment, Share share) {
-		ShareUnreadReply unread = new ShareUnreadReply();
-		unread.setContent(comment.getContent());
-		unread.setDate(DateUtils.now());
-		unread.setId(NumGenerator.getUuid());
-		unread.setReceiverId(fatherCommenter.getId());
-		unread.setReplierId(commenter.getId());
-		unread.setState(ShareUnreadReply.Nuread);
-
-		unread.setType(ShareUnreadReply.Comment);
-		unread.setShareId(share.getId());
-		dao.insert(unread);
-	}
-
-	// 给消息发表者创建一条未读信息
-	private void createUnreadCommentReply(User commenter, ShareComment comment,
-			Share share) {
-		ShareUnreadReply unread = new ShareUnreadReply();
-		unread.setContent(comment.getContent());
-		unread.setDate(DateUtils.now());
-		unread.setId(NumGenerator.getUuid());
-		unread.setReceiverId(share.getSharerId());
-		unread.setReplierId(commenter.getId());
-		unread.setState(ShareUnreadReply.Nuread);
-
-		unread.setType(ShareUnreadReply.Comment);
-		unread.setShareId(share.getId());
-		dao.insert(unread);
-	}
-
-	// 给消息发表者创建一条未读点赞信息
-	private void createUnreadPraiseReply(User praiser, Share share) {
-		ShareUnreadReply unread = new ShareUnreadReply();
-		unread.setDate(DateUtils.now());
-		unread.setId(NumGenerator.getUuid());
-		unread.setReceiverId(share.getSharerId());
-		unread.setReplierId(praiser.getId());
-		unread.setState(ShareUnreadReply.Nuread);
-
-		unread.setType(ShareUnreadReply.Praise);
-		unread.setShareId(share.getId());
-		dao.insert(unread);
-	}
-
-	// 删除对应的点赞信息
-	private void deleteUnreadPraiseReply(User praiser, Share share) {
-		ShareUnreadReply reply = dao.fetch(
-				ShareUnreadReply.class,
-				Cnd.where("replierId", "=", praiser.getId())
-						.and("shareId", "=", share.getId())
-						.and("type", "=", ShareUnreadReply.Praise));
-		dao.delete(reply);
-	}
-
-	// 检查是否已经收藏
-	private boolean okCollect(User collecter, Share share) {
-		Share tmp = dao.fetch(
-				Share.class,
-				Cnd.where("sharerId", "=", collecter.getId()).and("collectId",
-						"=", share.getId()));
-		return tmp == null ? true : false;
 	}
 
 	/**
@@ -420,25 +290,6 @@ public class ShareService {
 		return share;
 	}
 
-	// 判断这个是否为收藏的分享
-	private boolean okCancelCollect(User collecter, Share share) {
-		share = dao.fetch(Share.class, share.getId());// 获取这条分享
-		if (share != null && !share.From_Other.equals(share.getType())
-				&& share.getSharerId().equals(collecter.getId())) {
-			Share collect = dao.fetch(Share.class, share.getCollectId());
-			collect.setCollectNum(collect.getCollectNum() - 1);// 被收藏数-1
-			dao.update(collect);
-			return true;
-		}
-		return false;
-	}
-
-	// 根据分享id获取分享的标题
-	private String getShareTitle(String id) {
-		Share share = dao.fetch(Share.class, id);
-		return share.getTitle();
-	}
-
 	/**
 	 * 获取@到自己的点赞类消息
 	 * 
@@ -527,5 +378,154 @@ public class ShareService {
 			reply.setShareTitle(getShareTitle(reply.getShareId()));// 获取被收藏分享墙的标题
 		}
 		return new QueryResult(replys, page);
+	}
+
+	// 给分享的发表者发送一条收藏类未读信息
+	private void createUnreadCollectReply(User collecter, Share share) {
+		ShareUnreadReply unread = new ShareUnreadReply();
+		unread.setDate(DateUtils.now());
+		unread.setId(NumGenerator.getUuid());
+		unread.setReceiverId(share.getSharerId());
+		unread.setReplierId(collecter.getId());
+		unread.setState(ShareUnreadReply.Nuread);
+
+		unread.setType(ShareUnreadReply.Collect);
+		unread.setShareId(share.getId());
+		dao.insert(unread);
+	}
+
+	// 判断这个是否为收藏的分享
+	private boolean okCancelCollect(User collecter, Share share) {
+		share = dao.fetch(Share.class, share.getId());// 获取这条分享
+		if (share != null && !share.From_Other.equals(share.getType())
+				&& share.getSharerId().equals(collecter.getId())) {
+			Share collect = dao.fetch(Share.class, share.getCollectId());
+			collect.setCollectNum(collect.getCollectNum() - 1);// 被收藏数-1
+			dao.update(collect);
+			return true;
+		}
+		return false;
+	}
+
+	// 根据分享id获取分享的标题
+	private String getShareTitle(String id) {
+		Share share = dao.fetch(Share.class, id);
+		return share.getTitle();
+	}
+
+	// 删除对应的点赞信息
+	private void deleteUnreadCollectReply(User collecter, Share share) {
+		ShareUnreadReply reply = dao.fetch(
+				ShareUnreadReply.class,
+				Cnd.where("replierId", "=", collecter.getId())
+						.and("shareId", "=", share.getId())
+						.and("type", "=", ShareUnreadReply.Collect));
+		dao.delete(reply);
+	}
+
+	// 修改被收藏数
+	private void changeCollectNumber(Share share, int increment) {
+		share = dao.fetch(Share.class, share.getId());
+		share.setCollectNum(share.getCollectNum() + increment);
+		dao.update(share);
+	}
+
+	// 删除点赞记录
+	private void deletePraise(Share share, User praiser) {
+		MessPraise praise = dao.fetch(
+				MessPraise.class,
+				Cnd.where("shareId", "=", share.getId()).and("praiserId", "=",
+						praiser.getId()));
+		if (praise != null) {
+			dao.delete(MessPraise.class, praise.getId());
+		}
+	}
+
+	// 点赞数增减
+	private void changePraiseNumber(Share share, int i) {
+		share = dao.fetch(Share.class, share.getId());
+		share.setPraiseNum(share.getPraiseNum() + i);
+		dao.update(share);
+	}
+
+	// 检查是否已点赞
+	private boolean okPraise(Share share, User praiser) {
+		SharePraise praise = dao.fetch(
+				SharePraise.class,
+				Cnd.where("shareId", "=", share.getId()).and("praiserId", "=",
+						praiser.getId()));
+		return praise == null ? true : false;
+	}
+
+	// 改变评论数
+	private void changeCommentNumber(Share share, int i) {
+		share = dao.fetch(Share.class, share.getId());
+		share.setCommentNum(share.getCommentNum() + i);
+		dao.update(share);
+	}
+
+	// 给父评论者创建一条未读信息
+	private void createUnreadCommentReply(User commenter, User fatherCommenter,
+			ShareComment comment, Share share) {
+		ShareUnreadReply unread = new ShareUnreadReply();
+		unread.setContent(comment.getContent());
+		unread.setDate(DateUtils.now());
+		unread.setId(NumGenerator.getUuid());
+		unread.setReceiverId(fatherCommenter.getId());
+		unread.setReplierId(commenter.getId());
+		unread.setState(ShareUnreadReply.Nuread);
+
+		unread.setType(ShareUnreadReply.Comment);
+		unread.setShareId(share.getId());
+		dao.insert(unread);
+	}
+
+	// 给消息发表者创建一条未读信息
+	private void createUnreadCommentReply(User commenter, ShareComment comment,
+			Share share) {
+		ShareUnreadReply unread = new ShareUnreadReply();
+		unread.setContent(comment.getContent());
+		unread.setDate(DateUtils.now());
+		unread.setId(NumGenerator.getUuid());
+		unread.setReceiverId(share.getSharerId());
+		unread.setReplierId(commenter.getId());
+		unread.setState(ShareUnreadReply.Nuread);
+
+		unread.setType(ShareUnreadReply.Comment);
+		unread.setShareId(share.getId());
+		dao.insert(unread);
+	}
+
+	// 给消息发表者创建一条未读点赞信息
+	private void createUnreadPraiseReply(User praiser, Share share) {
+		ShareUnreadReply unread = new ShareUnreadReply();
+		unread.setDate(DateUtils.now());
+		unread.setId(NumGenerator.getUuid());
+		unread.setReceiverId(share.getSharerId());
+		unread.setReplierId(praiser.getId());
+		unread.setState(ShareUnreadReply.Nuread);
+
+		unread.setType(ShareUnreadReply.Praise);
+		unread.setShareId(share.getId());
+		dao.insert(unread);
+	}
+
+	// 删除对应的点赞信息
+	private void deleteUnreadPraiseReply(User praiser, Share share) {
+		ShareUnreadReply reply = dao.fetch(
+				ShareUnreadReply.class,
+				Cnd.where("replierId", "=", praiser.getId())
+						.and("shareId", "=", share.getId())
+						.and("type", "=", ShareUnreadReply.Praise));
+		dao.delete(reply);
+	}
+
+	// 检查是否已经收藏
+	private boolean okCollect(User collecter, Share share) {
+		Share tmp = dao.fetch(
+				Share.class,
+				Cnd.where("sharerId", "=", collecter.getId()).and("collectId",
+						"=", share.getId()));
+		return tmp == null ? true : false;
 	}
 }

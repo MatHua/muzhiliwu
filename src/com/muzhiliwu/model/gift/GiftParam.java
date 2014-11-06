@@ -12,4 +12,29 @@ public class GiftParam extends IdEntity {
 	private String param_name;// 参数名
 	@Column
 	private String param_value;// 参数值
+
+	public String getGiftId() {
+		return giftId;
+	}
+
+	public void setGiftId(String giftId) {
+		this.giftId = giftId;
+	}
+
+	public String getParam_name() {
+		return param_name;
+	}
+
+	public void setParam_name(String param_name) {
+		this.param_name = param_name;
+	}
+
+	public String getParam_value() {
+		return param_value;
+	}
+
+	public void setParam_value(String param_value) {
+		this.param_value = param_value;
+	}
+
 }

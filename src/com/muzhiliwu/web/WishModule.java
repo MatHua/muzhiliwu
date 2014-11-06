@@ -69,6 +69,19 @@ public class WishModule {
 		return am;
 	}
 
+	// 将愿望分享到社交网站
+	@At
+	@Ok("json")
+	public Object share(@Param("::wish.") Wish wish) {
+		ActionMessage am = new ActionMessage();
+		String result = wishService.shareWish(wish);
+		if (ActionMessage.success.equals(result)) {
+			am.setMessage("愿望分享成功~");
+			am.setType(ActionMessage.success);
+		}
+		return am;
+	}
+
 	// 获取愿望的详细信息~已测试
 	@At
 	@Ok("json")
@@ -152,7 +165,8 @@ public class WishModule {
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object myCollectList(@Param("::page.") Pager page, HttpSession session) {
+	public Object myCollectList(@Param("::page.") Pager page,
+			HttpSession session) {
 		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
@@ -208,5 +222,45 @@ public class WishModule {
 			am.setType(ActionMessage.fail);
 		}
 		return am;
+	}
+
+	// 获取@我的点赞类消息
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
+			HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+
+		QueryResult result = wishService.getMyUnreadPraiseReply(user, page);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+		return ams;
+	}
+
+	// 获取@我的评论类的消息
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object getMyUnreadCollectReply(@Param("::page.") Pager page,
+			HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
+		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+
+		QueryResult result = wishService.getMyUnreadCollectReply(user, page);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+		return ams;
 	}
 }

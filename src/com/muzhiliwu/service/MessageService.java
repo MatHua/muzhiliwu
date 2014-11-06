@@ -91,33 +91,6 @@ public class MessageService {
 		}
 	}
 
-	// 删除点赞记录
-	private void deletePraise(Message msg, User praiser) {
-		MessPraise praise = dao.fetch(
-				MessPraise.class,
-				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
-						praiser.getId()));
-		if (praise != null) {
-			dao.delete(MessPraise.class, praise.getId());
-		}
-	}
-
-	// 点赞数增减
-	private void changePraiseNumber(Message msg, int i) {
-		msg = dao.fetch(Message.class, msg.getId());
-		msg.setPraiseNum(msg.getPraiseNum() + i);
-		dao.update(msg);
-	}
-
-	// 检查是否已点赞
-	public boolean okPraise(Message msg, User praiser) {
-		MessPraise praise = dao.fetch(
-				MessPraise.class,
-				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
-						praiser.getId()));
-		return praise == null ? true : false;
-	}
-
 	/**
 	 * 留言墙评论
 	 * 
@@ -150,68 +123,6 @@ public class MessageService {
 		changeCommentNumber(msg, 1);// 评论数+1
 		dao.insert(comment);// 插入一条评论
 		return ActionMessage.success;
-	}
-
-	// 改变评论数
-	private void changeCommentNumber(Message msg, int i) {
-		msg = dao.fetch(Message.class, msg.getId());
-		msg.setCommentNum(msg.getCommentNum() + i);
-		dao.update(msg);
-	}
-
-	// 创建一条未读的评论类信息~回复某人的评论
-	private void createUnreadCommentReply(User commenter, User fatherCommenter,
-			MessComment comment, Message msg) {
-		MessUnreadReply unread = new MessUnreadReply();
-		unread.setContent(comment.getContent());
-		unread.setDate(DateUtils.now());
-		unread.setId(NumGenerator.getUuid());
-		unread.setReceiverId(fatherCommenter.getId());
-		unread.setReplierId(commenter.getId());
-		unread.setState(MessUnreadReply.Nuread);
-
-		unread.setType(MessUnreadReply.Comment);
-		unread.setMessId(msg.getId());
-		dao.insert(unread);
-	}
-
-	// 创建一条未读的评论类信息~发送给留言的发表者
-	private void createUnreadCommentReply(User commenter, MessComment comment,
-			Message msg) {
-		MessUnreadReply unread = new MessUnreadReply();
-		unread.setContent(comment.getContent());
-		unread.setDate(DateUtils.now());
-		unread.setId(NumGenerator.getUuid());
-		unread.setReceiverId(msg.getPublisherId());
-		unread.setReplierId(commenter.getId());
-		unread.setState(MessUnreadReply.Nuread);
-
-		unread.setType(MessUnreadReply.Comment);
-		unread.setMessId(msg.getId());
-		dao.insert(unread);
-	}
-
-	// 创建一条未读的点赞类消息
-	private void createUnreadPraiseReply(User praiser, Message msg) {
-		MessUnreadReply unread = new MessUnreadReply();
-		unread.setDate(DateUtils.now());
-		unread.setId(NumGenerator.getUuid());
-		unread.setMessId(msg.getId());
-		unread.setReceiverId(msg.getPublisherId());
-		unread.setReplierId(praiser.getId());
-		unread.setState(MessUnreadReply.Nuread);
-		unread.setType(MessUnreadReply.Praise);
-		dao.insert(unread);
-	}
-
-	// 删除对应的未读的点赞类消息
-	private void deleteUnreadPraiseReply(User praiser, Message msg) {
-		MessUnreadReply reply = dao.fetch(
-				MessUnreadReply.class,
-				Cnd.where("replierId", "=", praiser.getId())
-						.and("messId", "=", msg.getId())
-						.and("type", "=", MessUnreadReply.Praise));
-		dao.delete(reply);
 	}
 
 	/**
@@ -293,12 +204,6 @@ public class MessageService {
 		return msg;
 	}
 
-	// 根据消息id获取消息的标题
-	private String getMessTitle(String id) {
-		Message msg = dao.fetch(Message.class, id);
-		return msg.getTitle();
-	}
-
 	/**
 	 * 获取@到自己的点赞类消息
 	 * 
@@ -359,4 +264,118 @@ public class MessageService {
 		return new QueryResult(replys, page);
 	}
 
+	/**
+	 * 删除一个留言
+	 * 
+	 * @param operator
+	 *            操作者
+	 * @param msg
+	 *            要被删除的留言
+	 * @return
+	 */
+	// public String deleteMessage(User operator, Message msg) {
+	// msg = dao.fetch(Message.class, msg.getId());
+	// if (msg.getPublisherId().equals(operator.getId())) {// 是发表者才能删
+	// dao.deleteLinks(msg, "praises");// 删除对应的点赞信息
+	// dao.deleteLinks(msg, "comments");// 删除对应的评论信息
+	// dao.delete(msg);
+	// return ActionMessage.success;
+	// }
+	// return ActionMessage.fail;
+	// }
+
+	// 删除点赞记录
+	private void deletePraise(Message msg, User praiser) {
+		MessPraise praise = dao.fetch(
+				MessPraise.class,
+				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
+						praiser.getId()));
+		if (praise != null) {
+			dao.delete(MessPraise.class, praise.getId());
+		}
+	}
+
+	// 点赞数增减
+	private void changePraiseNumber(Message msg, int i) {
+		msg = dao.fetch(Message.class, msg.getId());
+		msg.setPraiseNum(msg.getPraiseNum() + i);
+		dao.update(msg);
+	}
+
+	// 检查是否已点赞
+	private boolean okPraise(Message msg, User praiser) {
+		MessPraise praise = dao.fetch(
+				MessPraise.class,
+				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
+						praiser.getId()));
+		return praise == null ? true : false;
+	}
+
+	// 改变评论数
+	private void changeCommentNumber(Message msg, int i) {
+		msg = dao.fetch(Message.class, msg.getId());
+		msg.setCommentNum(msg.getCommentNum() + i);
+		dao.update(msg);
+	}
+
+	// 创建一条未读的评论类信息~回复某人的评论
+	private void createUnreadCommentReply(User commenter, User fatherCommenter,
+			MessComment comment, Message msg) {
+		MessUnreadReply unread = new MessUnreadReply();
+		unread.setContent(comment.getContent());
+		unread.setDate(DateUtils.now());
+		unread.setId(NumGenerator.getUuid());
+		unread.setReceiverId(fatherCommenter.getId());
+		unread.setReplierId(commenter.getId());
+		unread.setState(MessUnreadReply.Nuread);
+
+		unread.setType(MessUnreadReply.Comment);
+		unread.setMessId(msg.getId());
+		dao.insert(unread);
+	}
+
+	// 创建一条未读的评论类信息~发送给留言的发表者
+	private void createUnreadCommentReply(User commenter, MessComment comment,
+			Message msg) {
+		MessUnreadReply unread = new MessUnreadReply();
+		unread.setContent(comment.getContent());
+		unread.setDate(DateUtils.now());
+		unread.setId(NumGenerator.getUuid());
+		unread.setReceiverId(msg.getPublisherId());
+		unread.setReplierId(commenter.getId());
+		unread.setState(MessUnreadReply.Nuread);
+
+		unread.setType(MessUnreadReply.Comment);
+		unread.setMessId(msg.getId());
+		dao.insert(unread);
+	}
+
+	// 创建一条未读的点赞类消息
+	private void createUnreadPraiseReply(User praiser, Message msg) {
+		MessUnreadReply unread = new MessUnreadReply();
+		unread.setDate(DateUtils.now());
+		unread.setId(NumGenerator.getUuid());
+		unread.setMessId(msg.getId());
+		unread.setReceiverId(msg.getPublisherId());
+		unread.setReplierId(praiser.getId());
+		unread.setState(MessUnreadReply.Nuread);
+		unread.setType(MessUnreadReply.Praise);
+		dao.insert(unread);
+	}
+
+	// 删除对应的未读的点赞类消息
+	private void deleteUnreadPraiseReply(User praiser, Message msg) {
+		MessUnreadReply reply = dao.fetch(
+				MessUnreadReply.class,
+				Cnd.where("replierId", "=", praiser.getId())
+						.and("messId", "=", msg.getId())
+						.and("type", "=", MessUnreadReply.Praise));
+		dao.delete(reply);
+	}
+
+	// 根据消息id获取消息的标题
+	private String getMessTitle(String id) {
+		Message msg = dao.fetch(Message.class, id);
+		return msg.getTitle();
+	}
 }

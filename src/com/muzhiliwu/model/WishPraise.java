@@ -10,7 +10,7 @@ public class WishPraise extends IdEntity {
 	private String wishId;// 联结"t_wish"表
 
 	@Column
-	private String praiserId;
+	private String praiserId;// 点赞者id
 
 	@One(target = User.class, field = "praiserId")
 	private User praiser;// 便于记录点赞者信息

@@ -3,12 +3,12 @@ package com.muzhiliwu.model.gift;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
-@Table("t_gift_tag")
-public class GiftTag extends IdEntity {
+@Table("t_gift_size")
+public class GiftSize extends IdEntity {
 	@Column
-	private String giftId;// 礼品id
+	private String giftId;// 商品id
 	@Column
-	private String tagId;// 礼品的标签
+	private String size;// 商品尺寸
 
 	public String getGiftId() {
 		return giftId;
@@ -18,12 +18,12 @@ public class GiftTag extends IdEntity {
 		this.giftId = giftId;
 	}
 
-	public String getTagId() {
-		return tagId;
+	public String getSize() {
+		return size;
 	}
 
-	public void setTagId(String tagId) {
-		this.tagId = tagId;
+	public void setSize(String size) {
+		this.size = size;
 	}
 
 }

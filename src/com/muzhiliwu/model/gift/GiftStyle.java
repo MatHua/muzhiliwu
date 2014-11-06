@@ -12,7 +12,44 @@ public class GiftStyle extends IdEntity {
 	private String giftId;// 联结id
 
 	@Column
-	private String style_name;// 商品款式名
+	private String styleName;// 商品款式名
+
+	@Column
+	private float price;// 单价
+
 	@Many(target = GiftStylePic.class, field = "styleId")
-	private List<GiftStylePic> stylePics;
+	private List<GiftStylePic> stylePics;// 款式对应的图片
+
+	public String getGiftId() {
+		return giftId;
+	}
+
+	public void setGiftId(String giftId) {
+		this.giftId = giftId;
+	}
+
+	public List<GiftStylePic> getStylePics() {
+		return stylePics;
+	}
+
+	public void setStylePics(List<GiftStylePic> stylePics) {
+		this.stylePics = stylePics;
+	}
+
+	public String getStyleName() {
+		return styleName;
+	}
+
+	public void setStyleName(String styleName) {
+		this.styleName = styleName;
+	}
+
+	public float getPrice() {
+		return price;
+	}
+
+	public void setPrice(float price) {
+		this.price = price;
+	}
+
 }
