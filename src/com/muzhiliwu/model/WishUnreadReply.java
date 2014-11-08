@@ -19,6 +19,7 @@ public class WishUnreadReply extends IdEntity {
 
 	@Column
 	private String wishId;// 对应的许愿id
+	@Column
 	private String wishTitle;// 许愿的标题
 
 	@Column

@@ -154,10 +154,11 @@ public class MessageModule {
 	// 获取留言的详细信息
 	@At
 	@Ok("json")
-	public Object detail(@Param("::msg.") Message msg) {
+	public Object detail(@Param("::msg.") Message msg, HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
 		ActionMessage am = new ActionMessage();
 		am.setMessage("获取留言的详细信息~");
-		am.setObject(messageService.getDetails(msg));
+		am.setObject(messageService.getDetails(msg, user));
 		am.setType(ActionMessage.success);
 		return am;
 	}

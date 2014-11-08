@@ -19,12 +19,12 @@ public class GiftComment extends IdEntity {
 	private String giftId;// 被评价的礼品的id
 	@One(target = Gift.class, field = "giftId")
 	private Gift gift;// 被评价的礼品
-	
+
 	@Column
 	private String commenterId;// 评价发表者id
 	@One(target = User.class, field = "commenterId")
 	private User commenter;// 评价发表者者
-	
+
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 评价内容
@@ -33,6 +33,8 @@ public class GiftComment extends IdEntity {
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String reply;// 商家回复内容
+
+	private boolean isMeComment;// 标记是否是我评论的
 
 	public String getGiftId() {
 		return giftId;
@@ -88,6 +90,14 @@ public class GiftComment extends IdEntity {
 
 	public void setCommenter(User commenter) {
 		this.commenter = commenter;
+	}
+
+	public boolean isMeComment() {
+		return isMeComment;
+	}
+
+	public void setMeComment(boolean isMeComment) {
+		this.isMeComment = isMeComment;
 	}
 
 }

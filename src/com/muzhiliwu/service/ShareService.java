@@ -177,7 +177,8 @@ public class ShareService {
 		comment.setDate(DateUtils.now());
 		comment.setShareId(share.getId());// 联结id
 		// 如果父评论存在,则为父评论插入子评论
-		if (!Strings.isBlank(fatherCommenter.getId())) {
+		if (fatherCommenter != null
+				&& !Strings.isBlank(fatherCommenter.getId())) {
 			comment.setFatherCommenterId(fatherCommenter.getId());
 			createUnreadCommentReply(commenter, fatherCommenter, comment, share);// 给父评论者发送一条未读信息
 		}
@@ -198,6 +199,10 @@ public class ShareService {
 				page);
 		page.setRecordCount(dao.count(Share.class));
 
+		// 加载分享发表者
+		dao.fetchLinks(shares, "sharer");
+		// 如果该分享是收藏别人的,加载收藏的来源
+		dao.fetchLinks(shares, "fromer");
 		for (int i = 0; i < shares.size(); i++) {
 			shares.get(i).setCollected(false);
 			// 判断用户有没有收藏该分享
@@ -206,13 +211,6 @@ public class ShareService {
 					shares.get(i).setCollected(true);
 				}
 			}
-			// 加载分享发表者
-			dao.fetchLinks(shares.get(i), "sharer");
-			// 如果该分享是收藏别人的,加载收藏的来源
-			if (Share.From_Other.equals(shares.get(i).getType())) {
-				dao.fetchLinks(shares.get(i), "fromer");
-			}
-
 			// **********下面是详情~~~~~~~~~~~~~~~~
 			// 加载点赞者
 			// 加载评论者
@@ -236,18 +234,13 @@ public class ShareService {
 		page.setRecordCount(dao.count(Share.class,
 				Cnd.where("sharerId", "=", user.getId())));
 
-		for (int i = 0; i < shares.size(); i++) {
-			dao.fetchLinks(shares.get(i), "sharer");
-			// 如果该分享是收藏别人的,加载收藏的来源
-			if (Share.From_Other.equals(shares.get(i).getType())) {
-				dao.fetchLinks(shares.get(i), "fromer");
-			}
-
-			// **********下面是详情~~~~~~~~~~~~~~~~
-			// 加载点赞者
-			// 加载评论者
-			// 加载每条评论的父评论
-		}
+		dao.fetchLinks(shares, "sharer");
+		// 如果该分享是收藏别人的,加载收藏的来源
+		dao.fetchLinks(shares, "fromer");
+		// **********下面是详情~~~~~~~~~~~~~~~~
+		// 加载点赞者
+		// 加载评论者
+		// 加载每条评论的父评论
 		return new QueryResult(shares, page);
 	}
 
@@ -274,17 +267,22 @@ public class ShareService {
 			dao.fetchLinks(share, "fromer");
 		}
 		dao.fetchLinks(share, "praises");// 加载点赞信息
-		for (int i = 0; i < share.getPraises().size(); i++) {
-			// 加载点赞的点赞者信息
-			dao.fetchLinks(share.getPraises().get(i), "praiser");
-		}
-		dao.fetchLinks(share, "comments");// 加载评论
+
+		// 加载点赞的点赞者信息
+		dao.fetchLinks(share.getPraises(), "praiser");
+		// 加载评论
+		dao.fetchLinks(share, "comments");
+		// 加载评论者的信息
+		dao.fetchLinks(share.getComments(), "commenter");
+		// 加载父评论者的信息
+		dao.fetchLinks(share.getComments(), "fatherCommenter");
 		for (int i = 0; i < share.getComments().size(); i++) {
-			// 加载评论者的信息
-			dao.fetchLinks(share.getComments().get(i), "commenter");
-			if (!Strings.isBlank(share.getComments().get(i)
-					.getFatherCommenterId())) {// 加载父评论者的信息
-				dao.fetchLinks(share.getComments().get(i), "fatherCommenter");
+			// 判断这条评论是否是本人发出的
+			share.getComments().get(i).setMeComment(false);
+			if (user != null
+					&& share.getComments().get(i).getCommenterId()
+							.equals(user.getId())) {
+				share.getComments().get(i).setMeComment(true);
 			}
 		}
 		return share;
@@ -312,11 +310,8 @@ public class ShareService {
 				Cnd.where("receiverId", "=", user.getId())
 						.and("type", "=", ShareUnreadReply.Praise)
 						.and("state", "=", ShareUnreadReply.Nuread)));
-		// 获取相应的联结信息
-		for (ShareUnreadReply reply : replys) {
-			dao.fetchLinks(reply, "replier");// 加载消息发出者
-			reply.setShareTitle(getShareTitle(reply.getShareId()));// 获取被点赞分享墙的标题
-		}
+		// 加载消息发出者
+		dao.fetchLinks(replys, "replier");
 		return new QueryResult(replys, page);
 	}
 
@@ -342,11 +337,9 @@ public class ShareService {
 				Cnd.where("receiverId", "=", user.getId())
 						.and("type", "=", ShareUnreadReply.Comment)
 						.and("state", "=", ShareUnreadReply.Nuread)));
-		// 获取相应的联结信息
-		for (ShareUnreadReply reply : replys) {
-			dao.fetchLinks(reply, "replier");// 加载消息发出者
-			reply.setShareTitle(getShareTitle(reply.getShareId()));// 获取被评论分享墙的标题
-		}
+
+		// 加载消息发出者
+		dao.fetchLinks(replys, "replier");
 		return new QueryResult(replys, page);
 	}
 
@@ -372,11 +365,8 @@ public class ShareService {
 				Cnd.where("receiverId", "=", user.getId())
 						.and("type", "=", ShareUnreadReply.Collect)
 						.and("state", "=", ShareUnreadReply.Nuread)));
-		// 获取相应的联结信息
-		for (ShareUnreadReply reply : replys) {
-			dao.fetchLinks(reply, "replier");// 加载消息发出者
-			reply.setShareTitle(getShareTitle(reply.getShareId()));// 获取被收藏分享墙的标题
-		}
+
+		dao.fetchLinks(replys, "replier");// 加载消息发出者
 		return new QueryResult(replys, page);
 	}
 
@@ -408,10 +398,10 @@ public class ShareService {
 	}
 
 	// 根据分享id获取分享的标题
-	private String getShareTitle(String id) {
-		Share share = dao.fetch(Share.class, id);
-		return share.getTitle();
-	}
+	// private String getShareTitle(String id) {
+	// Share share = dao.fetch(Share.class, id);
+	// return share.getTitle();
+	// }
 
 	// 删除对应的点赞信息
 	private void deleteUnreadCollectReply(User collecter, Share share) {
@@ -477,12 +467,16 @@ public class ShareService {
 
 		unread.setType(ShareUnreadReply.Comment);
 		unread.setShareId(share.getId());
+		unread.setShareTitle(share.getTitle());
 		dao.insert(unread);
 	}
 
 	// 给消息发表者创建一条未读信息
 	private void createUnreadCommentReply(User commenter, ShareComment comment,
 			Share share) {
+		if (Strings.isBlank(share.getSharerId())) {
+			share = dao.fetch(Share.class, share.getId());
+		}
 		ShareUnreadReply unread = new ShareUnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
@@ -493,6 +487,7 @@ public class ShareService {
 
 		unread.setType(ShareUnreadReply.Comment);
 		unread.setShareId(share.getId());
+		unread.setShareTitle(share.getTitle());
 		dao.insert(unread);
 	}
 
@@ -507,6 +502,7 @@ public class ShareService {
 
 		unread.setType(ShareUnreadReply.Praise);
 		unread.setShareId(share.getId());
+		unread.setShareTitle(share.getTitle());
 		dao.insert(unread);
 	}
 

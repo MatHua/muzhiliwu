@@ -25,6 +25,8 @@ public class GiftCollectComment extends IdEntity {
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 评论内容
 
+	private boolean isMeComment;// 标记是不是我评价的
+
 	public String getCollectId() {
 		return collectId;
 	}
@@ -71,6 +73,14 @@ public class GiftCollectComment extends IdEntity {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public boolean isMeComment() {
+		return isMeComment;
+	}
+
+	public void setMeComment(boolean isMeComment) {
+		this.isMeComment = isMeComment;
 	}
 
 }

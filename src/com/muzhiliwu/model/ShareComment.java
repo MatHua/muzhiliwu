@@ -32,6 +32,8 @@ public class ShareComment extends IdEntity {
 	@One(target = User.class, field = "fatherCommenterId")
 	private User fatherCommenter;// 父级评论者id,便于找到该评论的父级评论者
 
+	private boolean isMeComment;// 标记是否是本人评价的
+
 	public String getShareId() {
 		return shareId;
 	}
@@ -80,5 +82,12 @@ public class ShareComment extends IdEntity {
 		this.fatherCommenter = fatherCommenter;
 	}
 
-	
+	public boolean isMeComment() {
+		return isMeComment;
+	}
+
+	public void setMeComment(boolean isMeComment) {
+		this.isMeComment = isMeComment;
+	}
+
 }

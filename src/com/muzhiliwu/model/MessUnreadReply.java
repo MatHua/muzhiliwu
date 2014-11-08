@@ -24,7 +24,6 @@ public class MessUnreadReply extends IdEntity {
 
 	@Column
 	private String messId;// 被评论的留言的id
-
 	@Column
 	private String messTitle;// 被评论的留言的标题
 

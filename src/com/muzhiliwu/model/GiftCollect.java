@@ -2,7 +2,10 @@ package com.muzhiliwu.model;
 
 import java.util.List;
 
+import org.nutz.dao.entity.annotation.ColDefine;
+import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Comment;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
@@ -15,6 +18,14 @@ public class GiftCollect extends IdEntity {
 	private String collectorId;// 收藏者id
 	@One(target = User.class, field = "collectorId")
 	private User collector;// 收藏者
+
+	@Column
+	private String title;// 采集标题
+
+	@Column
+	@ColDefine(type = ColType.TEXT)
+	private String descript;// 采集描述
+
 	@Column
 	private String giftId;// 被收藏的礼品的id
 	@One(target = Gift.class, field = "giftId")
@@ -92,6 +103,22 @@ public class GiftCollect extends IdEntity {
 
 	public void setPraises(List<GiftCollectPraise> praises) {
 		this.praises = praises;
+	}
+
+	public String getDescript() {
+		return descript;
+	}
+
+	public void setDescript(String descript) {
+		this.descript = descript;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }

@@ -18,8 +18,10 @@ public class ShareUnreadReply extends IdEntity {
 
 	@Column
 	private String receiverId;// 接收者id,用于联结"t_user"表
+	
 	@Column
 	private String shareId;// 对应的分享的id
+	@Column
 	private String shareTitle;// 对应分享的标题
 
 	@Column

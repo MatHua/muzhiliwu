@@ -45,7 +45,7 @@ public class WishService {
 	public String publishOrUpdateWish(User publisher, Wish wish,
 			HttpSession session) {
 		if (Strings.isBlank(wish.getId())) {// 许愿
-			long increment = Wish.Wish_Gift.equals(wish.getType()) ? Integral.Integral_For_Publish_Gift_Wish
+			int increment = Wish.Wish_Gift.equals(wish.getType()) ? Integral.Integral_For_Publish_Gift_Wish
 					: Integral.Integral_For_Publish_No_Gift_Wish;
 			if (!userService.okIntegral(publisher, increment, session)) {
 				return ActionMessage.Not_Integral;// 不够积分
@@ -178,15 +178,16 @@ public class WishService {
 		}
 		dao.fetchLinks(wish, "wisher");
 		dao.fetchLinks(wish, "praises");// 加载点赞信息
-		for (int i = 0; i < wish.getPraises().size(); i++) {
-			// 加载点赞的点赞者信息
-			dao.fetchLinks(wish.getPraises().get(i), "praiser");
-		}
-		dao.fetchLinks(wish, "collectes");// 获取收藏信息
-		for (int i = 0; i < wish.getCollectes().size(); i++) {
-			// 获取所有收藏者信息
-			dao.fetchLinks(wish.getCollectes().get(i), "collecter");
-		}
+
+		// 加载点赞的点赞者信息
+		dao.fetchLinks(wish.getPraises(), "praiser");
+
+		// 获取收藏信息
+		dao.fetchLinks(wish, "collectes");
+
+		// 获取所有收藏者信息
+		dao.fetchLinks(wish.getCollectes(), "collecter");
+
 		// 还有一些详细信息
 		// 加载评论
 		// 加载评论者的信息
@@ -207,12 +208,10 @@ public class WishService {
 		page.setRecordCount(dao.count(Wish.class,
 				Cnd.where("wisherId", "=", user.getId())));
 
-		for (int i = 0; i < wishes.size(); i++) {
-			dao.fetchLinks(wishes.get(i), "wisher");
-			// **********下面是详情~~~~~~~~~~~~~~~~
-			// 加载点赞者
-			// 加载收藏者
-		}
+		dao.fetchLinks(wishes, "wisher");
+		// **********下面是详情~~~~~~~~~~~~~~~~
+		// 加载点赞者
+		// 加载收藏者
 		return new QueryResult(wishes, page);
 	}
 
@@ -228,10 +227,11 @@ public class WishService {
 				Cnd.where("collecterId", "=", user.getId()), page);
 		page.setRecordCount(dao.count(WishCollect.class,
 				Cnd.where("collecterId", "=", user.getId())));
-		for (int i = 0; i < collectes.size(); i++) {
-			dao.fetchLinks(collectes.get(i), "collecter");
-			dao.fetchLinks(collectes.get(i), "wish");
-			dao.fetchLinks(collectes.get(i).getWish(), "wisher");
+
+		dao.fetchLinks(collectes, "collecter");
+		dao.fetchLinks(collectes, "wish");
+		for (WishCollect collect : collectes) {
+			dao.fetchLinks(collect.getWish(), "wisher");
 		}
 		return new QueryResult(collectes, page);
 	}
@@ -247,6 +247,8 @@ public class WishService {
 				page);
 		page.setRecordCount(dao.count(Wish.class));
 
+		// 加载分享发表者
+		dao.fetchLinks(wishes, "wisher");
 		for (int i = 0; i < wishes.size(); i++) {
 			// 判断用户有没有收藏该分享
 			wishes.get(i).setCollected(false);
@@ -255,8 +257,6 @@ public class WishService {
 					wishes.get(i).setCollected(true);
 				}
 			}
-			// 加载分享发表者
-			dao.fetchLinks(wishes.get(i), "wisher");
 		}
 		return new QueryResult(wishes, page);
 	}
@@ -298,11 +298,9 @@ public class WishService {
 				Cnd.where("receiverId", "=", user.getId())
 						.and("type", "=", WishUnreadReply.Praise)
 						.and("state", "=", WishUnreadReply.Nuread)));
-		// 获取相应的联结信息
-		for (WishUnreadReply reply : replys) {
-			dao.fetchLinks(reply, "replier");// 加载消息发出者
-			reply.setWishTitle(getWishTitle(reply.getWishId()));// 获取被点赞分享墙的标题
-		}
+
+		// 加载消息发出者
+		dao.fetchLinks(replys, "replier");
 		return new QueryResult(replys, page);
 	}
 
@@ -328,19 +326,17 @@ public class WishService {
 				Cnd.where("receiverId", "=", user.getId())
 						.and("type", "=", WishUnreadReply.Collect)
 						.and("state", "=", WishUnreadReply.Nuread)));
-		// 获取相应的联结信息
-		for (WishUnreadReply reply : replys) {
-			dao.fetchLinks(reply, "replier");// 加载消息发出者
-			reply.setWishTitle(getWishTitle(reply.getWishId()));// 获取被收藏分享墙的标题
-		}
+
+		// 加载消息发出者
+		dao.fetchLinks(replys, "replier");
 		return new QueryResult(replys, page);
 	}
 
 	// 获取许愿的标题
-	private String getWishTitle(String id) {
-		Wish wish = dao.fetch(Wish.class, id);
-		return wish.getTitle();
-	}
+	// private String getWishTitle(String id) {
+	// Wish wish = dao.fetch(Wish.class, id);
+	// return wish.getTitle();
+	// }
 
 	// 判断这个是否为收藏的分享
 	private boolean okCancelCollect(User collecter, WishCollect collect) {
@@ -384,6 +380,9 @@ public class WishService {
 
 	// 给分享的发表者发送一条收藏类未读信息
 	private void createUnreadCollectReply(User collecter, Wish wish) {
+		if (Strings.isBlank(wish.getTitle())) {
+			wish = dao.fetch(Wish.class, wish.getId());
+		}
 		WishUnreadReply unread = new WishUnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
@@ -393,11 +392,15 @@ public class WishService {
 
 		unread.setType(ShareUnreadReply.Collect);
 		unread.setWishId(wish.getId());
+		unread.setWishTitle(wish.getTitle());
 		dao.insert(unread);
 	}
 
 	// 给分享的发表者发送一条收藏类未读信息
 	private void createUnreadPraiseReply(User praiser, Wish wish) {
+		if (Strings.isBlank(wish.getTitle())) {
+			wish = dao.fetch(Wish.class, wish.getId());
+		}
 		WishUnreadReply unread = new WishUnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
@@ -407,6 +410,7 @@ public class WishService {
 
 		unread.setType(ShareUnreadReply.Praise);
 		unread.setWishId(wish.getId());
+		unread.setWishTitle(wish.getTitle());
 		dao.insert(unread);
 	}
 

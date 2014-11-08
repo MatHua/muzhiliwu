@@ -115,7 +115,8 @@ public class MessageService {
 		comment.setDate(DateUtils.now());
 		comment.setMessId(msg.getId());// 联结id
 		// 如果父评论存在,则为父评论插入子评论
-		if (!Strings.isBlank(fatherCommenter.getId())) {
+		if (fatherCommenter != null
+				&& !Strings.isBlank(fatherCommenter.getId())) {
 			comment.setFatherCommenterId(fatherCommenter.getId());
 			createUnreadCommentReply(commenter, fatherCommenter, comment, msg);// 给父评论者发送一个未读信息
 		}
@@ -137,15 +138,13 @@ public class MessageService {
 		page.setRecordCount(dao.count(Message.class));
 		Message msg;
 		List<Message> results = new ArrayList<Message>();
-		for (int i = 0; i < msgs.size(); i++) {
-			// 加载发表者
-			dao.fetchLinks(msgs.get(i), "publisher");
 
-			// **********下面是详情~~~~~~~~~~~~~~~~
-			// 加载点赞者
-			// 加载评论者
-			// 加载每条评论的父评论
-		}
+		// 加载发表者
+		dao.fetchLinks(msgs, "publisher");
+		// **********下面是详情~~~~~~~~~~~~~~~~
+		// 加载点赞者
+		// 加载评论者
+		// 加载每条评论的父评论
 		return new QueryResult(msgs, page);
 	}
 
@@ -167,10 +166,8 @@ public class MessageService {
 		page.setRecordCount(dao.count(Message.class,
 				Cnd.where("publisherId", "=", user.getId())));
 
-		for (int i = 0; i < msgs.size(); i++) {
-			// 加载发表者
-			dao.fetchLinks(msgs.get(i), "publisher");
-		}
+		// 加载发表者
+		dao.fetchLinks(msgs, "publisher");
 		// **********下面是详情~~~~~~~~~~~~~~~~
 		// 加载点赞者
 		// 加载评论者
@@ -184,21 +181,26 @@ public class MessageService {
 	 * @param msg
 	 * @return
 	 */
-	public Message getDetails(Message msg) {
+	public Message getDetails(Message msg, User user) {
 		msg = dao.fetch(Message.class, msg.getId());
 		dao.fetchLinks(msg, "publisher");// 加载发表者信息
 		dao.fetchLinks(msg, "praises");// 加载点赞信息
-		for (int i = 0; i < msg.getPraises().size(); i++) {
-			// 加载点赞的点赞者信息
-			dao.fetchLinks(msg.getPraises().get(i), "praiser");
-		}
+
+		// 加载点赞的点赞者信息
+		dao.fetchLinks(msg.getPraises(), "praiser");
 		dao.fetchLinks(msg, "comments");// 加载评论
+
+		// 加载评论者的信息
+		dao.fetchLinks(msg.getComments(), "commenter");
+		// 加载父评论者的信息
+		dao.fetchLinks(msg.getComments(), "fatherCommenter");
 		for (int i = 0; i < msg.getComments().size(); i++) {
-			// 加载评论者的信息
-			dao.fetchLinks(msg.getComments().get(i), "commenter");
-			if (!Strings.isBlank(msg.getComments().get(i)
-					.getFatherCommenterId())) {// 加载父评论者的信息
-				dao.fetchLinks(msg.getComments().get(i), "fatherCommenter");
+			// 判断这条评论是否是本人发出的
+			msg.getComments().get(i).setMeComment(false);
+			if (user != null
+					&& msg.getComments().get(i).getCommenterId()
+							.equals(user.getId())) {
+				msg.getComments().get(i).setMeComment(true);
 			}
 		}
 		return msg;
@@ -227,10 +229,7 @@ public class MessageService {
 						.and("type", "=", MessUnreadReply.Praise)
 						.and("state", "=", MessUnreadReply.Nuread)));
 		// 获取相应的联结信息
-		for (MessUnreadReply reply : replys) {
-			dao.fetchLinks(reply, "replier");// 加载消息发出者
-			reply.setMessTitle(getMessTitle(reply.getMessId()));// 获取被点赞留言的标题
-		}
+		dao.fetchLinks(replys, "replier");// 加载消息发出者
 		return new QueryResult(replys, page);
 	}
 
@@ -257,10 +256,7 @@ public class MessageService {
 						.and("type", "=", MessUnreadReply.Comment)
 						.and("state", "=", MessUnreadReply.Nuread)));
 		// 获取相应的联结信息
-		for (MessUnreadReply reply : replys) {
-			dao.fetchLinks(reply, "replier");// 加载消息发出者
-			reply.setMessTitle(getMessTitle(reply.getMessId()));// 获取被评论留言的标题
-		}
+		dao.fetchLinks(replys, "replier");// 加载消息发出者
 		return new QueryResult(replys, page);
 	}
 
@@ -321,6 +317,9 @@ public class MessageService {
 	// 创建一条未读的评论类信息~回复某人的评论
 	private void createUnreadCommentReply(User commenter, User fatherCommenter,
 			MessComment comment, Message msg) {
+		if (Strings.isBlank(msg.getTitle())) {
+			msg = dao.fetch(Message.class, msg.getId());
+		}
 		MessUnreadReply unread = new MessUnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
@@ -331,12 +330,16 @@ public class MessageService {
 
 		unread.setType(MessUnreadReply.Comment);
 		unread.setMessId(msg.getId());
+		unread.setMessTitle(msg.getTitle());
 		dao.insert(unread);
 	}
 
 	// 创建一条未读的评论类信息~发送给留言的发表者
 	private void createUnreadCommentReply(User commenter, MessComment comment,
 			Message msg) {
+		if (Strings.isBlank(msg.getTitle())) {
+			msg = dao.fetch(Message.class, msg.getId());
+		}
 		MessUnreadReply unread = new MessUnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
@@ -347,15 +350,20 @@ public class MessageService {
 
 		unread.setType(MessUnreadReply.Comment);
 		unread.setMessId(msg.getId());
+		unread.setMessTitle(msg.getTitle());
 		dao.insert(unread);
 	}
 
 	// 创建一条未读的点赞类消息
 	private void createUnreadPraiseReply(User praiser, Message msg) {
+		if (Strings.isBlank(msg.getTitle())) {
+			msg = dao.fetch(Message.class, msg.getId());
+		}
 		MessUnreadReply unread = new MessUnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setMessId(msg.getId());
+		unread.setMessTitle(msg.getTitle());
 		unread.setReceiverId(msg.getPublisherId());
 		unread.setReplierId(praiser.getId());
 		unread.setState(MessUnreadReply.Nuread);
@@ -374,8 +382,8 @@ public class MessageService {
 	}
 
 	// 根据消息id获取消息的标题
-	private String getMessTitle(String id) {
-		Message msg = dao.fetch(Message.class, id);
-		return msg.getTitle();
-	}
+	// private String getMessTitle(String id) {
+	// Message msg = dao.fetch(Message.class, id);
+	// return msg.getTitle();
+	// }
 }

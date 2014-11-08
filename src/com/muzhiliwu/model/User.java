@@ -44,7 +44,7 @@ public class User extends IdEntity {
 	@Column
 	private String emotion;// 情感状况
 	@Column
-	private long integral;// 积分数
+	private int integral;// 积分数
 
 	@Many(target = Message.class, field = "publisherId")
 	private List<Message> myMessages;// 我的留言,便于找出用户自己发表的留言
@@ -268,11 +268,11 @@ public class User extends IdEntity {
 		this.myShareUnreadReplies = myShareUnreadReplies;
 	}
 
-	public long getIntegral() {
+	public int getIntegral() {
 		return integral;
 	}
 
-	public void setIntegral(long integral) {
+	public void setIntegral(int integral) {
 		this.integral = integral;
 	}
 

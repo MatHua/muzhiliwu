@@ -23,6 +23,11 @@ public class GiftCollectUnreadReply extends IdEntity {
 	private User replier;// 便于记录回复者
 
 	@Column
+	private String collectId;// 对应礼品收藏的id
+	@Column
+	private String collectTitle;// 采集描述信息
+
+	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;
 
@@ -78,6 +83,22 @@ public class GiftCollectUnreadReply extends IdEntity {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getCollectId() {
+		return collectId;
+	}
+
+	public void setCollectId(String collectId) {
+		this.collectId = collectId;
+	}
+
+	public String getCollectTitle() {
+		return collectTitle;
+	}
+
+	public void setCollectTitle(String collectTitle) {
+		this.collectTitle = collectTitle;
 	}
 
 }

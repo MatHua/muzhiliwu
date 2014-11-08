@@ -40,10 +40,6 @@ public class UserService {
 				User.class,
 				Cnd.where("code", "=", code).and("pass", "=",
 						convert ? md5.getMD5ofStr(pass) : pass));
-
-		// 获取未读的回复
-		if (user != null)
-			getReply(user);
 		return user;
 	}
 
@@ -160,7 +156,7 @@ public class UserService {
 	 *            积分增量
 	 * @return
 	 */
-	public boolean okIntegral(User user, long increment, HttpSession session) {
+	public boolean okIntegral(User user, int increment, HttpSession session) {
 		user = dao.fetch(User.class, user.getId());
 		if (user.getIntegral() + increment >= 0) {// 积分足够
 			user.setIntegral(user.getIntegral() + increment);
@@ -169,39 +165,6 @@ public class UserService {
 			return true;
 		}
 		return false;
-	}
-
-	// 获取用户未读回复
-	private void getReply(User user) {
-
-		// 获取未读的留言墙回复
-		dao.fetchLinks(user, "myMessUnreadReplies", Cnd.orderBy().desc("date"));
-		MessUnreadReply messReply;
-		for (int i = 0; i < user.getMyMessUnreadReplies().size(); i++) {
-			// 获取回复者信息
-			dao.fetchLinks(user.getMyMessUnreadReplies().get(i), "replier");
-		}
-		// 获取未读的分享墙回复
-		dao.fetchLinks(user, "myShareUnreadReplies");
-		ShareUnreadReply shareReply;
-		for (int i = 0; i < user.getMyShareUnreadReplies().size(); i++) {
-			// 获取回复者信息
-			dao.fetchLinks(user.getMyShareUnreadReplies().get(i), "replier");
-			// shareReply = user.getMyShareUnreadReplies().get(i);
-			// shareReply.setReplier(getUserById(shareReply.getReplierId()));
-		}
-
-		// dao.fetchLinks(user, "myMessages");
-		// dao.fetchLinks(user, "myMessComments", Cnd.orderBy().desc("date"));//
-		// 评论按时间降序
-
-		// dao.fetchLinks(user, "myWishes");
-		// dao.fetchLinks(user, "myWishCollectes");
-
-		// dao.fetchLinks(user, "myShares");
-		// dao.fetchLinks(user, "myShareCollectes");
-		// dao.fetchLinks(user, "myShareComments",
-		// Cnd.orderBy().desc("date"));// 评论按时间降序
 	}
 
 	// 检查密码

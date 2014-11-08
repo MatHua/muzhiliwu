@@ -1,9 +1,10 @@
 package com.muzhiliwu.model;
 
-import org.nutz.dao.entity.annotation.Column;
-import org.nutz.dao.entity.annotation.Table;
+import java.util.List;
 
-import com.muzhiliwu.model.IdEntity;
+import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Many;
+import org.nutz.dao.entity.annotation.Table;
 
 @Table("t_test_demo")
 public class TestDemo extends IdEntity {
@@ -11,6 +12,9 @@ public class TestDemo extends IdEntity {
 	private String name;
 	@Column
 	private String email;
+
+	@Many(target = MyTest.class, field = "testId")
+	private List<MyTest> myTests;
 
 	public String getName() {
 		return name;
@@ -28,4 +32,11 @@ public class TestDemo extends IdEntity {
 		this.email = email;
 	}
 
+	public List<MyTest> getMyTests() {
+		return myTests;
+	}
+
+	public void setMyTests(List<MyTest> myTests) {
+		this.myTests = myTests;
+	}
 }
