@@ -1,17 +1,35 @@
 package com.muzhiliwu.model.gift;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.model.Wish;
 
+//许愿商品订单
 @Table("t_order_form_for_wish")
-public class OrderFormForWish extends IdEntity {
+public class OrderFormForWish {
+	@Name
 	@Column
-	private String wisherId;// 许愿者id
-	@One(target = User.class, field = "wisherId")
-	private User wisher;// 许愿者
+	private String orderId;// 订单号
+
+	@Column
+	private String date;// 订单生成时间
+
+	@Column
+	private String cartId;// 购物车id
+
+	@Column
+	private String creatorId;// 创建者id
+	@One(target = User.class, field = "creatorId")
+	private User creator;// 订单创建者~即许愿者
+
+	@Column
+	private String wishId;// 许愿单id
+	@One(target = Wish.class, field = "wishId")
+	private Wish wish;// 许愿单
 
 	@Column
 	private String giftId;// 联结礼物
@@ -29,23 +47,32 @@ public class OrderFormForWish extends IdEntity {
 	private GiftSize size;// 许愿者选择的尺寸
 
 	@Column
+	private String contactWayId;// 联结联系方式的表
+	@One(target = ReceiveContactWay.class, field = "contactWayId")
+	private ReceiveContactWay contactWay;// 保存联系方式
+
+	@Column
 	private int number;// 许愿者选择的商品数量
+	@Column
 	private float totalPrice;// 总价
 
-	public String getWisherId() {
-		return wisherId;
+	@Column
+	private String state;// 订单状态
+
+	public String getDate() {
+		return date;
 	}
 
-	public void setWisherId(String wisherId) {
-		this.wisherId = wisherId;
+	public void setDate(String date) {
+		this.date = date;
 	}
 
-	public User getWisher() {
-		return wisher;
+	public String getWishId() {
+		return wishId;
 	}
 
-	public void setWisher(User wisher) {
-		this.wisher = wisher;
+	public void setWishId(String wishId) {
+		this.wishId = wishId;
 	}
 
 	public String getGiftId() {
@@ -110,6 +137,46 @@ public class OrderFormForWish extends IdEntity {
 
 	public void setTotalPrice(float totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+
+	public Wish getWish() {
+		return wish;
+	}
+
+	public void setWish(Wish wish) {
+		this.wish = wish;
+	}
+
+	public String getContactWayId() {
+		return contactWayId;
+	}
+
+	public void setContactWayId(String contactWayId) {
+		this.contactWayId = contactWayId;
+	}
+
+	public ReceiveContactWay getContactWay() {
+		return contactWay;
+	}
+
+	public void setContactWay(ReceiveContactWay contactWay) {
+		this.contactWay = contactWay;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 
 }

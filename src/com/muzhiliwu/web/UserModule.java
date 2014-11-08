@@ -35,21 +35,7 @@ public class UserModule {
 	@Inject
 	private UserService userService;
 
-	// 用来测试
-	// @At
-	// public JSONObject test(String name, String pass) {
-	// User user = userService.checkUser(name, pass, true);
-	// JSONObject json = new JSONObject();
-	// if (user != null) {
-	// json.put("id", user.getId());
-	// json.put("name", user.getName());
-	// json.put("pass", user.getPass());
-	// json.put("mess", "这是敏姐");
-	// }
-	// return json;
-	// }
-
-	// 测试~测试通过
+	// 测试
 	@At
 	@Ok("json")
 	public Object login(String code, String pass, HttpSession session,
@@ -86,7 +72,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 几时检查用户输入的用户名是否已被注册 ~测试通过
+	// 几时检查用户输入的用户名是否已被注册 
 	@At
 	@Ok("json")
 	public Object checkRepeat(@Param("::user.") User user) {
@@ -101,7 +87,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 注册 ~测试通过
+	// 注册
 	@At
 	@Ok("json")
 	public Object regist(@Param("::user.") User user) {
@@ -121,7 +107,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 修改个人资料 ~测试通过
+	// 修改个人资料 
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -137,7 +123,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 修改密码 ~测试通过
+	// 修改密码 
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -156,7 +142,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 退出登录 ~测试通过
+	// 退出登录
 	@At
 	@Ok("json")
 	public Object logout(HttpSession session) {
@@ -169,7 +155,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 获取个人信息~测试通过
+	// 获取个人信息
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -181,7 +167,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 上传用户头像~测试通过
+	// 上传用户头像
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -205,7 +191,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 获取用户头像~测试通过
+	// 获取用户头像
 	@At
 	@Ok("void")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))

@@ -9,6 +9,8 @@ import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
+import com.muzhiliwu.model.gift.OrderFormForWish;
+
 @Table("t_wish")
 public class Wish extends IdEntity {
 	// state
@@ -48,6 +50,11 @@ public class Wish extends IdEntity {
 	private User wisher;// 用于记录许愿者
 
 	private boolean collected;// 标记是否已被收藏
+
+	@Column
+	private String wishOrderFormId;// 联结id
+	@One(target = OrderFormForWish.class, field = "wishOrderFormId")
+	private OrderFormForWish wishOrderForm;// 对应的许愿订单
 
 	public String getWisherId() {
 		return wisherId;
@@ -143,6 +150,22 @@ public class Wish extends IdEntity {
 
 	public void setShareNum(int shareNum) {
 		this.shareNum = shareNum;
+	}
+
+	public String getWishOrderFormId() {
+		return wishOrderFormId;
+	}
+
+	public void setWishOrderFormId(String wishOrderFormId) {
+		this.wishOrderFormId = wishOrderFormId;
+	}
+
+	public OrderFormForWish getWishOrderForm() {
+		return wishOrderForm;
+	}
+
+	public void setWishOrderForm(OrderFormForWish wishOrderForm) {
+		this.wishOrderForm = wishOrderForm;
 	}
 
 }

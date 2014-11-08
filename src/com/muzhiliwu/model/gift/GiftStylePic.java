@@ -3,12 +3,13 @@ package com.muzhiliwu.model.gift;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
+//商品款式对应的照片
 @Table("t_gift_style_pic")
 public class GiftStylePic extends IdEntity {
 	@Column
 	private String styleId;// 联结id
 	@Column
-	private String pic_path;// 图片路径
+	private String picPath;// 图片路径
 
 	public String getStyleId() {
 		return styleId;
@@ -18,12 +19,12 @@ public class GiftStylePic extends IdEntity {
 		this.styleId = styleId;
 	}
 
-	public String getPic_path() {
-		return pic_path;
+	public String getPicPath() {
+		return picPath;
 	}
 
-	public void setPic_path(String pic_path) {
-		this.pic_path = pic_path;
+	public void setPicPath(String picPath) {
+		this.picPath = picPath;
 	}
 
 }

@@ -3,6 +3,7 @@ package com.muzhiliwu.model.gift;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
+//商品尺寸表
 @Table("t_gift_size")
 public class GiftSize extends IdEntity {
 	@Column

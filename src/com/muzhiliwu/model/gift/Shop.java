@@ -8,10 +8,17 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Table;
 
+//保存商家的表
 @Table("t_shop")
 public class Shop extends IdEntity {
-	public static final String Entity_Shop = "entity_shop";// 实体店
-	public static final String Online_Store = "online_store";// 网店
+	public static final String EntityShop = "entity_shop";// 实体店
+	public static final String OnlineStore = "online_store";// 网店
+
+	public static final String ShopOpen = "open";// 营业状态
+	public static final String ShopRest = "rest";// 店主休息
+
+	public static final String CanBusiness = "can_business";// 可营业状态
+	public static final String BanBusiness = "ban_business";// 被超级管理员禁止营业
 
 	@Column
 	private String shopName;// 店名
@@ -24,14 +31,24 @@ public class Shop extends IdEntity {
 	@Column
 	private String email;// 邮箱
 	@Column
+	private String alipayCode;// 支付宝账号(用于收款)
+	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String address;// 地址
 	@Column
 	@ColDefine(type = ColType.TEXT)
-	private String ShopStory;// 品牌故事
-	@Column
-	private int goods_number;// 商品数量
+	private String shopStory;// 品牌故事
 
+	@Column
+	private int salesNumber;// 销售数量
+
+	@Column
+	private String businessState;// 营业状态
+	@Column
+	private String okBusiness;// 超级管理员控制该店是否可营业
+
+	@Column
+	private int giftNum;// 商品数量
 	@Many(target = Gift.class, field = "shopId")
 	private List<Gift> gifts;// 商品
 
@@ -57,22 +74,6 @@ public class Shop extends IdEntity {
 
 	public void setAddress(String address) {
 		this.address = address;
-	}
-
-	public String getShopStory() {
-		return ShopStory;
-	}
-
-	public void setShopStory(String shopStory) {
-		ShopStory = shopStory;
-	}
-
-	public int getGoods_number() {
-		return goods_number;
-	}
-
-	public void setGoods_number(int goods_number) {
-		this.goods_number = goods_number;
 	}
 
 	public List<Gift> getGifts() {
@@ -105,6 +106,54 @@ public class Shop extends IdEntity {
 
 	public void setShopBoss(String shopBoss) {
 		this.shopBoss = shopBoss;
+	}
+
+	public int getSalesNumber() {
+		return salesNumber;
+	}
+
+	public void setSalesNumber(int salesNumber) {
+		this.salesNumber = salesNumber;
+	}
+
+	public String getBusinessState() {
+		return businessState;
+	}
+
+	public void setBusinessState(String businessState) {
+		this.businessState = businessState;
+	}
+
+	public String getOkBusiness() {
+		return okBusiness;
+	}
+
+	public void setOkBusiness(String okBusiness) {
+		this.okBusiness = okBusiness;
+	}
+
+	public int getGiftNum() {
+		return giftNum;
+	}
+
+	public void setGiftNum(int giftNum) {
+		this.giftNum = giftNum;
+	}
+
+	public String getAlipayCode() {
+		return alipayCode;
+	}
+
+	public void setAlipayCode(String alipayCode) {
+		this.alipayCode = alipayCode;
+	}
+
+	public String getShopStory() {
+		return shopStory;
+	}
+
+	public void setShopStory(String shopStory) {
+		this.shopStory = shopStory;
 	}
 
 }

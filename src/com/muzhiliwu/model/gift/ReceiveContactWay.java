@@ -8,23 +8,23 @@ import org.nutz.dao.entity.annotation.Table;
 
 import com.muzhiliwu.model.User;
 
+//用户地址信息表
 @Table("t_receive_contact_way")
 public class ReceiveContactWay extends IdEntity {
 	@Column
 	private String creatorId;// 创建者id
 	@One(target = User.class, field = "creatorId")
 	private User creator;// 创建者
+
 	@Column
-	private String receive_name;// 收货人姓名
+	private String name;// 收货人姓名
+
 	@Column
 	@ColDefine(type = ColType.TEXT)
-	private String receive_address;// 收货人地址
+	private String address;// 收货人地址
+
 	@Column
-	private String receive_zip;// 收货人邮编
-	@Column
-	private String receive_phone;// 收货人电话
-	@Column
-	private String receive_mobile;// 收货人手机
+	private String mobile;// 收货人手机
 
 	public String getCreatorId() {
 		return creatorId;
@@ -42,44 +42,28 @@ public class ReceiveContactWay extends IdEntity {
 		this.creator = creator;
 	}
 
-	public String getReceive_name() {
-		return receive_name;
+	public String getName() {
+		return name;
 	}
 
-	public void setReceive_name(String receive_name) {
-		this.receive_name = receive_name;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getReceive_address() {
-		return receive_address;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setReceive_address(String receive_address) {
-		this.receive_address = receive_address;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
-	public String getReceive_zip() {
-		return receive_zip;
+	public String getMobile() {
+		return mobile;
 	}
 
-	public void setReceive_zip(String receive_zip) {
-		this.receive_zip = receive_zip;
-	}
-
-	public String getReceive_phone() {
-		return receive_phone;
-	}
-
-	public void setReceive_phone(String receive_phone) {
-		this.receive_phone = receive_phone;
-	}
-
-	public String getReceive_mobile() {
-		return receive_mobile;
-	}
-
-	public void setReceive_mobile(String receive_mobile) {
-		this.receive_mobile = receive_mobile;
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
 	}
 
 }

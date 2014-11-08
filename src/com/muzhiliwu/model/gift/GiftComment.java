@@ -19,10 +19,12 @@ public class GiftComment extends IdEntity {
 	private String giftId;// 被评价的礼品的id
 	@One(target = Gift.class, field = "giftId")
 	private Gift gift;// 被评价的礼品
+	
 	@Column
-	private String valuatorId;// 评价发表者id
-	@One(target = User.class, field = "valuatorId")
-	private User valuator;// 评价发表者者
+	private String commenterId;// 评价发表者id
+	@One(target = User.class, field = "commenterId")
+	private User commenter;// 评价发表者者
+	
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 评价内容
@@ -48,22 +50,6 @@ public class GiftComment extends IdEntity {
 		this.gift = gift;
 	}
 
-	public String getValuatorId() {
-		return valuatorId;
-	}
-
-	public void setValuatorId(String valuatorId) {
-		this.valuatorId = valuatorId;
-	}
-
-	public User getValuator() {
-		return valuator;
-	}
-
-	public void setValuator(User valuator) {
-		this.valuator = valuator;
-	}
-
 	public String getContent() {
 		return content;
 	}
@@ -86,6 +72,22 @@ public class GiftComment extends IdEntity {
 
 	public void setReply(String reply) {
 		this.reply = reply;
+	}
+
+	public String getCommenterId() {
+		return commenterId;
+	}
+
+	public void setCommenterId(String commenterId) {
+		this.commenterId = commenterId;
+	}
+
+	public User getCommenter() {
+		return commenter;
+	}
+
+	public void setCommenter(User commenter) {
+		this.commenter = commenter;
 	}
 
 }

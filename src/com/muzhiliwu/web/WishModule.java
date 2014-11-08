@@ -29,7 +29,7 @@ public class WishModule {
 	@Inject
 	private Dao dao;// 用于测试而已
 
-	// 许愿~已测试
+	// 许愿
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -51,7 +51,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 修改愿望~已测试
+	// 修改愿望
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -82,7 +82,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 获取愿望的详细信息~已测试
+	// 获取愿望的详细信息
 	@At
 	@Ok("json")
 	public Object detail(@Param("::wish.") Wish wish, HttpSession session) {
@@ -94,7 +94,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 获取收藏的愿望的详细信息~已测试
+	// 获取收藏的愿望的详细信息
 	@At
 	@Ok("json")
 	public Object detail(@Param("::collect.") WishCollect collect) {
@@ -105,7 +105,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 点赞或取消点赞~已测试
+	// 点赞或取消点赞
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -181,7 +181,7 @@ public class WishModule {
 		return ams;
 	}
 
-	// 收藏愿望~已测试
+	// 收藏愿望
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -204,7 +204,7 @@ public class WishModule {
 		return am;
 	}
 
-	// 取消收藏~已测试
+	// 取消收藏
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))

@@ -11,11 +11,16 @@ import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
+//礼品商品表
 @Table("t_gift")
 public class Gift extends IdEntity {
-	private static final DecimalFormat df = new DecimalFormat("0.00");
+	private static final DecimalFormat df = new DecimalFormat("0.0");
+
 	public static final String FromOnlineShop = "from_online_shop";// 来源网店
 	public static final String FromEntityShop = "from_entity_shop";// 来源实体店
+
+	public static final String OnSale = "on_sale";// 在销售
+	public static final String NotSale = "not_sale";// 商品下架
 
 	@Column
 	private String fromType;// 来源~网店、实体店
@@ -35,25 +40,45 @@ public class Gift extends IdEntity {
 	@Column
 	private Double price;// 商品价格
 	@Column
-	private String type;// 商品类型
+	private String type;// 商品分类
 	@Column
-	private long collectNum;// 收藏数
-	// @Column
-	// private long
+	private int stock;// 库存量
+	@Column
+	private int collectNum;// 收藏数
+	@Column
+	private int shareNum;// 分享数
+	@Column
+	private String saleState;// 销售状态
 
+	@Column
+	private int styleNum;// 款式数
 	@Many(target = GiftStyle.class, field = "giftId")
 	private List<GiftStyle> styles;// 礼物的款式
 
+	@Column
+	private int sizeNum;// 礼品尺寸数
 	@Many(target = GiftStyle.class, field = "giftId")
-	private List<GiftSize> sizes;// 礼品款式
+	private List<GiftSize> sizes;// 礼品尺寸
 
+	@Column
+	private int tagNum;// 标签数
 	@ManyMany(target = Tag.class, relation = "t_gift_tag", from = "giftId", to = "tagId")
 	private List<Tag> tags;// 获取礼品被标注的标签
 
 	@Column
-	private int evaluatNum;// 评价数
+	private int commentNum;// 评价数
 	@Many(target = GiftComment.class, field = "giftId")
 	private List<GiftComment> comments;// 商品所有评价
+
+	@Column
+	private int paramNum;// 商品规格参数数
+	@Many(target = GiftParam.class, field = "giftId")
+	private List<GiftParam> params;// 商品所有规格参数
+
+	@Column
+	private int saleRecordNum;// 成交记录数
+	@Many(target = SaleRecord.class, field = "giftId")
+	private List<SaleRecord> records;// 成交记录
 
 	public String getFromType() {
 		return fromType;
@@ -69,14 +94,6 @@ public class Gift extends IdEntity {
 
 	public void setUrl(String url) {
 		this.url = url;
-	}
-
-	public String getShopId() {
-		return shopId;
-	}
-
-	public void setShopId(String shopId) {
-		this.shopId = shopId;
 	}
 
 	public Shop getSeller() {
@@ -111,14 +128,6 @@ public class Gift extends IdEntity {
 		this.type = type;
 	}
 
-	public long getCollectNum() {
-		return collectNum;
-	}
-
-	public void setCollectNum(long collectNum) {
-		this.collectNum = collectNum;
-	}
-
 	public List<GiftStyle> getStyles() {
 		return styles;
 	}
@@ -143,14 +152,6 @@ public class Gift extends IdEntity {
 		this.tags = tags;
 	}
 
-	public int getEvaluatNum() {
-		return evaluatNum;
-	}
-
-	public void setEvaluatNum(int evaluatNum) {
-		this.evaluatNum = evaluatNum;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -165,6 +166,110 @@ public class Gift extends IdEntity {
 
 	public void setComments(List<GiftComment> comments) {
 		this.comments = comments;
+	}
+
+	public int getStyleNum() {
+		return styleNum;
+	}
+
+	public void setStyleNum(int styleNum) {
+		this.styleNum = styleNum;
+	}
+
+	public int getSizeNum() {
+		return sizeNum;
+	}
+
+	public void setSizeNum(int sizeNum) {
+		this.sizeNum = sizeNum;
+	}
+
+	public int getTagNum() {
+		return tagNum;
+	}
+
+	public void setTagNum(int tagNum) {
+		this.tagNum = tagNum;
+	}
+
+	public int getCommentNum() {
+		return commentNum;
+	}
+
+	public void setCommentNum(int commentNum) {
+		this.commentNum = commentNum;
+	}
+
+	public int getStock() {
+		return stock;
+	}
+
+	public void setStock(int stock) {
+		this.stock = stock;
+	}
+
+	public int getCollectNum() {
+		return collectNum;
+	}
+
+	public void setCollectNum(int collectNum) {
+		this.collectNum = collectNum;
+	}
+
+	public int getShareNum() {
+		return shareNum;
+	}
+
+	public void setShareNum(int shareNum) {
+		this.shareNum = shareNum;
+	}
+
+	public int getSaleRecordNum() {
+		return saleRecordNum;
+	}
+
+	public void setSaleRecordNum(int saleRecordNum) {
+		this.saleRecordNum = saleRecordNum;
+	}
+
+	public List<SaleRecord> getRecords() {
+		return records;
+	}
+
+	public void setRecords(List<SaleRecord> records) {
+		this.records = records;
+	}
+
+	public int getParamNum() {
+		return paramNum;
+	}
+
+	public void setParamNum(int paramNum) {
+		this.paramNum = paramNum;
+	}
+
+	public List<GiftParam> getParams() {
+		return params;
+	}
+
+	public void setParams(List<GiftParam> params) {
+		this.params = params;
+	}
+
+	public String getSaleState() {
+		return saleState;
+	}
+
+	public void setSaleState(String saleState) {
+		this.saleState = saleState;
+	}
+
+	public String getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(String shopId) {
+		this.shopId = shopId;
 	}
 
 }

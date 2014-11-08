@@ -6,13 +6,14 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Table;
 
+//商品款式表
 @Table("t_gift_style")
 public class GiftStyle extends IdEntity {
 	@Column
 	private String giftId;// 联结id
 
 	@Column
-	private String styleName;// 商品款式名
+	private String name;// 商品款式名
 
 	@Column
 	private float price;// 单价
@@ -36,20 +37,20 @@ public class GiftStyle extends IdEntity {
 		this.stylePics = stylePics;
 	}
 
-	public String getStyleName() {
-		return styleName;
-	}
-
-	public void setStyleName(String styleName) {
-		this.styleName = styleName;
-	}
-
 	public float getPrice() {
 		return price;
 	}
 
 	public void setPrice(float price) {
 		this.price = price;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

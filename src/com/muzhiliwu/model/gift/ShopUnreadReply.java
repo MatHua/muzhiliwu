@@ -8,6 +8,7 @@ import org.nutz.dao.entity.annotation.Table;
 
 import com.muzhiliwu.model.User;
 
+//商家未读信息表
 @Table("t_shop_unread_reply")
 public class ShopUnreadReply extends IdEntity {
 	public static final String Nuread = "unread";// 未读
@@ -16,9 +17,10 @@ public class ShopUnreadReply extends IdEntity {
 	public static final String Collect = "collect";// 收藏类未读信息
 	public static final String Praise = "praise";// 点赞类未读信息
 	public static final String Comment = "comment";// 商品评价类未读信息
+	public static final String SucceedBuy = "succeed_buy";// 成功购买类评价信息
 
 	@Column
-	private String shopId;// 店铺id,用于联结"t_shop"表
+	private String shopId;// 店主id(消息接收者id)
 
 	@Column
 	private String giftId;// 被评价/点赞的商品的id

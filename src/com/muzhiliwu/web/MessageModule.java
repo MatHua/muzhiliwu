@@ -29,7 +29,7 @@ public class MessageModule {
 	@Inject
 	private Dao dao;// 用于测试而已
 
-	// 发表一条留言~已测试
+	// 发表一条留言
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -51,7 +51,7 @@ public class MessageModule {
 		return am;
 	}
 
-	// 更新一条留言~已测试
+	// 更新一条留言
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -70,7 +70,7 @@ public class MessageModule {
 		return am;
 	}
 
-	// 获取某一页留言~已测试
+	// 获取某一页留言
 	@At
 	@Ok("json")
 	public Object list(@Param("::page.") Pager page) {
@@ -87,7 +87,7 @@ public class MessageModule {
 		return ams;
 	}
 
-	// 获取用户的留言~已测试
+	// 获取用户的留言
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -108,7 +108,7 @@ public class MessageModule {
 		return ams;
 	}
 
-	// 点赞或取消点赞~已测试
+	// 点赞或取消点赞
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -127,7 +127,7 @@ public class MessageModule {
 		return am;
 	}
 
-	// 评论留言或者评论别人的评论~已测试
+	// 评论留言或者评论别人的评论
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -151,7 +151,7 @@ public class MessageModule {
 		return am;
 	}
 
-	// 获取留言的详细信息~已测试
+	// 获取留言的详细信息
 	@At
 	@Ok("json")
 	public Object detail(@Param("::msg.") Message msg) {
