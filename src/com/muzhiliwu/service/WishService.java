@@ -12,7 +12,6 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 
-import com.muzhiliwu.model.Share;
 import com.muzhiliwu.model.ShareUnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
@@ -42,29 +41,42 @@ public class WishService {
 	 *            修改积分
 	 * @return
 	 */
-	public String publishOrUpdateWish(User publisher, Wish wish,
-			HttpSession session) {
-		if (Strings.isBlank(wish.getId())) {// 许愿
-			int increment = Wish.Wish_Gift.equals(wish.getType()) ? Integral.Integral_For_Publish_Gift_Wish
-					: Integral.Integral_For_Publish_No_Gift_Wish;
-			if (!userService.okIntegral(publisher, increment, session)) {
-				return ActionMessage.Not_Integral;// 不够积分
-			}
-			wish.setId(NumGenerator.getUuid());
-			wish.setDate(DateUtils.now());
-			wish.setWisherId(publisher.getId());// 许愿者id
-			wish.setState(Wish.Unrealized);// 愿望未实现
-
-			wish.setPraiseNum(0);// 点赞数为0
-			wish.setCollectNum(0);// 被收藏数为0
-			wish.setShareNum(0);
-
-			dao.insert(wish);
-		} else {// 修改愿望
-			wish.setDate(DateUtils.now());
-			dao.update(wish);
+	public String publishWish(User publisher, Wish wish, HttpSession session) {
+		// 许愿
+		int increment = Wish.Wish_Gift.equals(wish.getType()) ? Integral.Integral_For_Publish_Gift_Wish
+				: Integral.Integral_For_Publish_No_Gift_Wish;
+		if (!userService.okIntegral(publisher, increment, session)) {
+			return ActionMessage.Not_Integral;// 不够积分
 		}
+		wish.setId(NumGenerator.getUuid());
+		wish.setDate(DateUtils.now());
+		wish.setWisherId(publisher.getId());// 许愿者id
+		wish.setState(Wish.Unrealized);// 愿望未实现
+
+		wish.setPraiseNum(0);// 点赞数为0
+		wish.setCollectNum(0);// 被收藏数为0
+		wish.setShareNum(0);
+
+		dao.insert(wish);
 		return ActionMessage.success;
+	}
+
+	/**
+	 * 更新一个愿望内容
+	 * 
+	 * @param publisher
+	 * @param tmp
+	 * @return
+	 */
+	public String updateWish(User publisher, Wish tmp) {
+		Wish wish = dao.fetch(Wish.class, tmp.getId());
+		if (wish.getWisherId().equals(publisher.getId())) {
+			wish.setContent(tmp.getContent());
+			wish.setDate(DateUtils.now());
+			wish.setTitle(tmp.getTitle());
+			return ActionMessage.success;
+		}
+		return ActionMessage.fail;
 	}
 
 	/**
@@ -76,8 +88,12 @@ public class WishService {
 	 *            点赞者
 	 * @return
 	 */
-	public boolean praiseWish(Wish wish, User praiser) {
+	public String praiseWish(Wish wish, User praiser, HttpSession session) {
 		if (okPraise(wish.getId(), praiser.getId())) {// 点赞
+			if (!userService.okIntegral(praiser,
+					Integral.Integral_For_Praise_Wish, session)) {
+				return ActionMessage.Not_Integral;
+			}
 			WishPraise praise = new WishPraise();
 			praise.setId(NumGenerator.getUuid());
 			praise.setDate(DateUtils.now());
@@ -88,14 +104,29 @@ public class WishService {
 			createUnreadPraiseReply(praiser, wish);// 给许愿者发送点赞类未读信息
 
 			dao.insert(praise);
-			return true;
-		} else {// 取消点赞
+			return ActionMessage.success;
+		}
+		return ActionMessage.fail;
+	}
+
+	/**
+	 * 取消点赞
+	 * 
+	 * @param wish
+	 *            被取消点赞的愿望
+	 * @param praiser
+	 *            点赞者
+	 * @return
+	 */
+	public String cancelPraiseWish(Wish wish, User praiser) {
+		if (!okPraise(wish.getId(), praiser.getId())) {// 点赞
+			// 取消点赞
 			deletePraise(wish, praiser);// 删除点赞记录
 			changePraiseNumber(wish, -1);// 点赞数-1
-
 			deletePraise(wish, praiser);// 删除对应的点赞信息
-			return false;
+			return ActionMessage.cancel;
 		}
+		return ActionMessage.fail;
 	}
 
 	/**
@@ -105,7 +136,13 @@ public class WishService {
 	 *            被分享的许愿
 	 * @return
 	 */
-	public String shareWish(Wish wish) {
+	public String shareWish(Wish wish, User sharer, HttpSession session) {
+		// 分享到社交网有一定积分奖励
+		if (sharer != null
+				&& !userService.okIntegral(sharer,
+						Integral.Integral_for_Share_Wish, session)) {
+			return ActionMessage.Not_Integral;
+		}
 		changeShareNumber(wish, 1);
 		return ActionMessage.success;
 	}
@@ -121,11 +158,11 @@ public class WishService {
 	 * @return
 	 */
 	public String collectWish(User collecter, Wish wish, HttpSession session) {
-		if (!userService.okIntegral(collecter,
-				Integral.Integral_For_Collect_Wish, session)) {
-			return ActionMessage.Not_Integral;// 不够积分
-		}
 		if (okCollect(collecter, wish)) {
+			if (!userService.okIntegral(collecter,
+					Integral.Integral_For_Collect_Wish, session)) {
+				return ActionMessage.Not_Integral;// 不够积分
+			}
 			// 模拟一次收藏
 			WishCollect collect = new WishCollect();
 			collect.setId(NumGenerator.getUuid());
@@ -168,9 +205,9 @@ public class WishService {
 	 */
 	public Wish getDetail(Wish wish, User user) {
 		wish = dao.fetch(Wish.class, wish.getId());
-		// 还要判断一下是否已经收藏~~~~~~~~~~~~~~~
-		wish.setCollected(false);
+		
 		// 判断用户有没有收藏该分享
+		wish.setCollected(false);
 		if (user != null) {
 			if (!okCollect(user, wish)) {
 				wish.setCollected(true);
@@ -249,12 +286,12 @@ public class WishService {
 
 		// 加载分享发表者
 		dao.fetchLinks(wishes, "wisher");
-		for (int i = 0; i < wishes.size(); i++) {
+		for (Wish wish : wishes) {
 			// 判断用户有没有收藏该分享
-			wishes.get(i).setCollected(false);
+			wish.setCollected(false);
 			if (user != null) {
-				if (!okCollect(user, wishes.get(i))) {
-					wishes.get(i).setCollected(true);
+				if (!okCollect(user, wish)) {
+					wish.setCollected(true);
 				}
 			}
 		}
@@ -357,9 +394,7 @@ public class WishService {
 				WishPraise.class,
 				Cnd.where("wishId", "=", wish.getId()).and("praiserId", "=",
 						praiser.getId()));
-		if (praise != null) {
-			dao.delete(praise);
-		}
+		dao.delete(praise);
 	}
 
 	// 点赞数增减

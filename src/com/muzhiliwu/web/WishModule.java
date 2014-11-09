@@ -34,13 +34,13 @@ public class WishModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object publish(@Param("::wish.") Wish wish, HttpSession session) {
-		ActionMessage am = new ActionMessage();
+
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		String result = wishService.publishOrUpdateWish(publisher, wish,
-				session);
+		String result = wishService.publishWish(publisher, wish, session);
 
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("愿望发表成功~");
 			am.setType(ActionMessage.success);
@@ -56,15 +56,18 @@ public class WishModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object update(@Param("::wish.") Wish wish, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		String result = wishService.publishOrUpdateWish(publisher, wish,
-				session);
+
+		String result = wishService.updateWish(publisher, wish);
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("愿望修改成功~");
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.fail.equals(result)) {
+			am.setMessage("愿望修改失败,您或许不是愿望发表者~");
+			am.setType(ActionMessage.fail);
 		}
 		return am;
 	}
@@ -72,9 +75,10 @@ public class WishModule {
 	// 将愿望分享到社交网站
 	@At
 	@Ok("json")
-	public Object share(@Param("::wish.") Wish wish) {
+	public Object share(@Param("::wish.") Wish wish, HttpSession session) {
+		User sharer = (User) session.getAttribute("t_user");
+		String result = wishService.shareWish(wish, sharer, session);
 		ActionMessage am = new ActionMessage();
-		String result = wishService.shareWish(wish);
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("愿望分享成功~");
 			am.setType(ActionMessage.success);
@@ -86,9 +90,9 @@ public class WishModule {
 	@At
 	@Ok("json")
 	public Object detail(@Param("::wish.") Wish wish, HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
 		ActionMessage am = new ActionMessage();
 		am.setMessage("获取愿望的详细信息");
-		User user = (User) session.getAttribute("t_user");
 		am.setObject(wishService.getDetail(wish, user));
 		am.setType(ActionMessage.success);
 		return am;
@@ -105,21 +109,43 @@ public class WishModule {
 		return am;
 	}
 
+	public Object cancelPraise(@Param("::wish.") Wish wish, HttpSession session) {
+		User praiser = (User) session.getAttribute("t_user");
+		// User praiser = dao
+		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+
+		String tmp = wishService.cancelPraiseWish(wish, praiser);
+		ActionMessage am = new ActionMessage();
+		if (ActionMessage.cancel.equals(tmp)) {
+			am.setMessage("点赞取消成功~");
+			am.setType(ActionMessage.cancel);
+		} else if (ActionMessage.fail.equals(tmp)) {
+			am.setMessage("点赞取消失败,您或许还未点赞~");
+			am.setType(ActionMessage.fail);
+		}
+		return am;
+	}
+
 	// 点赞或取消点赞
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object praise(@Param("::wish.") Wish wish, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User praiser = (User) session.getAttribute("t_user");
 		// User praiser = dao
 		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		if (wishService.praiseWish(wish, praiser)) {
+
+		String tmp = wishService.praiseWish(wish, praiser, session);
+		ActionMessage am = new ActionMessage();
+		if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("点赞成功~");
 			am.setType(ActionMessage.success);
-		} else {
-			am.setMessage("点赞取消成功~");
-			am.setType(ActionMessage.cancel);
+		} else if (ActionMessage.fail.equals(tmp)) {
+			am.setMessage("点赞失败,您或许已经点赞~");
+			am.setType(ActionMessage.fail);
+		} else if (ActionMessage.Not_Integral.equals(tmp)) {
+			am.setMessage("积分不够~");
+			am.setType(ActionMessage.Not_Integral);
 		}
 		return am;
 	}
@@ -186,11 +212,12 @@ public class WishModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object collect(@Param("::wish.") Wish wish, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User collecter = (User) session.getAttribute("t_user");
 		// User collecter = dao
 		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 		String result = wishService.collectWish(collecter, wish, session);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.Not_Integral.equals(result)) {
 			am.setMessage("积分不够,不能收藏~");
 			am.setType(ActionMessage.Not_Integral);
@@ -213,6 +240,7 @@ public class WishModule {
 		User collecter = (User) session.getAttribute("t_user");
 		// User collecter = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+
 		ActionMessage am = new ActionMessage();
 		if (wishService.cancelCollectWish(collecter, collect)) {
 			am.setMessage("收藏取消成功~");

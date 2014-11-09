@@ -40,26 +40,42 @@ public class ShareService {
 	 *            一条留言
 	 * @return
 	 */
-	public String publishOrUpdateShare(User sharer, Share share,
-			HttpSession session) {
-		if (Strings.isBlank(share.getId())) {// 发布分享
-			if (!userService.okIntegral(sharer,
-					Integral.Integral_For_Publish_Share, session)) {
-				return ActionMessage.Not_Integral;// 不够积分
-			}
-			share.setId(NumGenerator.getUuid());
-			share.setDate(DateUtils.now());
-			share.setSharerId(sharer.getId());
-			share.setType(Share.From_Own);// 原创
-			share.setCollectNum(0);// 收藏数为0
-			share.setCommentNum(0);// 评论数为0
-			share.setPraiseNum(0);// 点赞数为0
-			dao.insert(share);
-		} else {// 修改分享
-			share.setDate(DateUtils.now());
-			dao.update(share);
+	public String publishShare(User sharer, Share share, HttpSession session) {
+
+		if (!userService.okIntegral(sharer,
+				Integral.Integral_For_Publish_Share, session)) {
+			return ActionMessage.Not_Integral;// 不够积分
 		}
+		share.setId(NumGenerator.getUuid());
+		share.setDate(DateUtils.now());
+		share.setSharerId(sharer.getId());
+		share.setType(Share.From_Own);// 原创
+		share.setCollectNum(0);// 收藏数为0
+		share.setCommentNum(0);// 评论数为0
+		share.setPraiseNum(0);// 点赞数为0
+		dao.insert(share);
 		return ActionMessage.success;
+	}
+
+	/**
+	 * 更新一条分享
+	 * 
+	 * @param sharer
+	 *            分享者
+	 * @param tmp
+	 *            要更新的内容
+	 * @return
+	 */
+	public String updateShare(User sharer, Share tmp) {
+		Share share = dao.fetch(Share.class, tmp.getId());
+		if (share.getSharerId().equals(sharer.getId())) {
+			share.setContent(tmp.getContent());
+			share.setDate(DateUtils.now());
+			share.setTitle(tmp.getTitle());
+			dao.update(share);
+			return ActionMessage.success;
+		}
+		return ActionMessage.fail;
 	}
 
 	/**
@@ -74,11 +90,11 @@ public class ShareService {
 	 * @return
 	 */
 	public String collectShare(User collecter, Share share, HttpSession session) {
-		if (!userService.okIntegral(collecter,
-				Integral.Integral_For_Collect_Share, session)) {
-			return ActionMessage.Not_Integral;// 不够积分
-		}
 		if (okCollect(collecter, share)) {
+			if (!userService.okIntegral(collecter,
+					Integral.Integral_For_Collect_Share, session)) {
+				return ActionMessage.Not_Integral;// 不够积分
+			}
 			// 模拟一次转载收藏
 			share = dao.fetch(Share.class, share.getId());
 			Share collect = new Share();
@@ -131,7 +147,7 @@ public class ShareService {
 	 *            点赞者
 	 * @return
 	 */
-	public boolean praiseShare(Share share, User praiser) {
+	public String praiseShare(Share share, User praiser) {
 		if (okPraise(share, praiser)) {// 点赞
 			SharePraise praise = new SharePraise();
 			praise.setId(NumGenerator.getUuid());
@@ -142,15 +158,30 @@ public class ShareService {
 
 			createUnreadPraiseReply(praiser, share);// 给分享的发表者发送一条未读的点赞信息
 			dao.insert(praise);
-			return true;
-		} else {// 取消点赞
+			return ActionMessage.success;
+		}
+		return ActionMessage.fail;
+	}
+
+	/**
+	 * 取消点赞
+	 * 
+	 * @param share
+	 *            被取消点赞的分享
+	 * @param praiser
+	 *            点赞者
+	 * @return
+	 */
+	public String cancelPraiseShare(Share share, User praiser) {
+		if (!okPraise(share, praiser)) {
 			// 删除点赞记录
 			deletePraise(share, praiser);
 			changePraiseNumber(share, -1);
 
 			deleteUnreadPraiseReply(praiser, share);// 给分享的发表者发送一条未读的点赞信息
-			return false;
+			return ActionMessage.cancel;
 		}
+		return ActionMessage.fail;
 	}
 
 	/**
@@ -203,13 +234,11 @@ public class ShareService {
 		dao.fetchLinks(shares, "sharer");
 		// 如果该分享是收藏别人的,加载收藏的来源
 		dao.fetchLinks(shares, "fromer");
-		for (int i = 0; i < shares.size(); i++) {
-			shares.get(i).setCollected(false);
+		for (Share share : shares) {
+			share.setCollected(false);
 			// 判断用户有没有收藏该分享
-			if (user != null) {
-				if (!okCollect(user, shares.get(i))) {
-					shares.get(i).setCollected(true);
-				}
+			if (!okCollect(user, share)) {
+				share.setCollected(true);
 			}
 			// **********下面是详情~~~~~~~~~~~~~~~~
 			// 加载点赞者
@@ -255,10 +284,8 @@ public class ShareService {
 
 		// 判断用户有没有收藏该分享
 		share.setCollected(false);
-		if (user != null) {
-			if (!okCollect(user, share)) {
-				share.setCollected(true);
-			}
+		if (user != null && !okCollect(user, share)) {
+			share.setCollected(true);
 		}
 
 		dao.fetchLinks(share, "sharer");
@@ -276,13 +303,11 @@ public class ShareService {
 		dao.fetchLinks(share.getComments(), "commenter");
 		// 加载父评论者的信息
 		dao.fetchLinks(share.getComments(), "fatherCommenter");
-		for (int i = 0; i < share.getComments().size(); i++) {
+		for (ShareComment comment : share.getComments()) {
 			// 判断这条评论是否是本人发出的
-			share.getComments().get(i).setMeComment(false);
-			if (user != null
-					&& share.getComments().get(i).getCommenterId()
-							.equals(user.getId())) {
-				share.getComments().get(i).setMeComment(true);
+			comment.setMeComment(false);
+			if (user != null && comment.getCommenterId().equals(user.getId())) {
+				comment.setMeComment(true);
 			}
 		}
 		return share;
@@ -426,9 +451,8 @@ public class ShareService {
 				MessPraise.class,
 				Cnd.where("shareId", "=", share.getId()).and("praiserId", "=",
 						praiser.getId()));
-		if (praise != null) {
-			dao.delete(MessPraise.class, praise.getId());
-		}
+
+		dao.delete(MessPraise.class, praise.getId());
 	}
 
 	// 点赞数增减

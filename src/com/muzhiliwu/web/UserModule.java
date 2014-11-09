@@ -72,7 +72,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 几时检查用户输入的用户名是否已被注册 
+	// 几时检查用户输入的用户名是否已被注册
 	@At
 	@Ok("json")
 	public Object checkRepeat(@Param("::user.") User user) {
@@ -97,7 +97,8 @@ public class UserModule {
 			am.setType(ActionMessage.fail);
 			return am;
 		}
-		if (userService.registOrEditUser(user, user.getPass())) {
+		String tmp = userService.registOrEditUser(user, user.getPass());
+		if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("注册成功~");
 			am.setType(ActionMessage.success);
 		} else {
@@ -107,13 +108,14 @@ public class UserModule {
 		return am;
 	}
 
-	// 修改个人资料 
+	// 修改个人资料
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object editSelf(@Param("::user.") User user, HttpSession session) {
 		ActionMessage am = new ActionMessage();
-		if (userService.registOrEditUser(user, user.getPass())) {
+		String tmp = userService.registOrEditUser(user, user.getPass());
+		if (ActionMessage.success.equals(tmp)) {
 			am.setType(ActionMessage.success);
 			am.setMessage("个人信息修改成功~");
 		} else {
@@ -123,7 +125,7 @@ public class UserModule {
 		return am;
 	}
 
-	// 修改密码 
+	// 修改密码
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
@@ -131,6 +133,7 @@ public class UserModule {
 		User user = (User) session.getAttribute("t_user");
 		// User user = new User();// 测试用的
 		// user.setId("673e21df955d4da5930910282fbfeaf2");
+
 		ActionMessage am = new ActionMessage();
 		if (userService.changePass(user, oldPass, newPass)) {
 			am.setMessage("密码修改成功~");
@@ -179,6 +182,7 @@ public class UserModule {
 		User user = (User) session.getAttribute("t_user");
 		boolean result = userService.uploadPhoto(user.getCode(), tfs,
 				context.getRealPath("/"));
+
 		ActionMessage am = new ActionMessage();
 		if (result) {
 			am.setMessage("头像上传成功^_^");
@@ -192,34 +196,35 @@ public class UserModule {
 	}
 
 	// 获取用户头像
-	@At
-	@Ok("void")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public void getUserPic(HttpServletResponse response, String code,
-			ServletContext context) throws IOException {
-		ServletOutputStream out = response.getOutputStream();// 获取输出流
-		response.setContentType("image/gif");
-		response.setHeader("Pragma", "No-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setDateHeader("Expires", 0);
-
-		// 通过过滤查找图片
-		String regx = code + ".*";
-		File f2 = new File(context.getRealPath("/") + "/WEB-INF/userphoto/");
-
-		File[] s = f2.listFiles(new FileFilter(regx));
-		if (s == null || s.length <= 0) {
-			return;
-		}
-
-		InputStream fis = new FileInputStream(s[0]);
-		int i = fis.available();// 得到文件大小
-		byte buf[] = new byte[i];
-		int len = 0;
-		while ((len = fis.read(buf)) != -1) {
-			out.write(buf, 0, len);
-		}
-		out.close();
-		fis.close();
-	}
+	// @At
+	// @Ok("void")
+	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
+	// }))
+	// public void getUserPic(HttpServletResponse response, String code,
+	// ServletContext context) throws IOException {
+	// ServletOutputStream out = response.getOutputStream();// 获取输出流
+	// response.setContentType("image/gif");
+	// response.setHeader("Pragma", "No-cache");
+	// response.setHeader("Cache-Control", "no-cache");
+	// response.setDateHeader("Expires", 0);
+	//
+	// // 通过过滤查找图片
+	// String regx = code + ".*";
+	// File f2 = new File(context.getRealPath("/") + "/WEB-INF/userphoto/");
+	//
+	// File[] s = f2.listFiles(new FileFilter(regx));
+	// if (s == null || s.length <= 0) {
+	// return;
+	// }
+	//
+	// InputStream fis = new FileInputStream(s[0]);
+	// int i = fis.available();// 得到文件大小
+	// byte buf[] = new byte[i];
+	// int len = 0;
+	// while ((len = fis.read(buf)) != -1) {
+	// out.write(buf, 0, len);
+	// }
+	// out.close();
+	// fis.close();
+	// }
 }

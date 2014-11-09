@@ -1,5 +1,7 @@
 package com.muzhiliwu.web;
 
+import java.awt.Desktop.Action;
+
 import javax.servlet.http.HttpSession;
 
 import org.nutz.dao.Dao;
@@ -34,12 +36,12 @@ public class ShareModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object publish(@Param("::share.") Share share, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		String result = shareService.publishOrUpdateShare(publisher, share,
-				session);
+		String result = shareService.publishShare(publisher, share, session);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("分享发表成功~");
 			am.setType(ActionMessage.success);
@@ -55,15 +57,18 @@ public class ShareModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object update(@Param("::share.") Share share, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		String result = shareService.publishOrUpdateShare(publisher, share,
-				session);
+		String result = shareService.updateShare(publisher, share);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("留言更改成功~");
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.fail.equals(result)) {
+			am.setMessage("留言更改失败,请确保您是留言的发表者");
+			am.setType(ActionMessage.fail);
 		}
 		return am;
 	}
@@ -76,8 +81,9 @@ public class ShareModule {
 		User collecter = (User) session.getAttribute("t_user");
 		// User collecter = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		ActionMessage am = new ActionMessage();
 		String result = shareService.collectShare(collecter, share, session);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("收藏成功~");
 			am.setType(ActionMessage.success);
@@ -100,6 +106,7 @@ public class ShareModule {
 		User collecter = (User) session.getAttribute("t_user");
 		// User collecter = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+
 		ActionMessage am = new ActionMessage();
 		if (shareService.cancelCollectShare(collecter, share)) {
 			am.setMessage("收藏取消成功~");
@@ -116,16 +123,39 @@ public class ShareModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object praise(@Param("::share.") Share share, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User praiser = (User) session.getAttribute("t_user");
 		// User praiser = dao
 		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		if (shareService.praiseShare(share, praiser)) {
+
+		String tmp = shareService.praiseShare(share, praiser);
+		ActionMessage am = new ActionMessage();
+		if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("点赞成功~");
 			am.setType(ActionMessage.success);
-		} else {
+		} else if (ActionMessage.fail.equals(tmp)) {
+			am.setMessage("点赞失败,您或许已经点赞~");
+			am.setType(ActionMessage.fail);
+		}
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object cancelPraise(@Param("::share.") Share share,
+			HttpSession session) {
+		User praiser = (User) session.getAttribute("t_user");
+		// User praiser = dao
+		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+
+		String tmp = shareService.cancelPraiseShare(share, praiser);
+		ActionMessage am = new ActionMessage();
+		if (ActionMessage.cancel.equals(tmp)) {
 			am.setMessage("点赞取消成功~");
 			am.setType(ActionMessage.cancel);
+		} else if (ActionMessage.fail.equals(tmp)) {
+			am.setMessage("点赞取消失败,您或许未曾点赞~");
+			am.setType(ActionMessage.fail);
 		}
 		return am;
 	}
@@ -142,9 +172,10 @@ public class ShareModule {
 		// User commenter = dao.fetch(User.class,
 		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
-		ActionMessage am = new ActionMessage();
 		String result = shareService.commentShare(share, commenter, comment,
 				fatherCommenter, session);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("评论成功~");
 			am.setType(ActionMessage.success);
@@ -199,9 +230,10 @@ public class ShareModule {
 	@At
 	@Ok("json")
 	public Object detail(@Param("::share.") Share share, HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
 		ActionMessage am = new ActionMessage();
 		am.setMessage("获取分享详细内容~");
-		User user = (User) session.getAttribute("t_user");
 		am.setObject(shareService.getDetail(share, user));
 		am.setType(ActionMessage.success);
 		return am;

@@ -8,7 +8,7 @@ public class Integral {
 	// Message
 	public static final int Integral_For_Comment_Message = 10;
 	public static final int Integral_For_Publish_Message = -10;
-	// public static final int Integral_For_Praise_Message = 10;
+	public static final int Integral_For_Praise_Message = 10;
 
 	// Share
 	public static final int Integral_For_Comment_Share = 10;
@@ -21,7 +21,8 @@ public class Integral {
 	public static final int Integral_For_Publish_Gift_Wish = 10;
 	public static final int Integral_For_Publish_No_Gift_Wish = 10;
 	public static final int Integral_For_Collect_Wish = -10;
-	// public static final int Integral_For_Praise_Wish = 10;
+	public static final int Integral_for_Share_Wish = 10;
+	public static final int Integral_For_Praise_Wish = 10;
 
 	// Gift
 	public static final int Integral_For_Collect_Gift = 10;

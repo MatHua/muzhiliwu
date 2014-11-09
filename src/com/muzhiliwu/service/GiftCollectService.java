@@ -45,13 +45,18 @@ public class GiftCollectService {
 	 *            被收藏的礼品商品
 	 * @return
 	 */
-	public String collectGift(User collector, Gift gift) {
+	public String collectGift(User collector, Gift gift, GiftCollect collect,
+			HttpSession session) {
 		if (okCollect(collector, gift)) {// 可以被收藏
-			GiftCollect collect = new GiftCollect();
+			if (!userService.okIntegral(collector,
+					Integral.Integral_For_Collect_Gift, session)) {
+				return ActionMessage.Not_Integral;
+			}
 			collect.setId(NumGenerator.getUuid());// 主键id
 			collect.setDate(DateUtils.now());// 被收藏时间
 			collect.setCollectorId(collector.getId());// 收藏者id
 			collect.setGiftId(gift.getId());// 礼品id
+
 			collect.setPraiseNum(0);// 点赞数为0
 			collect.setCommentNum(0);// 评论数为0
 			dao.insert(collect);
@@ -94,7 +99,7 @@ public class GiftCollectService {
 	public String commentGiftCollect(GiftCollect collect, User commenter,
 			GiftCollectComment comment, User fatherCommenter,
 			HttpSession session) {
-		if (userService.okIntegral(commenter,
+		if (!userService.okIntegral(commenter,
 				Integral.Integral_For_Collect_Gift, session)) {
 			return ActionMessage.Not_Integral;
 		}
@@ -124,8 +129,14 @@ public class GiftCollectService {
 	 *            被点赞的礼品收藏
 	 * @return
 	 */
-	public String praiseGiftCollect(User praiser, GiftCollect collect) {
+	public String praiseGiftCollect(User praiser, GiftCollect collect,
+			HttpSession session) {
 		if (okPraise(praiser, collect)) {
+			if (!userService.okIntegral(praiser,
+					Integral.Integral_For_Praise_Gift, session)) {
+				return ActionMessage.Not_Integral;
+			}
+
 			GiftCollectPraise praise = new GiftCollectPraise();
 			praise.setId(NumGenerator.getUuid());// 主键id
 			praise.setDate(DateUtils.now());// 点赞时间
@@ -135,32 +146,95 @@ public class GiftCollectService {
 			changeGiftCollectPraiseNum(collect, 1);// 对应商品收藏的点赞数+1
 			createUnreadPraiseReply(praiser, collect);// 给礼品收藏者发送一条点赞类未读信息
 			return ActionMessage.success;
-		} else {
+		}
+		return ActionMessage.fail;
+	}
+
+	/**
+	 * 取消礼品收藏的点赞
+	 * 
+	 * @param praiser
+	 *            点赞者
+	 * @param collect
+	 *            被取消点赞的礼品收藏
+	 * @return
+	 */
+	public String cancelPraiseGiftCollect(User praiser, GiftCollect collect) {
+		if (!okPraise(praiser, collect)) {
 			deletePraise(praiser, collect);// 删除对应的点赞记录
 			changeGiftCollectPraiseNum(collect, -1);// 对应的点赞数-1
 			deleteUnreadPraiseReply(praiser, collect);// 删除对应的点赞类未读信息
 			return ActionMessage.cancel;
 		}
+		return ActionMessage.fail;
 	}
 
-	// public QueryResult getMyGiftCollect(User user, Pager page) {
-	// List<GiftCollect> collects = dao.query(GiftCollect.class,
-	// Cnd.where("collectorId", "=", user.getId()).desc("date"), page);
-	// page.setRecordCount(dao.count(GiftCollect.class,
-	// Cnd.where("collectorId", "=", user.getId())));
-	// dao.fetchLinks(collects, "collect");
-	// }
+	/**
+	 * 获取我的礼品收藏
+	 * 
+	 * @param user
+	 *            指代"自己"
+	 * @param page
+	 *            分页参数
+	 * @return
+	 */
+	public QueryResult getMyGiftCollects(User user, Pager page) {
+		List<GiftCollect> collects = dao.query(GiftCollect.class,
+				Cnd.where("collectorId", "=", user.getId()).desc("date"), page);
+		page.setRecordCount(dao.count(GiftCollect.class,
+				Cnd.where("collectorId", "=", user.getId())));
+		dao.fetchLinks(collects, "collector");
+		dao.fetchLinks(collects, "gift");
 
-	// for (int i = 0; i < msgs.size(); i++) {
-	// // 加载发表者
-	// dao.fetchLinks(msgs.get(i), "publisher");
-	// }
-	// // **********下面是详情~~~~~~~~~~~~~~~~
-	// // 加载点赞者
-	// // 加载评论者
-	// // 加载每条评论的父评论
-	// return new QueryResult(msgs, page);
-	// }
+		// **********下面是详情~~~~~~~~~~~~~~~~
+		// 加载点赞者
+		// 加载评论者
+		// 加载每条评论的父评论
+		return new QueryResult(collects, page);
+	}
+
+	/**
+	 * 获取某一页礼品收藏
+	 * 
+	 * @param page
+	 *            分页参数
+	 * @return
+	 */
+	public QueryResult getGiftCollects(Pager page) {
+		List<GiftCollect> collects = dao.query(GiftCollect.class, Cnd.orderBy()
+				.desc("date"), page);
+		page.setRecordCount(dao.count(GiftCollect.class));
+		dao.fetchLinks(collects, "collector");
+		dao.fetchLinks(collects, "gift");
+
+		// **********下面是详情~~~~~~~~~~~~~~~~
+		// 加载点赞者
+		// 加载评论者
+		// 加载每条评论的父评论
+		return new QueryResult(collects, page);
+	}
+
+	public GiftCollect getDetails(GiftCollect collect, User user) {
+		collect = dao.fetch(GiftCollect.class, collect.getId());
+		dao.fetchLinks(collect, "collector");// 加载收藏者
+		dao.fetchLinks(collect, "gift");// 加载收藏的商品
+
+		dao.fetchLinks(collect, "praises");// 加载点赞信息
+		dao.fetchLinks(collect.getPraises(), "praiser");// 加载点赞者信息
+
+		dao.fetchLinks(collect, "comments");// 加载评论信息
+		dao.fetchLinks(collect.getComments(), "commenter");// 加载所有评论者信息
+		dao.fetchLinks(collect.getComments(), "fatherCommenter");// 加载父评论信息
+
+		for (GiftCollectComment comment : collect.getComments()) {
+			// 判断这条评论是否是本人发出的
+			comment.setMeComment(false);
+			if (user != null && comment.getCommenterId().equals(user.getId())) {
+				comment.setMeComment(true);
+			}
+		}
+		return collect;
+	}
 
 	/**
 	 * 获取@到自己的点赞类信息
@@ -238,9 +312,7 @@ public class GiftCollectService {
 				GiftCollectPraise.class,
 				Cnd.where("praiserId", "=", praiser.getId()).and("collectId",
 						"=", collect.getId()));
-		if (praise != null) {
-			dao.delete(praise);
-		}
+		dao.delete(praise);
 	}
 
 	// 判断该商品是否已被该用户收藏~

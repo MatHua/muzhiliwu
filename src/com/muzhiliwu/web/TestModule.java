@@ -53,4 +53,23 @@ public class TestModule {
 		am.setMessage("雅妹蝶~");
 		return am;
 	}
+
+	@At
+	@Ok("json")
+	public Object delete(String id) {
+		TestDemo xx = dao.fetch(TestDemo.class, id);
+		dao.fetchLinks(xx, "myTests");
+		dao.deleteWith(xx, "myTests");
+
+		ActionMessage am = new ActionMessage();
+		List<TestDemo> tests = dao.query(TestDemo.class,
+				Cnd.where("name", "=", "name"));
+		dao.fetchLinks(tests, "myTests");
+		for (TestDemo test : tests) {
+			dao.fetchLinks(test.getMyTests(), "msgs");
+		}
+		am.setObject(tests);
+		am.setMessage("雅妹蝶~");
+		return am;
+	}
 }

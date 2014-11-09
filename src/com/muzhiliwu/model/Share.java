@@ -27,6 +27,15 @@ public class Share extends IdEntity {
 	private User fromer;// 收藏来源者
 
 	@Column
+	private String sharerId;// 分享者id
+	@One(target = User.class, field = "sharerId")
+	private User sharer;// 用于记录该分享的发布者
+
+	@Column
+	private String collectId;// 记录收藏的分享id
+	public boolean collected;// 标记是否被当前用户收藏
+
+	@Column
 	private int commentNum;// 评论数
 	@Many(target = ShareComment.class, field = "shareId")
 	private List<ShareComment> comments;// 该分享的所有评论
@@ -38,18 +47,9 @@ public class Share extends IdEntity {
 
 	@Column
 	private int collectNum;// 被收藏数
+
 	// @Many(target = ShareCollect.class, field = "shareId")
 	// private List<ShareCollect> collectes;// 便于记录分享的收藏者
-
-	@Column
-	private String sharerId;// 分享者id
-	@One(target = User.class, field = "sharerId")
-	private User sharer;// 用于记录该分享的发布者
-
-	@Column
-	private String collectId;// 记录收藏的分享id
-
-	public boolean collected;// 标记是否被当前用户收藏
 
 	public String getSharerId() {
 		return sharerId;

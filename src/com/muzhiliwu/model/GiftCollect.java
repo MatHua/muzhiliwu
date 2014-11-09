@@ -29,7 +29,7 @@ public class GiftCollect extends IdEntity {
 	@Column
 	private String giftId;// 被收藏的礼品的id
 	@One(target = Gift.class, field = "giftId")
-	private Gift collect;// 被收藏的礼物
+	private Gift gift;// 被收藏的礼物
 
 	@Column
 	private int commentNum;// 评论数
@@ -63,14 +63,6 @@ public class GiftCollect extends IdEntity {
 
 	public void setGiftId(String giftId) {
 		this.giftId = giftId;
-	}
-
-	public Gift getCollect() {
-		return collect;
-	}
-
-	public void setCollect(Gift collect) {
-		this.collect = collect;
 	}
 
 	public int getCommentNum() {
@@ -119,6 +111,14 @@ public class GiftCollect extends IdEntity {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public Gift getGift() {
+		return gift;
+	}
+
+	public void setGift(Gift gift) {
+		this.gift = gift;
 	}
 
 }

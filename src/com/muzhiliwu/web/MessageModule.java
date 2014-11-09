@@ -34,13 +34,13 @@ public class MessageModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object publish(@Param("::msg.") Message msg, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
-		String result = messageService.publishOrUpdateMessage(publisher, msg,
-				session);
+		String result = messageService.publishMessage(publisher, msg, session);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {// 发表成功
 			am.setMessage("留言发表成功~");
 			am.setType(ActionMessage.success);
@@ -56,16 +56,19 @@ public class MessageModule {
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object update(@Param("::msg.") Message msg, HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
 		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
-		String result = messageService.publishOrUpdateMessage(publisher, msg,
-				session);
+		String result = messageService.updateMessage(publisher, msg);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {// 发表成功
 			am.setMessage("留言修改成功~");
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.fail.equals(result)) {
+			am.setMessage("留言修改失败,您或许不是留言发表者~");
+			am.setType(ActionMessage.fail);
 		}
 		return am;
 	}
@@ -108,21 +111,47 @@ public class MessageModule {
 		return ams;
 	}
 
-	// 点赞或取消点赞
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	public Object cancelPraise(@Param("::msg.") Message msg, HttpSession session) {
+		User praiser = (User) session.getAttribute("t_user");
+		// User praiser = dao
+		// .fetch(User.class, "7f74f863a1474866ac1151bc179c60ab");// 用来测试
+
+		String tmp = messageService.cancelPraiseMessage(msg, praiser);
+		ActionMessage am = new ActionMessage();
+		if (ActionMessage.cancel.equals(tmp)) {
+			am.setMessage("点赞取消成功~");
+			am.setType(ActionMessage.cancel);
+		} else if (ActionMessage.fail.equals(tmp)) {
+			am.setMessage("点赞取消失败,也许您未曾点赞");
+			am.setType(ActionMessage.fail);
+		}
+		return am;
+	}
+
+	// 点赞
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object praise(@Param("::msg.") Message msg, HttpSession session) {
-		ActionMessage am = new ActionMessage();
+
 		User praiser = (User) session.getAttribute("t_user");
 		// User praiser = dao
 		// .fetch(User.class, "7f74f863a1474866ac1151bc179c60ab");// 用来测试
-		if (messageService.praiseMessage(msg, praiser)) {
+
+		String tmp = messageService.praiseMessage(msg, praiser, session);
+		ActionMessage am = new ActionMessage();
+		if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("点赞成功~");
 			am.setType(ActionMessage.success);
-		} else {
-			am.setMessage("点赞取消成功~");
-			am.setType(ActionMessage.cancel);
+		} else if (ActionMessage.fail.equals(tmp)) {
+			am.setMessage("点赞失败,请不要重复点赞~");
+			am.setType(ActionMessage.fail);
+		} else if (ActionMessage.Not_Integral.equals(tmp)) {
+			am.setMessage("积分不够~");
+			am.setType(ActionMessage.Not_Integral);
 		}
 		return am;
 	}
@@ -135,12 +164,13 @@ public class MessageModule {
 			@Param("::comment.") MessComment comment,
 			@Param("::fatherCommenter.") User fatherCommenter,
 			HttpSession session) {
-		ActionMessage am = new ActionMessage();
 		User commenter = (User) session.getAttribute("t_user");
 		// User commenter = dao.fetch(User.class,
 		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 		String result = messageService.commentMessage(msg, commenter, comment,
 				fatherCommenter, session);
+
+		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("评论成功~");
 			am.setType(ActionMessage.success);
@@ -163,7 +193,7 @@ public class MessageModule {
 		return am;
 	}
 
-	// 获取@我的消息
+	// 获取@我的点赞类未读信息消息
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))

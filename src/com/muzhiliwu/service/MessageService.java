@@ -41,24 +41,42 @@ public class MessageService {
 	 *            修改积分
 	 * @return
 	 */
-	public String publishOrUpdateMessage(User publisher, Message msg,
+	public String publishMessage(User publisher, Message msg,
 			HttpSession session) {
-		if (Strings.isBlank(msg.getId())) {// 发布一条留言
-			if (!userService.okIntegral(publisher,
-					Integral.Integral_For_Publish_Message, session)) {
-				return ActionMessage.Not_Integral;// 不够积分
-			}
-			msg.setId(NumGenerator.getUuid());
-			msg.setDate(DateUtils.now());
-			msg.setPublisherId(publisher.getId());
-			msg.setPraiseNum(0);// 点赞数为0
-			msg.setCommentNum(0);// 评论数
-			dao.insert(msg);
-		} else {// 修改一条留言
-			msg.setDate(DateUtils.now());
-			dao.update(msg);
+		// 发布一条留言
+		if (!userService.okIntegral(publisher,
+				Integral.Integral_For_Publish_Message, session)) {
+			return ActionMessage.Not_Integral;// 不够积分
 		}
+		msg.setId(NumGenerator.getUuid());
+		msg.setDate(DateUtils.now());
+		msg.setPublisherId(publisher.getId());
+		msg.setPraiseNum(0);// 点赞数为0
+		msg.setCommentNum(0);// 评论数
+		dao.insert(msg);
 		return ActionMessage.success;
+	}
+
+	/**
+	 * 更新一条留言
+	 * 
+	 * @param publisher
+	 *            验证是否是留言发表者
+	 * @param tmp
+	 *            留言要更新的内容
+	 * @return
+	 */
+	public String updateMessage(User publisher, Message tmp) {
+		Message mess = dao.fetch(Message.class, tmp.getId());
+		if (mess.getPublisherId().equals(publisher.getId())) {
+			// 下面是可能要修改的信息~一些不能修改的信息不能在此修改
+			mess.setContent(tmp.getContent());
+			mess.setDate(DateUtils.now());
+			mess.setTitle(tmp.getTitle());
+			dao.update(mess);
+			return ActionMessage.success;
+		}
+		return ActionMessage.fail;
 	}
 
 	/**
@@ -70,8 +88,12 @@ public class MessageService {
 	 *            点赞者
 	 * @return
 	 */
-	public boolean praiseMessage(Message msg, User praiser) {
+	public String praiseMessage(Message msg, User praiser, HttpSession session) {
 		if (okPraise(msg, praiser)) {// 点赞
+			if (!userService.okIntegral(praiser,
+					Integral.Integral_For_Praise_Message, session)) {
+				return ActionMessage.Not_Integral;
+			}
 			MessPraise praise = new MessPraise();
 			praise.setId(NumGenerator.getUuid());
 			praise.setDate(DateUtils.now());
@@ -81,14 +103,29 @@ public class MessageService {
 			dao.insert(praise);
 
 			createUnreadPraiseReply(praiser, msg);// 给留言发表者发送一条未读的点赞信息
-			return true;
-		} else {// 取消点赞
+			return ActionMessage.success;
+		}
+		return ActionMessage.fail;
+	}
+
+	/**
+	 * 取消点赞
+	 * 
+	 * @param msg
+	 *            被取消点赞的留言
+	 * @param praiser
+	 *            点赞者
+	 * @return
+	 */
+	public String cancelPraiseMessage(Message msg, User praiser) {
+		if (!okPraise(msg, praiser)) {
 			deletePraise(msg, praiser);// 删除点赞记录
 			changePraiseNumber(msg, -1);// 点赞数-1
 
 			deleteUnreadPraiseReply(praiser, msg);// 删除对应的未读的点赞信息
-			return false;
+			return ActionMessage.cancel;
 		}
+		return ActionMessage.fail;
 	}
 
 	/**
@@ -194,13 +231,11 @@ public class MessageService {
 		dao.fetchLinks(msg.getComments(), "commenter");
 		// 加载父评论者的信息
 		dao.fetchLinks(msg.getComments(), "fatherCommenter");
-		for (int i = 0; i < msg.getComments().size(); i++) {
+		for (MessComment comment : msg.getComments()) {
 			// 判断这条评论是否是本人发出的
-			msg.getComments().get(i).setMeComment(false);
-			if (user != null
-					&& msg.getComments().get(i).getCommenterId()
-							.equals(user.getId())) {
-				msg.getComments().get(i).setMeComment(true);
+			comment.setMeComment(false);
+			if (user != null && comment.getCommenterId().equals(user.getId())) {
+				comment.setMeComment(true);
 			}
 		}
 		return msg;
@@ -286,9 +321,7 @@ public class MessageService {
 				MessPraise.class,
 				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
 						praiser.getId()));
-		if (praise != null) {
-			dao.delete(MessPraise.class, praise.getId());
-		}
+		dao.delete(MessPraise.class, praise.getId());
 	}
 
 	// 点赞数增减

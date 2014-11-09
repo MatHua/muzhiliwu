@@ -16,6 +16,7 @@ import org.nutz.mvc.upload.TempFile;
 import com.muzhiliwu.model.MessUnreadReply;
 import com.muzhiliwu.model.ShareUnreadReply;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
 import com.muzhiliwu.utils.Integral;
@@ -50,11 +51,11 @@ public class UserService {
 	 * @param pass
 	 * @return
 	 */
-	public boolean registOrEditUser(User user, String pass) {
+	public String registOrEditUser(User user, String pass) {
 		if (Strings.isBlank(user.getId())) {// 注册
 			// 账号已被注册
 			if (!checkRepeat(user.getCode())) {
-				return false;
+				return ActionMessage.fail;
 			}
 			// 一些系统自修改的信息
 			user.setCode(user.getCode().trim());
@@ -72,7 +73,7 @@ public class UserService {
 			user.setDate(DateUtils.now());
 			dao.update(user);
 		}
-		return true;
+		return ActionMessage.success;
 	}
 
 	public boolean checkRepeat(String code) {
@@ -108,7 +109,8 @@ public class UserService {
 		// 更新数据库信息
 		User u = getUserByCode(code);
 		if (u != null) {
-			template += "/WEB-INF/userphoto/";
+			// template += "/WEB-INF/userphoto/";
+			template += "/userphoto/";
 
 			// 如果对应的文件夹不存在,就创建该文件夹
 			Files.createDirIfNoExists(template);
@@ -170,10 +172,8 @@ public class UserService {
 	// 检查密码
 	private boolean checkPass(User user, String oldPass) {
 		MD5 md5 = new MD5();
-		if (user != null) {
-			if (md5.getMD5ofStr(oldPass).equals(user.getPass())) {
-				return true;
-			}
+		if (user != null && md5.getMD5ofStr(oldPass).equals(user.getPass())) {
+			return true;
 		}
 		return false;
 	}
