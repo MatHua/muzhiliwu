@@ -3,12 +3,15 @@ package com.muzhiliwu.model.gift;
 import java.util.List;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 //商品标签表
 @Table("t_tag")
+@TableIndexes({ @Index(name = "idx_tag", fields = { "creatorId" }, unique = false) })
 public class Tag extends IdEntity {
 	@Column
 	private String creatorId;// 创建者id

@@ -3,10 +3,13 @@ package com.muzhiliwu.model;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_gift_collect_unread_reply")
+@TableIndexes({ @Index(name = "idx_gift_collect_unread_reply", fields = { "receiverId" }, unique = false) })
 public class GiftCollectUnreadReply extends IdEntity {
 	public static final String Nuread = "unread";// 未读
 	public static final String Read = "read";// 已读

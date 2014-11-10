@@ -3,6 +3,7 @@ package com.muzhiliwu.model;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Table;
 
+//测试用的~
 @Table("t_my_msg")
 public class MyMsg extends IdEntity {
 	@Column

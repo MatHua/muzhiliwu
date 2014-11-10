@@ -5,10 +5,13 @@ import java.util.List;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_user")
+@TableIndexes({ @Index(name = "idx_user", fields = { "code" }, unique = false) })
 public class User extends IdEntity {
 	@Column
 	private String code;// 账号

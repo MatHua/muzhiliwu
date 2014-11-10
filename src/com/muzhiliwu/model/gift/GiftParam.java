@@ -1,10 +1,13 @@
 package com.muzhiliwu.model.gift;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 //商品的一些具体参数
 @Table("t_gift_param")
+@TableIndexes({ @Index(name = "idx_gift_param", fields = { "giftId" }, unique = false) })
 public class GiftParam extends IdEntity {
 	@Column
 	private String giftId;// 商品id

@@ -3,13 +3,16 @@ package com.muzhiliwu.model.gift;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.User;
 
 //商家未读信息表
 @Table("t_shop_unread_reply")
+@TableIndexes({ @Index(name = "idx_shop_unread_reply", fields = { "shopId" }, unique = false) })
 public class ShopUnreadReply extends IdEntity {
 	public static final String Nuread = "unread";// 未读
 	public static final String Read = "read";// 已读

@@ -14,6 +14,7 @@ import org.nutz.dao.entity.annotation.TableIndexes;
 @Table("t_mess_comment")
 // @TableIndexes(value = { @Index(fields = { "messCommentId" }, unique = false,
 // name = "otherMessComment") })
+@TableIndexes({ @Index(name = "idx_mess_comment", fields = { "messId" }, unique = false) })
 public class MessComment extends IdEntity {
 	@Column
 	private String messId;// 留言id,用于联结"t_message"表的messageId(id)

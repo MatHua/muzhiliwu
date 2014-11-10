@@ -3,13 +3,16 @@ package com.muzhiliwu.model.gift;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.User;
 
 //用户地址信息表
 @Table("t_receive_contact_way")
+@TableIndexes({ @Index(name = "idx_receive_contact_way", fields = { "creatorId" }, unique = false) })
 public class ReceiveContactWay extends IdEntity {
 	@Column
 	private String creatorId;// 创建者id

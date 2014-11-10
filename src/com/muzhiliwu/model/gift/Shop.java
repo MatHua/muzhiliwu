@@ -5,11 +5,14 @@ import java.util.List;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 //保存商家的表
 @Table("t_shop")
+@TableIndexes({ @Index(name = "idx_shop", fields = { "code" }, unique = false) })
 public class Shop extends IdEntity {
 	public static final String EntityShop = "entity_shop";// 实体店
 	public static final String OnlineStore = "online_store";// 网店
@@ -19,6 +22,11 @@ public class Shop extends IdEntity {
 
 	public static final String CanBusiness = "can_business";// 可营业状态
 	public static final String BanBusiness = "ban_business";// 被超级管理员禁止营业
+
+	@Column
+	private String code;// 商店账号
+	@Column
+	private String pass;// 密码
 
 	@Column
 	private String shopName;// 店名
@@ -154,6 +162,22 @@ public class Shop extends IdEntity {
 
 	public void setShopStory(String shopStory) {
 		this.shopStory = shopStory;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getPass() {
+		return pass;
+	}
+
+	public void setPass(String pass) {
+		this.pass = pass;
 	}
 
 }

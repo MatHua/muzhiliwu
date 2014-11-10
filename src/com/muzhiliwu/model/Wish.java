@@ -5,13 +5,16 @@ import java.util.List;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.gift.OrderFormForWish;
 
 @Table("t_wish")
+@TableIndexes({ @Index(name = "idx_wish", fields = { "wisherId" }, unique = false) })
 public class Wish extends IdEntity {
 	// state
 	public static final String Unrealized = "unrealized";// 为实现愿望

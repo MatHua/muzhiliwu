@@ -6,13 +6,16 @@ import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Comment;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.gift.Gift;
 
 @Table("t_gift_collect")
+@TableIndexes({ @Index(name = "idx_gift_collect", fields = { "collectorId" }, unique = false) })
 public class GiftCollect extends IdEntity {
 	@Column
 	private String collectorId;// 收藏者id

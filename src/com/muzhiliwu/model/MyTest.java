@@ -6,6 +6,7 @@ import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Table;
 
+//测试用的~
 @Table("t_my_test")
 public class MyTest extends IdEntity {
 	@Column

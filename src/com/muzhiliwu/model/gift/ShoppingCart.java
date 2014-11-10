@@ -3,15 +3,18 @@ package com.muzhiliwu.model.gift;
 import java.util.List;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.User;
 
 //购物车~
 @Table("t_shopping_cart")
+@TableIndexes({ @Index(name = "idx_shopping_cart", fields = { "buyerId" }, unique = false) })
 public class ShoppingCart extends IdEntity {
 
 	@Column

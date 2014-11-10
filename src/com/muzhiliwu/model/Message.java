@@ -5,11 +5,14 @@ import java.util.List;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_mess")
+@TableIndexes({ @Index(name = "idx_mess", fields = { "publisherId" }, unique = false) })
 public class Message extends IdEntity {// 留言墙
 	@Column
 	@ColDefine(type = ColType.TEXT)

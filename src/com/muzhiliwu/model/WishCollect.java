@@ -1,10 +1,13 @@
 package com.muzhiliwu.model;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_wish_collect")
+@TableIndexes({ @Index(name = "idx_wish_collect", fields = { "wishId" }, unique = false) })
 public class WishCollect extends IdEntity {
 	@Column
 	private String wishId;// 联结"t_wish"表

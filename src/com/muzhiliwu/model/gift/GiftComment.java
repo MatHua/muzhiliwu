@@ -3,13 +3,16 @@ package com.muzhiliwu.model.gift;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.User;
 
 //商品评价表
 @Table("t_gift_comment")
+@TableIndexes({ @Index(name = "idx_gift_comment", fields = { "giftId" }, unique = false) })
 public class GiftComment extends IdEntity {
 	public static final String Good = "good";// 好评
 	public static final String Bad = "bad";// 差评

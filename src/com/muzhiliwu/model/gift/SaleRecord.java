@@ -1,13 +1,16 @@
 package com.muzhiliwu.model.gift;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.User;
 
 //成交记录表
 @Table("t_sale_record")
+@TableIndexes({ @Index(name = "idx_sale_record", fields = { "giftId" }, unique = false) })
 public class SaleRecord extends IdEntity {
 	@Column
 	private String giftId;// 用于联结

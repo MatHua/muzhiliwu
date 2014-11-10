@@ -1,15 +1,19 @@
 package com.muzhiliwu.model.gift;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
 
 //许愿商品订单
 @Table("t_order_form_for_wish")
+@TableIndexes({ @Index(name = "idx_order_form_for_wish", fields = {
+		"creatorId", "wishId" }, unique = false) })
 public class OrderFormForWish {
 	@Name
 	@Column

@@ -1,10 +1,13 @@
 package com.muzhiliwu.model;
 
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_share_praise")
+@TableIndexes({ @Index(name = "idx_share_praise", fields = { "shareId" }, unique = false) })
 public class SharePraise extends IdEntity {
 	@Column
 	private String shareId;// 联结"t_share"表

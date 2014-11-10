@@ -3,11 +3,14 @@ package com.muzhiliwu.model;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 //分享的未读回复
 @Table("t_share_unread_reply")
+@TableIndexes({ @Index(name = "idx_share_unread_reply", fields = { "receiverId" }, unique = false) })
 public class ShareUnreadReply extends IdEntity {
 	public static final String Nuread = "unread";// 未读
 	public static final String Read = "read";// 已读
@@ -18,7 +21,7 @@ public class ShareUnreadReply extends IdEntity {
 
 	@Column
 	private String receiverId;// 接收者id,用于联结"t_user"表
-	
+
 	@Column
 	private String shareId;// 对应的分享的id
 	@Column

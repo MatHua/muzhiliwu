@@ -6,13 +6,16 @@ import java.util.List;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 //礼品商品表
 @Table("t_gift")
+@TableIndexes({ @Index(name = "idx_gift", fields = { "shopId" }, unique = false) })
 public class Gift extends IdEntity {
 	private static final DecimalFormat df = new DecimalFormat("0.0");
 

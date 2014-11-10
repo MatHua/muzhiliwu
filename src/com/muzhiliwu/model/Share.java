@@ -5,11 +5,14 @@ import java.util.List;
 import org.nutz.dao.entity.annotation.ColDefine;
 import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
+import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
+import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_share")
+@TableIndexes({ @Index(name = "idx_share", fields = { "sharerId" }, unique = false) })
 public class Share extends IdEntity {
 	public static final String From_Other = "from_other";// 收藏别人的
 	public static final String From_Own = "from_own";// 原创的
