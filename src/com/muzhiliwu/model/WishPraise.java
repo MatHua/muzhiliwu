@@ -7,7 +7,8 @@ import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
 
 @Table("t_wish_praise")
-@TableIndexes({ @Index(name = "idx_wish_praise", fields = { "wishId" }, unique = false) })
+@TableIndexes({ @Index(name = "idx_wish_praise", fields = { "wishId",
+		"praiserId" }, unique = false) })
 public class WishPraise extends IdEntity {
 	@Column
 	private String wishId;// 联结"t_wish"表
