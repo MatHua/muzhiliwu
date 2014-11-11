@@ -15,12 +15,12 @@ import org.nutz.lang.Strings;
 
 import com.muzhiliwu.model.MessComment;
 import com.muzhiliwu.model.MessPraise;
-import com.muzhiliwu.model.MessUnreadReply;
 import com.muzhiliwu.model.Message;
+import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
-import com.muzhiliwu.utils.Integral;
+import com.muzhiliwu.utils.MuzhiCoin;
 import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
@@ -44,9 +44,9 @@ public class MessageService {
 	public String publishMessage(User publisher, Message msg,
 			HttpSession session) {
 		// 发布一条留言
-		if (!userService.okIntegral(publisher,
-				Integral.Integral_For_Publish_Message, session)) {
-			return ActionMessage.Not_Integral;// 不够积分
+		if (!userService.okMuzhiCoin(publisher,
+				MuzhiCoin.MuzhiCoin_For_Publish_Message, session)) {
+			return ActionMessage.Not_MuzhiCoin;// 不够积分
 		}
 		msg.setId(NumGenerator.getUuid());
 		msg.setDate(DateUtils.now());
@@ -90,9 +90,9 @@ public class MessageService {
 	 */
 	public String praiseMessage(Message msg, User praiser, HttpSession session) {
 		if (okPraise(msg, praiser)) {// 点赞
-			if (!userService.okIntegral(praiser,
-					Integral.Integral_For_Praise_Message, session)) {
-				return ActionMessage.Not_Integral;
+			if (!userService.okMuzhiCoin(praiser,
+					MuzhiCoin.MuzhiCoin_For_Praise_Message, session)) {
+				return ActionMessage.Not_MuzhiCoin;
 			}
 			MessPraise praise = new MessPraise();
 			praise.setId(NumGenerator.getUuid());
@@ -143,9 +143,9 @@ public class MessageService {
 	 */
 	public String commentMessage(Message msg, User commenter,
 			MessComment comment, User fatherCommenter, HttpSession session) {
-		if (!userService.okIntegral(commenter,
-				Integral.Integral_For_Comment_Message, session)) {
-			return ActionMessage.Not_Integral;// 不够积分
+		if (!userService.okMuzhiCoin(commenter,
+				MuzhiCoin.MuzhiCoin_For_Comment_Message, session)) {
+			return ActionMessage.Not_MuzhiCoin;// 不够积分
 		}
 		comment.setId(NumGenerator.getUuid());
 		comment.setCommenterId(commenter.getId());// 联结id
@@ -241,59 +241,59 @@ public class MessageService {
 		return msg;
 	}
 
-	/**
-	 * 获取@到自己的点赞类消息
-	 * 
-	 * @param user
-	 *            消息接收
-	 * @param page
-	 *            分页参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
-		// 留言板点赞类未读消息
-		List<MessUnreadReply> replys = dao.query(
-				MessUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", MessUnreadReply.Praise).desc("date"),
-				page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				MessUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", MessUnreadReply.Praise)
-						.and("state", "=", MessUnreadReply.Nuread)));
-		// 获取相应的联结信息
-		dao.fetchLinks(replys, "replier");// 加载消息发出者
-		return new QueryResult(replys, page);
-	}
+	// /**
+	// * 获取@到自己的点赞类消息
+	// *
+	// * @param user
+	// * 消息接收
+	// * @param page
+	// * 分页参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
+	// // 留言板点赞类未读消息
+	// List<MessUnreadReply> replys = dao.query(
+	// MessUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", MessUnreadReply.Praise).desc("date"),
+	// page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// MessUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", MessUnreadReply.Praise)
+	// .and("state", "=", MessUnreadReply.Nuread)));
+	// // 获取相应的联结信息
+	// dao.fetchLinks(replys, "replier");// 加载消息发出者
+	// return new QueryResult(replys, page);
+	// }
 
-	/**
-	 * 获取@到自己的评论类消息
-	 * 
-	 * @param user
-	 *            消息接收者
-	 * @param page
-	 *            分类参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadCommentReply(User user, Pager page) {
-		// 留言板评论类未读消息
-		List<MessUnreadReply> replys = dao
-				.query(MessUnreadReply.class,
-						Cnd.where("receiverId", "=", user.getId())
-								.and("type", "=", MessUnreadReply.Comment)
-								.desc("date"), page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				MessUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", MessUnreadReply.Comment)
-						.and("state", "=", MessUnreadReply.Nuread)));
-		// 获取相应的联结信息
-		dao.fetchLinks(replys, "replier");// 加载消息发出者
-		return new QueryResult(replys, page);
-	}
+	// /**
+	// * 获取@到自己的评论类消息
+	// *
+	// * @param user
+	// * 消息接收者
+	// * @param page
+	// * 分类参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadCommentReply(User user, Pager page) {
+	// // 留言板评论类未读消息
+	// List<MessUnreadReply> replys = dao
+	// .query(MessUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", MessUnreadReply.Comment)
+	// .desc("date"), page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// MessUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", MessUnreadReply.Comment)
+	// .and("state", "=", MessUnreadReply.Nuread)));
+	// // 获取相应的联结信息
+	// dao.fetchLinks(replys, "replier");// 加载消息发出者
+	// return new QueryResult(replys, page);
+	// }
 
 	/**
 	 * 删除一个留言
@@ -353,17 +353,18 @@ public class MessageService {
 		if (Strings.isBlank(msg.getTitle())) {
 			msg = dao.fetch(Message.class, msg.getId());
 		}
-		MessUnreadReply unread = new MessUnreadReply();
+		UnreadReply unread = new UnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(fatherCommenter.getId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(MessUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(MessUnreadReply.Comment);
-		unread.setMessId(msg.getId());
-		unread.setMessTitle(msg.getTitle());
+		unread.setType(UnreadReply.Comment);
+		unread.setLinkId(msg.getId());
+		unread.setLinkTitle(msg.getTitle());
+		unread.setReplyForm(UnreadReply.FormMessage);
 		dao.insert(unread);
 	}
 
@@ -373,17 +374,18 @@ public class MessageService {
 		if (Strings.isBlank(msg.getTitle())) {
 			msg = dao.fetch(Message.class, msg.getId());
 		}
-		MessUnreadReply unread = new MessUnreadReply();
+		UnreadReply unread = new UnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(msg.getPublisherId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(MessUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(MessUnreadReply.Comment);
-		unread.setMessId(msg.getId());
-		unread.setMessTitle(msg.getTitle());
+		unread.setType(UnreadReply.Comment);
+		unread.setLinkId(msg.getId());
+		unread.setLinkTitle(msg.getTitle());
+		unread.setReplyForm(UnreadReply.FormMessage);
 		dao.insert(unread);
 	}
 
@@ -392,25 +394,27 @@ public class MessageService {
 		if (Strings.isBlank(msg.getTitle())) {
 			msg = dao.fetch(Message.class, msg.getId());
 		}
-		MessUnreadReply unread = new MessUnreadReply();
+		UnreadReply unread = new UnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
-		unread.setMessId(msg.getId());
-		unread.setMessTitle(msg.getTitle());
+		unread.setLinkId(msg.getId());
+		unread.setLinkTitle(msg.getTitle());
 		unread.setReceiverId(msg.getPublisherId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(MessUnreadReply.Nuread);
-		unread.setType(MessUnreadReply.Praise);
+		unread.setState(UnreadReply.Nuread);
+		unread.setType(UnreadReply.Praise);
+		unread.setReplyForm(UnreadReply.FormMessage);
 		dao.insert(unread);
 	}
 
 	// 删除对应的未读的点赞类消息
 	private void deleteUnreadPraiseReply(User praiser, Message msg) {
-		MessUnreadReply reply = dao.fetch(
-				MessUnreadReply.class,
+		UnreadReply reply = dao.fetch(
+				UnreadReply.class,
 				Cnd.where("replierId", "=", praiser.getId())
-						.and("messId", "=", msg.getId())
-						.and("type", "=", MessUnreadReply.Praise));
+						.and("linkId", "=", msg.getId())
+						.and("type", "=", UnreadReply.Praise)
+						.and("replyForm", "=", "UnreadReply.FormMessage"));
 		dao.delete(reply);
 	}
 

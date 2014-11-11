@@ -12,15 +12,14 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 
-import com.muzhiliwu.model.ShareUnreadReply;
+import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.WishCollect;
 import com.muzhiliwu.model.WishPraise;
-import com.muzhiliwu.model.WishUnreadReply;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
-import com.muzhiliwu.utils.Integral;
+import com.muzhiliwu.utils.MuzhiCoin;
 import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
@@ -43,10 +42,10 @@ public class WishService {
 	 */
 	public String publishWish(User publisher, Wish wish, HttpSession session) {
 		// 许愿
-		int increment = Wish.Wish_Gift.equals(wish.getType()) ? Integral.Integral_For_Publish_Gift_Wish
-				: Integral.Integral_For_Publish_No_Gift_Wish;
-		if (!userService.okIntegral(publisher, increment, session)) {
-			return ActionMessage.Not_Integral;// 不够积分
+		int increment = Wish.Wish_Gift.equals(wish.getType()) ? MuzhiCoin.MuzhiCoin_For_Publish_Gift_Wish
+				: MuzhiCoin.MuzhiCoin_For_Publish_No_Gift_Wish;
+		if (!userService.okMuzhiCoin(publisher, increment, session)) {
+			return ActionMessage.Not_MuzhiCoin;// 不够积分
 		}
 		wish.setId(NumGenerator.getUuid());
 		wish.setDate(DateUtils.now());
@@ -90,9 +89,9 @@ public class WishService {
 	 */
 	public String praiseWish(Wish wish, User praiser, HttpSession session) {
 		if (okPraise(wish.getId(), praiser.getId())) {// 点赞
-			if (!userService.okIntegral(praiser,
-					Integral.Integral_For_Praise_Wish, session)) {
-				return ActionMessage.Not_Integral;
+			if (!userService.okMuzhiCoin(praiser,
+					MuzhiCoin.MuzhiCoin_For_Praise_Wish, session)) {
+				return ActionMessage.Not_MuzhiCoin;
 			}
 			WishPraise praise = new WishPraise();
 			praise.setId(NumGenerator.getUuid());
@@ -139,9 +138,9 @@ public class WishService {
 	public String shareWish(Wish wish, User sharer, HttpSession session) {
 		// 分享到社交网有一定积分奖励
 		if (sharer != null
-				&& !userService.okIntegral(sharer,
-						Integral.Integral_for_Share_Wish, session)) {
-			return ActionMessage.Not_Integral;
+				&& !userService.okMuzhiCoin(sharer,
+						MuzhiCoin.MuzhiCoin_for_Share_Wish, session)) {
+			return ActionMessage.Not_MuzhiCoin;
 		}
 		changeShareNumber(wish, 1);
 		return ActionMessage.success;
@@ -159,9 +158,9 @@ public class WishService {
 	 */
 	public String collectWish(User collecter, Wish wish, HttpSession session) {
 		if (okCollect(collecter, wish)) {
-			if (!userService.okIntegral(collecter,
-					Integral.Integral_For_Collect_Wish, session)) {
-				return ActionMessage.Not_Integral;// 不够积分
+			if (!userService.okMuzhiCoin(collecter,
+					MuzhiCoin.MuzhiCoin_For_Collect_Wish, session)) {
+				return ActionMessage.Not_MuzhiCoin;// 不够积分
 			}
 			// 模拟一次收藏
 			WishCollect collect = new WishCollect();
@@ -205,7 +204,7 @@ public class WishService {
 	 */
 	public Wish getDetail(Wish wish, User user) {
 		wish = dao.fetch(Wish.class, wish.getId());
-		
+
 		// 判断用户有没有收藏该分享
 		wish.setCollected(false);
 		if (user != null) {
@@ -313,61 +312,61 @@ public class WishService {
 		return collect;
 	}
 
-	/**
-	 * 获取@到自己的点赞类消息
-	 * 
-	 * @param user
-	 *            消息接收
-	 * @param page
-	 *            分页参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
-		// 许愿墙点赞类未读消息
-		List<WishUnreadReply> replys = dao.query(
-				WishUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", WishUnreadReply.Praise).desc("date"),
-				page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				WishUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", WishUnreadReply.Praise)
-						.and("state", "=", WishUnreadReply.Nuread)));
+	// /**
+	// * 获取@到自己的点赞类消息
+	// *
+	// * @param user
+	// * 消息接收
+	// * @param page
+	// * 分页参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
+	// // 许愿墙点赞类未读消息
+	// List<WishUnreadReply> replys = dao.query(
+	// WishUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", WishUnreadReply.Praise).desc("date"),
+	// page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// WishUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", WishUnreadReply.Praise)
+	// .and("state", "=", WishUnreadReply.Nuread)));
+	//
+	// // 加载消息发出者
+	// dao.fetchLinks(replys, "replier");
+	// return new QueryResult(replys, page);
+	// }
 
-		// 加载消息发出者
-		dao.fetchLinks(replys, "replier");
-		return new QueryResult(replys, page);
-	}
-
-	/**
-	 * 获取@到自己的收藏类的未读信息
-	 * 
-	 * @param user
-	 *            未读信息接受者
-	 * @param page
-	 *            分页参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadCollectReply(User user, Pager page) {
-		// 许愿墙收藏类未读信息
-		List<WishUnreadReply> replys = dao
-				.query(WishUnreadReply.class,
-						Cnd.where("receiverId", "=", user.getId())
-								.and("type", "=", WishUnreadReply.Collect)
-								.desc("date"), page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				WishUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", WishUnreadReply.Collect)
-						.and("state", "=", WishUnreadReply.Nuread)));
-
-		// 加载消息发出者
-		dao.fetchLinks(replys, "replier");
-		return new QueryResult(replys, page);
-	}
+	// /**
+	// * 获取@到自己的收藏类的未读信息
+	// *
+	// * @param user
+	// * 未读信息接受者
+	// * @param page
+	// * 分页参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadCollectReply(User user, Pager page) {
+	// // 许愿墙收藏类未读信息
+	// List<WishUnreadReply> replys = dao
+	// .query(WishUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", WishUnreadReply.Collect)
+	// .desc("date"), page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// WishUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", WishUnreadReply.Collect)
+	// .and("state", "=", WishUnreadReply.Nuread)));
+	//
+	// // 加载消息发出者
+	// dao.fetchLinks(replys, "replier");
+	// return new QueryResult(replys, page);
+	// }
 
 	// 获取许愿的标题
 	// private String getWishTitle(String id) {
@@ -418,16 +417,17 @@ public class WishService {
 		if (Strings.isBlank(wish.getTitle())) {
 			wish = dao.fetch(Wish.class, wish.getId());
 		}
-		WishUnreadReply unread = new WishUnreadReply();
+		UnreadReply unread = new UnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(wish.getWisherId());
 		unread.setReplierId(collecter.getId());
-		unread.setState(ShareUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(ShareUnreadReply.Collect);
-		unread.setWishId(wish.getId());
-		unread.setWishTitle(wish.getTitle());
+		unread.setType(UnreadReply.Collect);
+		unread.setLinkId(wish.getId());
+		unread.setLinkTitle(wish.getTitle());
+		unread.setReplyForm(UnreadReply.FormWish);
 		dao.insert(unread);
 	}
 
@@ -436,36 +436,39 @@ public class WishService {
 		if (Strings.isBlank(wish.getTitle())) {
 			wish = dao.fetch(Wish.class, wish.getId());
 		}
-		WishUnreadReply unread = new WishUnreadReply();
+		UnreadReply unread = new UnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(wish.getWisherId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(ShareUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(ShareUnreadReply.Praise);
-		unread.setWishId(wish.getId());
-		unread.setWishTitle(wish.getTitle());
+		unread.setType(UnreadReply.Praise);
+		unread.setLinkId(wish.getId());
+		unread.setLinkTitle(wish.getTitle());
+		unread.setReplyForm(UnreadReply.FormWish);
 		dao.insert(unread);
 	}
 
 	// 删除对应的点赞信息
 	private void deleteUnreadPraiseReply(User praiser, Wish wish) {
-		WishUnreadReply reply = dao.fetch(
-				WishUnreadReply.class,
+		UnreadReply reply = dao.fetch(
+				UnreadReply.class,
 				Cnd.where("replierId", "=", praiser.getId())
-						.and("shareId", "=", wish.getId())
-						.and("type", "=", WishUnreadReply.Praise));
+						.and("linkId", "=", wish.getId())
+						.and("type", "=", UnreadReply.Praise)
+						.and("replyForm", "=", UnreadReply.FormWish));
 		dao.delete(reply);
 	}
 
 	// 删除对应的点赞信息
 	private void deleteUnreadCollectReply(User collecter, Wish wish) {
-		WishUnreadReply reply = dao.fetch(
-				WishUnreadReply.class,
+		UnreadReply reply = dao.fetch(
+				UnreadReply.class,
 				Cnd.where("replierId", "=", collecter.getId())
 						.and("shareId", "=", wish.getId())
-						.and("type", "=", WishUnreadReply.Collect));
+						.and("type", "=", UnreadReply.Collect)
+						.and("replyForm", "=", UnreadReply.FormWish));
 		dao.delete(reply);
 	}
 

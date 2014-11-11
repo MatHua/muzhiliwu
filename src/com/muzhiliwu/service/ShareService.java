@@ -13,15 +13,14 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 
 import com.muzhiliwu.model.MessPraise;
-import com.muzhiliwu.model.MessUnreadReply;
 import com.muzhiliwu.model.Share;
 import com.muzhiliwu.model.ShareComment;
 import com.muzhiliwu.model.SharePraise;
-import com.muzhiliwu.model.ShareUnreadReply;
+import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
-import com.muzhiliwu.utils.Integral;
+import com.muzhiliwu.utils.MuzhiCoin;
 import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
@@ -42,9 +41,9 @@ public class ShareService {
 	 */
 	public String publishShare(User sharer, Share share, HttpSession session) {
 
-		if (!userService.okIntegral(sharer,
-				Integral.Integral_For_Publish_Share, session)) {
-			return ActionMessage.Not_Integral;// 不够积分
+		if (!userService.okMuzhiCoin(sharer,
+				MuzhiCoin.MuzhiCoin_For_Publish_Share, session)) {
+			return ActionMessage.Not_MuzhiCoin;// 不够积分
 		}
 		share.setId(NumGenerator.getUuid());
 		share.setDate(DateUtils.now());
@@ -91,9 +90,9 @@ public class ShareService {
 	 */
 	public String collectShare(User collecter, Share share, HttpSession session) {
 		if (okCollect(collecter, share)) {
-			if (!userService.okIntegral(collecter,
-					Integral.Integral_For_Collect_Share, session)) {
-				return ActionMessage.Not_Integral;// 不够积分
+			if (!userService.okMuzhiCoin(collecter,
+					MuzhiCoin.MuzhiCoin_For_Collect_Share, session)) {
+				return ActionMessage.Not_MuzhiCoin;// 不够积分
 			}
 			// 模拟一次转载收藏
 			share = dao.fetch(Share.class, share.getId());
@@ -199,9 +198,9 @@ public class ShareService {
 	 */
 	public String commentShare(Share share, User commenter,
 			ShareComment comment, User fatherCommenter, HttpSession session) {
-		if (!userService.okIntegral(commenter,
-				Integral.Integral_For_Comment_Share, session)) {
-			return ActionMessage.Not_Integral;// 不够积分
+		if (!userService.okMuzhiCoin(commenter,
+				MuzhiCoin.MuzhiCoin_For_Comment_Share, session)) {
+			return ActionMessage.Not_MuzhiCoin;// 不够积分
 		}
 		comment.setId(NumGenerator.getUuid());
 		comment.setCommenterId(commenter.getId());// 联结id
@@ -313,99 +312,104 @@ public class ShareService {
 		return share;
 	}
 
-	/**
-	 * 获取@到自己的点赞类消息
-	 * 
-	 * @param user
-	 *            消息接收
-	 * @param page
-	 *            分页参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
-		// 分享墙点赞类未读消息
-		List<ShareUnreadReply> replys = dao
-				.query(ShareUnreadReply.class,
-						Cnd.where("receiverId", "=", user.getId())
-								.and("type", "=", ShareUnreadReply.Praise)
-								.desc("date"), page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				ShareUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", ShareUnreadReply.Praise)
-						.and("state", "=", ShareUnreadReply.Nuread)));
-		// 加载消息发出者
-		dao.fetchLinks(replys, "replier");
-		return new QueryResult(replys, page);
-	}
+	// /**
+	// * 获取@到自己的点赞类消息
+	// *
+	// * @param user
+	// * 消息接收
+	// * @param page
+	// * 分页参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
+	// // 分享墙点赞类未读消息
+	// List<ShareUnreadReply> replys = dao
+	// .query(ShareUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", ShareUnreadReply.Praise)
+	// .desc("date"), page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// ShareUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", ShareUnreadReply.Praise)
+	// .and("state", "=", ShareUnreadReply.Nuread)));
+	// // 加载消息发出者
+	// dao.fetchLinks(replys, "replier");
+	// return new QueryResult(replys, page);
+	// }
 
-	/**
-	 * 获取@到自己的评论类消息
-	 * 
-	 * @param user
-	 *            消息接收者
-	 * @param page
-	 *            分类参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadCommentReply(User user, Pager page) {
-		// 分享墙评论类未读消息
-		List<ShareUnreadReply> replys = dao.query(
-				ShareUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", ShareUnreadReply.Comment)
-						.desc("date"), page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				ShareUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", ShareUnreadReply.Comment)
-						.and("state", "=", ShareUnreadReply.Nuread)));
+	// /**
+	// * 获取@到自己的评论类消息
+	// *
+	// * @param user
+	// * 消息接收者
+	// * @param page
+	// * 分类参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadCommentReply(User user, Pager page) {
+	// // 分享墙评论类未读消息
+	// List<ShareUnreadReply> replys = dao.query(
+	// ShareUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", ShareUnreadReply.Comment)
+	// .desc("date"), page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// ShareUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", ShareUnreadReply.Comment)
+	// .and("state", "=", ShareUnreadReply.Nuread)));
+	//
+	// // 加载消息发出者
+	// dao.fetchLinks(replys, "replier");
+	// return new QueryResult(replys, page);
+	// }
 
-		// 加载消息发出者
-		dao.fetchLinks(replys, "replier");
-		return new QueryResult(replys, page);
-	}
-
-	/**
-	 * 获取@到自己的收藏类的未读信息
-	 * 
-	 * @param user
-	 *            未读信息接受者
-	 * @param page
-	 *            分页参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadCollectReply(User user, Pager page) {
-		// 分享墙收藏类未读信息
-		List<ShareUnreadReply> replys = dao.query(
-				ShareUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", ShareUnreadReply.Collect)
-						.desc("date"), page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				ShareUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", ShareUnreadReply.Collect)
-						.and("state", "=", ShareUnreadReply.Nuread)));
-
-		dao.fetchLinks(replys, "replier");// 加载消息发出者
-		return new QueryResult(replys, page);
-	}
+	// /**
+	// * 获取@到自己的收藏类的未读信息
+	// *
+	// * @param user
+	// * 未读信息接受者
+	// * @param page
+	// * 分页参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadCollectReply(User user, Pager page) {
+	// // 分享墙收藏类未读信息
+	// List<ShareUnreadReply> replys = dao.query(
+	// ShareUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", ShareUnreadReply.Collect)
+	// .desc("date"), page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// ShareUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", ShareUnreadReply.Collect)
+	// .and("state", "=", ShareUnreadReply.Nuread)));
+	//
+	// dao.fetchLinks(replys, "replier");// 加载消息发出者
+	// return new QueryResult(replys, page);
+	// }
 
 	// 给分享的发表者发送一条收藏类未读信息
 	private void createUnreadCollectReply(User collecter, Share share) {
-		ShareUnreadReply unread = new ShareUnreadReply();
+		if (Strings.isBlank(share.getTitle())) {
+			share = dao.fetch(Share.class, share.getId());
+		}
+		UnreadReply unread = new UnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(share.getSharerId());
 		unread.setReplierId(collecter.getId());
-		unread.setState(ShareUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(ShareUnreadReply.Collect);
-		unread.setShareId(share.getId());
+		unread.setType(UnreadReply.Collect);
+		unread.setLinkId(share.getId());
+		unread.setLinkTitle(share.getTitle());
+		unread.setReplyForm(UnreadReply.Share);
 		dao.insert(unread);
 	}
 
@@ -430,11 +434,12 @@ public class ShareService {
 
 	// 删除对应的点赞信息
 	private void deleteUnreadCollectReply(User collecter, Share share) {
-		ShareUnreadReply reply = dao.fetch(
-				ShareUnreadReply.class,
+		UnreadReply reply = dao.fetch(
+				UnreadReply.class,
 				Cnd.where("replierId", "=", collecter.getId())
-						.and("shareId", "=", share.getId())
-						.and("type", "=", ShareUnreadReply.Collect));
+						.and("linkId", "=", share.getId())
+						.and("type", "=", UnreadReply.Collect)
+						.and("replyForm", "=", UnreadReply.FormShare));
 		dao.delete(reply);
 	}
 
@@ -481,17 +486,21 @@ public class ShareService {
 	// 给父评论者创建一条未读信息
 	private void createUnreadCommentReply(User commenter, User fatherCommenter,
 			ShareComment comment, Share share) {
-		ShareUnreadReply unread = new ShareUnreadReply();
+		if (Strings.isBlank(share.getTitle())) {
+			share = dao.fetch(Share.class, share.getId());
+		}
+		UnreadReply unread = new UnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(fatherCommenter.getId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(ShareUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(ShareUnreadReply.Comment);
-		unread.setShareId(share.getId());
-		unread.setShareTitle(share.getTitle());
+		unread.setType(UnreadReply.Comment);
+		unread.setLinkId(share.getId());
+		unread.setLinkTitle(share.getTitle());
+		unread.setReplyForm(UnreadReply.FormShare);
 		dao.insert(unread);
 	}
 
@@ -501,42 +510,48 @@ public class ShareService {
 		if (Strings.isBlank(share.getSharerId())) {
 			share = dao.fetch(Share.class, share.getId());
 		}
-		ShareUnreadReply unread = new ShareUnreadReply();
+		UnreadReply unread = new UnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(share.getSharerId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(ShareUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(ShareUnreadReply.Comment);
-		unread.setShareId(share.getId());
-		unread.setShareTitle(share.getTitle());
+		unread.setType(UnreadReply.Comment);
+		unread.setLinkId(share.getId());
+		unread.setLinkTitle(share.getTitle());
+		unread.setReplyForm(UnreadReply.FormShare);
 		dao.insert(unread);
 	}
 
 	// 给消息发表者创建一条未读点赞信息
 	private void createUnreadPraiseReply(User praiser, Share share) {
-		ShareUnreadReply unread = new ShareUnreadReply();
+		if (Strings.isBlank(share.getSharerId())) {
+			share = dao.fetch(Share.class, share.getId());
+		}
+		UnreadReply unread = new UnreadReply();
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(share.getSharerId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(ShareUnreadReply.Nuread);
+		unread.setState(UnreadReply.Nuread);
 
-		unread.setType(ShareUnreadReply.Praise);
-		unread.setShareId(share.getId());
-		unread.setShareTitle(share.getTitle());
+		unread.setType(UnreadReply.Praise);
+		unread.setLinkId(share.getId());
+		unread.setLinkTitle(share.getTitle());
+		unread.setReplyForm(UnreadReply.FormShare);
 		dao.insert(unread);
 	}
 
 	// 删除对应的点赞信息
 	private void deleteUnreadPraiseReply(User praiser, Share share) {
-		ShareUnreadReply reply = dao.fetch(
-				ShareUnreadReply.class,
+		UnreadReply reply = dao.fetch(
+				UnreadReply.class,
 				Cnd.where("replierId", "=", praiser.getId())
-						.and("shareId", "=", share.getId())
-						.and("type", "=", ShareUnreadReply.Praise));
+						.and("linkId", "=", share.getId())
+						.and("type", "=", UnreadReply.Praise)
+						.and("replyForm", "=", UnreadReply.FormShare));
 		dao.delete(reply);
 	}
 

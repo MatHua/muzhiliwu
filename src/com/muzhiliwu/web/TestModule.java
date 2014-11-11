@@ -2,6 +2,8 @@ package com.muzhiliwu.web;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -9,7 +11,6 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 
-import com.muzhiliwu.model.MyTest;
 import com.muzhiliwu.model.TestDemo;
 import com.muzhiliwu.utils.ActionMessage;
 
@@ -18,6 +19,8 @@ import com.muzhiliwu.utils.ActionMessage;
 public class TestModule {
 	@Inject
 	private Dao dao;
+
+	private static Log log = LogFactory.getLog(TestDemo.class);// Logs.get()
 
 	@At("/?/name")
 	@Ok("json")
@@ -70,6 +73,44 @@ public class TestModule {
 		}
 		am.setObject(tests);
 		am.setMessage("雅妹蝶~");
+
 		return am;
+	}
+
+	@At
+	@Ok("json")
+	public Object insert() {
+		TestDemo test = new TestDemo();
+		test.setId("xx_xx");
+		test.setDate("xx_xx");
+		test.setEmail("xx_xx");
+		test.setName("xx_xx");
+		dao.insert(test);
+
+		TestDemo demo = new TestDemo();
+		demo.setId("xxxxx");
+		demo.setDate("xxxxx");
+		demo.setEmail("xxxxx");
+		demo.setName("xxxxx");
+		dao.insert(demo);
+		return "插入成功~";
+	}
+
+	@At
+	@Ok("json")
+	public Object getById1() {
+		TestDemo test = dao.fetch(TestDemo.class, "xx_xx");
+		return test;
+	}
+
+	@At
+	@Ok("json")
+	public Object getById2() {
+		log.warn("查找一条信息");
+		log.info("有新操作~");
+		log.error("错误了~");
+		// log.debug("测试~");
+		TestDemo test = dao.fetch(TestDemo.class, "xxxxx");
+		return test;
 	}
 }

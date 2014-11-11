@@ -13,8 +13,6 @@ public class GiftService {
 	private Dao dao;
 	@Inject
 	private UserService userService;
-	
-	
 
 	/**
 	 * 改变礼品的被收藏数

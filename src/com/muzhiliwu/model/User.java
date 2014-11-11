@@ -7,8 +7,11 @@ import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
+import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
+
+import com.muzhiliwu.model.gift.ShoppingCart;
 
 @Table("t_user")
 @TableIndexes({ @Index(name = "idx_user", fields = { "code" }, unique = false) })
@@ -47,44 +50,63 @@ public class User extends IdEntity {
 	@Column
 	private String emotion;// 情感状况
 	@Column
-	private int integral;// 积分数
+	private int muzhiCoin;// 拇指币
 
+	@Column
+	private int popularityValue;// 当前人气值
+	@Column
+	private int popularityRank;// 人气等级
+	@Column
+	private int popularityTop;// 当前级数人气最高分
+
+	@Column
+	private int sendGiftValue;// 当前级数送出礼物数
+	@Column
+	private int sendGiftRank;// 送出礼物等级
+	@Column
+	private int sendGiftTop;// 当前级数送出礼物最多分
+
+	// *********************留言************************************************
+	@Column
+	private int messNum;// 留言数
 	@Many(target = Message.class, field = "publisherId")
 	private List<Message> myMessages;// 我的留言,便于找出用户自己发表的留言
-	@Many(target = MessComment.class, field = "commenterId")
-	private List<MessComment> myMessComments;// 便于找到我在留言墙的评论及对应的回复
-	@Many(target = MessUnreadReply.class, field = "receiverId")
-	private List<MessUnreadReply> myMessUnreadReplies;// 便于找出我在留言墙的未读回复
+	// ________________________________________________________________________
 
+	// ********************许愿**************************************************
+	@Column
+	private int wishNum;// 许愿数
 	@Many(target = Wish.class, field = "wisherId")
 	private List<Wish> myWishes;// 我的许愿,便于找出用户自己许的愿
+
+	@Column
+	private int wantorNum;// 愿望实现的申请者数
+	@ManyMany(target = WishRealizationOfWantor.class, relation = "t_wish_realization_of_wantor", from = "wisherId", to = "wantorId")
+	private List<User> myWishWantor;// 想要帮忙实现愿望的人
+
+	@Column
+	private int wishCollectNum;// 收藏数
 	@Many(target = WishCollect.class, field = "collecterId")
 	private List<WishCollect> myWishCollectes;// 我收集的愿望,便于找出用户所收集到的愿望
+	// ________________________________________________________________________
 
+	// ************************分享墙*********************************************
+	@Column
+	private int shareNum;// 分享数
 	@Many(target = Share.class, field = "sharerId")
 	private List<Share> myShares;// 我的分享,便于找出用户自己发表的分享
-	// @Many(target = ShareCollect.class, field = "collecterId")
-	// private List<ShareCollect> myShareCollectes;// 我收集的分享,便于找到用户所收集的分享
-	@Many(target = ShareComment.class, field = "commenterId")
-	private List<MessComment> myShareComments;// 便于找到我在分享墙的评论及对应的回复
-	@Many(target = ShareUnreadReply.class, field = "receiverId")
-	private List<ShareUnreadReply> myShareUnreadReplies;// 便于找出我在分享墙的未读回复
 
-	public List<MessComment> getMyMessComments() {
-		return myMessComments;
-	}
+	// ________________________________________________________________________
 
-	public void setMyMessComments(List<MessComment> myMessComments) {
-		this.myMessComments = myMessComments;
-	}
+	// ************************购物车*********************************************
+	@Many(target = ShoppingCart.class, field = "buyerId")
+	private List<ShoppingCart> carts;
 
-	public List<MessComment> getMyShareComments() {
-		return myShareComments;
-	}
+	// __________________________________________________________________________
 
-	public void setMyShareComments(List<MessComment> myShareComments) {
-		this.myShareComments = myShareComments;
-	}
+	private int unreadReplyNum;// 记录总的未读信息数
+	@Many(target = UnreadReply.class, field = "receiverId")
+	private List<UnreadReply> myUnreadReplies;// 便于找出我在分享墙的未读回复
 
 	public String getName() {
 		return name;
@@ -246,37 +268,132 @@ public class User extends IdEntity {
 		this.myWishCollectes = myWishCollectes;
 	}
 
-	// public List<ShareCollect> getMyShareCollectes() {
-	// return myShareCollectes;
-	// }
-	//
-	// public void setMyShareCollectes(List<ShareCollect> myShareCollectes) {
-	// this.myShareCollectes = myShareCollectes;
-	// }
-
-	public List<MessUnreadReply> getMyMessUnreadReplies() {
-		return myMessUnreadReplies;
+	public int getMuzhiCoin() {
+		return muzhiCoin;
 	}
 
-	public void setMyMessUnreadReplies(List<MessUnreadReply> myMessUnreadReplies) {
-		this.myMessUnreadReplies = myMessUnreadReplies;
+	public void setMuzhiCoin(int muzhiCoin) {
+		this.muzhiCoin = muzhiCoin;
 	}
 
-	public List<ShareUnreadReply> getMyShareUnreadReplies() {
-		return myShareUnreadReplies;
+	public int getPopularityValue() {
+		return popularityValue;
 	}
 
-	public void setMyShareUnreadReplies(
-			List<ShareUnreadReply> myShareUnreadReplies) {
-		this.myShareUnreadReplies = myShareUnreadReplies;
+	public void setPopularityValue(int popularityValue) {
+		this.popularityValue = popularityValue;
 	}
 
-	public int getIntegral() {
-		return integral;
+	public int getPopularityRank() {
+		return popularityRank;
 	}
 
-	public void setIntegral(int integral) {
-		this.integral = integral;
+	public void setPopularityRank(int popularityRank) {
+		this.popularityRank = popularityRank;
+	}
+
+	public int getSendGiftValue() {
+		return sendGiftValue;
+	}
+
+	public void setSendGiftValue(int sendGiftValue) {
+		this.sendGiftValue = sendGiftValue;
+	}
+
+	public int getSendGiftRank() {
+		return sendGiftRank;
+	}
+
+	public void setSendGiftRank(int sendGiftRank) {
+		this.sendGiftRank = sendGiftRank;
+	}
+
+	public int getMessNum() {
+		return messNum;
+	}
+
+	public void setMessNum(int messNum) {
+		this.messNum = messNum;
+	}
+
+	public int getWishNum() {
+		return wishNum;
+	}
+
+	public void setWishNum(int wishNum) {
+		this.wishNum = wishNum;
+	}
+
+	public int getWantorNum() {
+		return wantorNum;
+	}
+
+	public void setWantorNum(int wantorNum) {
+		this.wantorNum = wantorNum;
+	}
+
+	public List<User> getMyWishWantor() {
+		return myWishWantor;
+	}
+
+	public void setMyWishWantor(List<User> myWishWantor) {
+		this.myWishWantor = myWishWantor;
+	}
+
+	public int getWishCollectNum() {
+		return wishCollectNum;
+	}
+
+	public void setWishCollectNum(int wishCollectNum) {
+		this.wishCollectNum = wishCollectNum;
+	}
+
+	public int getShareNum() {
+		return shareNum;
+	}
+
+	public void setShareNum(int shareNum) {
+		this.shareNum = shareNum;
+	}
+
+	public List<ShoppingCart> getCarts() {
+		return carts;
+	}
+
+	public void setCarts(List<ShoppingCart> carts) {
+		this.carts = carts;
+	}
+
+	public int getPopularityTop() {
+		return popularityTop;
+	}
+
+	public void setPopularityTop(int popularityTop) {
+		this.popularityTop = popularityTop;
+	}
+
+	public int getSendGiftTop() {
+		return sendGiftTop;
+	}
+
+	public void setSendGiftTop(int sendGiftTop) {
+		this.sendGiftTop = sendGiftTop;
+	}
+
+	public int getUnreadReplyNum() {
+		return unreadReplyNum;
+	}
+
+	public void setUnreadReplyNum(int unreadReplyNum) {
+		this.unreadReplyNum = unreadReplyNum;
+	}
+
+	public List<UnreadReply> getMyUnreadReplies() {
+		return myUnreadReplies;
+	}
+
+	public void setMyUnreadReplies(List<UnreadReply> myUnreadReplies) {
+		this.myUnreadReplies = myUnreadReplies;
 	}
 
 }

@@ -36,7 +36,7 @@ public class Share extends IdEntity {
 
 	@Column
 	private String collectId;// 记录收藏的分享id
-	public boolean collected;// 标记是否被当前用户收藏
+	private boolean collected;// 标记是否被当前用户收藏
 
 	@Column
 	private int commentNum;// 评论数

@@ -4,7 +4,7 @@ public class ActionMessage {
 	public static final String success = "1";
 	public static final String fail = "0";
 	public static final String cancel = "2";// 取消
-	public static final String Not_Integral = "3";// 不够积分
+	public static final String Not_MuzhiCoin = "3";// 不够积分
 	public static final String Auth_Code_Fail = "4";// 验证码错误
 	public static final String Account_Fail = "5";// 用户名或密码错误
 	public static final String Not_Login = "6";// 没有登陆

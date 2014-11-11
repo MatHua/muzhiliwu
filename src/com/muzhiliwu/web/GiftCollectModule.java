@@ -41,9 +41,9 @@ public class GiftCollectModule {
 				session);
 
 		ActionMessage am = new ActionMessage();
-		if (ActionMessage.Not_Integral.equals(tmp)) {
+		if (ActionMessage.Not_MuzhiCoin.equals(tmp)) {
 			am.setMessage("积分不够,收藏失败~");
-			am.setType(ActionMessage.Not_Integral);
+			am.setType(ActionMessage.Not_MuzhiCoin);
 		} else if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("收藏成功~");
 			am.setType(ActionMessage.success);
@@ -68,9 +68,9 @@ public class GiftCollectModule {
 				comment, fatherCommenter, session);
 
 		ActionMessage am = new ActionMessage();
-		if (ActionMessage.Not_Integral.equals(tmp)) {
+		if (ActionMessage.Not_MuzhiCoin.equals(tmp)) {
 			am.setMessage("积分不够~");
-			am.setType(ActionMessage.Not_Integral);
+			am.setType(ActionMessage.Not_MuzhiCoin);
 		} else if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("评论成功~");
 			am.setType(ActionMessage.success);
@@ -89,9 +89,9 @@ public class GiftCollectModule {
 				session);
 
 		ActionMessage am = new ActionMessage();
-		if (ActionMessage.Not_Integral.equals(tmp)) {
+		if (ActionMessage.Not_MuzhiCoin.equals(tmp)) {
 			am.setMessage("积分不够~");
-			am.setType(ActionMessage.Not_Integral);
+			am.setType(ActionMessage.Not_MuzhiCoin);
 		} else if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("点赞成功~");
 			am.setType(ActionMessage.success);
@@ -122,44 +122,46 @@ public class GiftCollectModule {
 	}
 
 	// 获取@我的点赞类未读信息消息
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
-			HttpSession session) {
-		User user = (User) session.getAttribute("t_user");
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
-
-		QueryResult result = giftCollectService.getMyUnreadPraiseReply(user,
-				page);
-
-		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
-		ams.setPageNum(result.getPager().getPageNumber());
-		ams.setPageSize(result.getPager().getPageSize());
-		ams.setObject(result.getList());
-		return ams;
-	}
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
+	// }))
+	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
+	// HttpSession session) {
+	// User user = (User) session.getAttribute("t_user");
+	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+	//
+	// QueryResult result = giftCollectService.getMyUnreadPraiseReply(user,
+	// page);
+	//
+	// ActionMessages ams = new ActionMessages();
+	// ams.setPageCount(result.getPager().getRecordCount());
+	// ams.setPageNum(result.getPager().getPageNumber());
+	// ams.setPageSize(result.getPager().getPageSize());
+	// ams.setObject(result.getList());
+	// return ams;
+	// }
 
 	// 获取@我的评论类的消息
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
-			HttpSession session) {
-		User user = (User) session.getAttribute("t_user");
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
-
-		QueryResult result = giftCollectService.getMyUnreadCommentReply(user,
-				page);
-
-		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
-		ams.setPageNum(result.getPager().getPageNumber());
-		ams.setPageSize(result.getPager().getPageSize());
-		ams.setObject(result.getList());
-		return ams;
-	}
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
+	// }))
+	// public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
+	// HttpSession session) {
+	// User user = (User) session.getAttribute("t_user");
+	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+	//
+	// QueryResult result = giftCollectService.getMyUnreadCommentReply(user,
+	// page);
+	//
+	// ActionMessages ams = new ActionMessages();
+	// ams.setPageCount(result.getPager().getRecordCount());
+	// ams.setPageNum(result.getPager().getPageNumber());
+	// ams.setPageSize(result.getPager().getPageSize());
+	// ams.setObject(result.getList());
+	// return ams;
+	// }
 
 	// 获取我的礼品收藏
 	@At

@@ -97,7 +97,7 @@ public class UserModule {
 			am.setType(ActionMessage.fail);
 			return am;
 		}
-		String tmp = userService.registOrEditUser(user, user.getPass());
+		String tmp = userService.registUser(user);
 		if (ActionMessage.success.equals(tmp)) {
 			am.setMessage("注册成功~");
 			am.setType(ActionMessage.success);
@@ -114,7 +114,7 @@ public class UserModule {
 	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
 	public Object editSelf(@Param("::user.") User user, HttpSession session) {
 		ActionMessage am = new ActionMessage();
-		String tmp = userService.registOrEditUser(user, user.getPass());
+		String tmp = userService.editUser(user, user.getPass());
 		if (ActionMessage.success.equals(tmp)) {
 			am.setType(ActionMessage.success);
 			am.setMessage("个人信息修改成功~");

@@ -15,17 +15,14 @@ import org.nutz.lang.Strings;
 import com.muzhiliwu.model.GiftCollect;
 import com.muzhiliwu.model.GiftCollectComment;
 import com.muzhiliwu.model.GiftCollectPraise;
-import com.muzhiliwu.model.GiftCollectUnreadReply;
-import com.muzhiliwu.model.MessUnreadReply;
-import com.muzhiliwu.model.Message;
+import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.service.gift.GiftService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
-import com.muzhiliwu.utils.Integral;
+import com.muzhiliwu.utils.MuzhiCoin;
 import com.muzhiliwu.utils.NumGenerator;
-import com.muzhiliwu.web.GiftCollectModule;
 
 @IocBean
 public class GiftCollectService {
@@ -48,9 +45,9 @@ public class GiftCollectService {
 	public String collectGift(User collector, Gift gift, GiftCollect collect,
 			HttpSession session) {
 		if (okCollect(collector, gift)) {// 可以被收藏
-			if (!userService.okIntegral(collector,
-					Integral.Integral_For_Collect_Gift, session)) {
-				return ActionMessage.Not_Integral;
+			if (!userService.okMuzhiCoin(collector,
+					MuzhiCoin.MuzhiCoin_For_Collect_Gift, session)) {
+				return ActionMessage.Not_MuzhiCoin;
 			}
 			collect.setId(NumGenerator.getUuid());// 主键id
 			collect.setDate(DateUtils.now());// 被收藏时间
@@ -99,9 +96,9 @@ public class GiftCollectService {
 	public String commentGiftCollect(GiftCollect collect, User commenter,
 			GiftCollectComment comment, User fatherCommenter,
 			HttpSession session) {
-		if (!userService.okIntegral(commenter,
-				Integral.Integral_For_Collect_Gift, session)) {
-			return ActionMessage.Not_Integral;
+		if (!userService.okMuzhiCoin(commenter,
+				MuzhiCoin.MuzhiCoin_For_Collect_Gift, session)) {
+			return ActionMessage.Not_MuzhiCoin;
 		}
 		comment.setId(NumGenerator.getUuid());
 		comment.setCollectId(collect.getId());
@@ -132,9 +129,9 @@ public class GiftCollectService {
 	public String praiseGiftCollect(User praiser, GiftCollect collect,
 			HttpSession session) {
 		if (okPraise(praiser, collect)) {
-			if (!userService.okIntegral(praiser,
-					Integral.Integral_For_Praise_Gift, session)) {
-				return ActionMessage.Not_Integral;
+			if (!userService.okMuzhiCoin(praiser,
+					MuzhiCoin.MuzhiCoin_For_Praise_Gift, session)) {
+				return ActionMessage.Not_MuzhiCoin;
 			}
 
 			GiftCollectPraise praise = new GiftCollectPraise();
@@ -236,59 +233,59 @@ public class GiftCollectService {
 		return collect;
 	}
 
-	/**
-	 * 获取@到自己的点赞类信息
-	 * 
-	 * @param user
-	 *            消息接受者
-	 * @param page
-	 *            分页参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
-		// 礼品收藏点赞类未读信息
-		List<GiftCollectUnreadReply> replies = dao.query(
-				GiftCollectUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", GiftCollectUnreadReply.Praise)
-						.desc("date"), page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				GiftCollectUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", GiftCollectUnreadReply.Praise)
-						.and("state", "=", GiftCollectUnreadReply.Nuread)));
-		// 获取相应的联结消息
-		dao.fetchLinks(replies, "replier");// 加载消息发出者
-		return new QueryResult(replies, page);
-	}
+	// /**
+	// * 获取@到自己的点赞类信息
+	// *
+	// * @param user
+	// * 消息接受者
+	// * @param page
+	// * 分页参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadPraiseReply(User user, Pager page) {
+	// // 礼品收藏点赞类未读信息
+	// List<GiftCollectUnreadReply> replies = dao.query(
+	// GiftCollectUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", GiftCollectUnreadReply.Praise)
+	// .desc("date"), page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// GiftCollectUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", GiftCollectUnreadReply.Praise)
+	// .and("state", "=", GiftCollectUnreadReply.Nuread)));
+	// // 获取相应的联结消息
+	// dao.fetchLinks(replies, "replier");// 加载消息发出者
+	// return new QueryResult(replies, page);
+	// }
 
-	/**
-	 * 获取@到自己的评论类未读信息
-	 * 
-	 * @param user
-	 *            信息接收者
-	 * @param page
-	 *            分页参数
-	 * @return
-	 */
-	public QueryResult getMyUnreadCommentReply(User user, Pager page) {
-		// 礼品收藏点赞类未读信息
-		List<GiftCollectUnreadReply> replies = dao.query(
-				GiftCollectUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", GiftCollectUnreadReply.Comment)
-						.desc("date"), page);
-		// 保存未读的消息条数
-		page.setRecordCount(dao.count(
-				GiftCollectUnreadReply.class,
-				Cnd.where("receiverId", "=", user.getId())
-						.and("type", "=", GiftCollectUnreadReply.Comment)
-						.and("state", "=", GiftCollectUnreadReply.Nuread)));
-		// 获取相应的联结消息
-		dao.fetchLinks(replies, "replier");// 加载消息发出者
-		return new QueryResult(replies, page);
-	}
+	// /**
+	// * 获取@到自己的评论类未读信息
+	// *
+	// * @param user
+	// * 信息接收者
+	// * @param page
+	// * 分页参数
+	// * @return
+	// */
+	// public QueryResult getMyUnreadCommentReply(User user, Pager page) {
+	// // 礼品收藏点赞类未读信息
+	// List<GiftCollectUnreadReply> replies = dao.query(
+	// GiftCollectUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", GiftCollectUnreadReply.Comment)
+	// .desc("date"), page);
+	// // 保存未读的消息条数
+	// page.setRecordCount(dao.count(
+	// GiftCollectUnreadReply.class,
+	// Cnd.where("receiverId", "=", user.getId())
+	// .and("type", "=", GiftCollectUnreadReply.Comment)
+	// .and("state", "=", GiftCollectUnreadReply.Nuread)));
+	// // 获取相应的联结消息
+	// dao.fetchLinks(replies, "replier");// 加载消息发出者
+	// return new QueryResult(replies, page);
+	// }
 
 	// 改变礼品收藏的点赞数
 	private void changeGiftCollectPraiseNum(GiftCollect collect, int increment) {
@@ -329,15 +326,16 @@ public class GiftCollectService {
 		if (Strings.isBlank(collect.getCollectorId())) {
 			collect = dao.fetch(GiftCollect.class, collect.getId());
 		}
-		GiftCollectUnreadReply unread = new GiftCollectUnreadReply();
-		unread.setCollectId(collect.getId());
-		unread.setCollectTitle(collect.getTitle());
+		UnreadReply unread = new UnreadReply();
+		unread.setLinkId(collect.getId());
+		unread.setLinkTitle(collect.getTitle());
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(collect.getCollectorId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(GiftCollectUnreadReply.Nuread);
-		unread.setType(GiftCollectUnreadReply.Praise);
+		unread.setState(UnreadReply.Nuread);
+		unread.setType(UnreadReply.Praise);
+		unread.setReplyForm(UnreadReply.FormGiftCollect);
 		dao.insert(unread);
 	}
 
@@ -347,16 +345,17 @@ public class GiftCollectService {
 		if (Strings.isBlank(collect.getCollectorId())) {
 			collect = dao.fetch(GiftCollect.class, collect.getId());
 		}
-		GiftCollectUnreadReply unread = new GiftCollectUnreadReply();
-		unread.setCollectId(collect.getId());
-		unread.setCollectTitle(collect.getTitle());
+		UnreadReply unread = new UnreadReply();
+		unread.setLinkId(collect.getId());
+		unread.setLinkTitle(collect.getTitle());
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(fatherCommenter.getId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(GiftCollectUnreadReply.Nuread);
-		unread.setType(GiftCollectUnreadReply.Comment);
+		unread.setState(UnreadReply.Nuread);
+		unread.setType(UnreadReply.Comment);
+		unread.setReplyForm(UnreadReply.FormGiftCollect);
 		dao.insert(unread);
 	}
 
@@ -366,16 +365,17 @@ public class GiftCollectService {
 		if (Strings.isBlank(collect.getCollectorId())) {
 			collect = dao.fetch(GiftCollect.class, collect.getId());
 		}
-		GiftCollectUnreadReply unread = new GiftCollectUnreadReply();
+		UnreadReply unread = new UnreadReply();
 		unread.setContent(comment.getContent());
 		unread.setDate(DateUtils.now());
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(collect.getCollectorId());
 		unread.setReceiverId(commenter.getId());
-		unread.setState(GiftCollectUnreadReply.Nuread);
-		unread.setType(GiftCollectUnreadReply.Comment);
-		unread.setCollectId(collect.getId());
-		unread.setCollectTitle(collect.getTitle());
+		unread.setState(UnreadReply.Nuread);
+		unread.setType(UnreadReply.Comment);
+		unread.setLinkId(collect.getId());
+		unread.setLinkTitle(collect.getTitle());
+		unread.setReplyForm(UnreadReply.FormGiftCollect);
 		dao.insert(unread);
 	}
 
@@ -388,11 +388,12 @@ public class GiftCollectService {
 
 	// 删除对应的未读的点赞类消息
 	private void deleteUnreadPraiseReply(User praiser, GiftCollect collect) {
-		GiftCollectUnreadReply reply = dao.fetch(
-				GiftCollectUnreadReply.class,
+		UnreadReply reply = dao.fetch(
+				UnreadReply.class,
 				Cnd.where("replierId", "=", praiser.getId())
-						.and("collectId", "=", collect.getId())
-						.and("type", "=", GiftCollectUnreadReply.Praise));
+						.and("linkId", "=", collect.getId())
+						.and("type", "=", UnreadReply.Praise)
+						.and("replyForm", "=", UnreadReply.FormGiftCollect));
 		dao.delete(reply);
 	}
 

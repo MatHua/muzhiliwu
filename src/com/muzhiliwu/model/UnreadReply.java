@@ -8,22 +8,32 @@ import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
 
-@Table("t_wish_unread_reply")
-@TableIndexes({ @Index(name = "idx_wish_unread_reply", fields = { "receiverId" }, unique = false) })
-public class WishUnreadReply extends IdEntity {
+@Table("t_unread_reply")
+@TableIndexes({ @Index(name = "idx_unread_reply", fields = { "receiverId" }, unique = false) })
+public class UnreadReply extends IdEntity {
 	public static final String Nuread = "unread";// 未读
 	public static final String Read = "read";// 已读
 
 	public static final String Collect = "collect";// 收藏类未读信息
 	public static final String Praise = "praise";// 点赞类未读信息
+	public static final String Comment = "comment";// 评论类未读信息
+	public static final String Share = "share";// 分享类未读信息
+
+	public static final String FormMessage = "form_message";// 来源留言墙
+	public static final String FormGiftCollect = "form_gift_collect";// 来源礼品收藏
+	public static final String FormShare = "form_share";// 来源分享
+	public static final String FormWish = "form_wish";// 来源许愿
+
+	@Column
+	private String replyForm;// 回复来源
 
 	@Column
 	private String receiverId;// 接收者id,用于联结"t_user"表
 
 	@Column
-	private String wishId;// 对应的许愿id
+	private String linkId;// 对应的许愿id
 	@Column
-	private String wishTitle;// 许愿的标题
+	private String linkTitle;// 许愿的标题
 
 	@Column
 	private String replierId;// 回复者id
@@ -88,20 +98,28 @@ public class WishUnreadReply extends IdEntity {
 		this.type = type;
 	}
 
-	public String getWishId() {
-		return wishId;
+	public String getLinkId() {
+		return linkId;
 	}
 
-	public void setWishId(String wishId) {
-		this.wishId = wishId;
+	public void setLinkId(String linkId) {
+		this.linkId = linkId;
 	}
 
-	public String getWishTitle() {
-		return wishTitle;
+	public String getLinkTitle() {
+		return linkTitle;
 	}
 
-	public void setWishTitle(String wishTitle) {
-		this.wishTitle = wishTitle;
+	public void setLinkTitle(String linkTitle) {
+		this.linkTitle = linkTitle;
+	}
+
+	public String getReplyForm() {
+		return replyForm;
+	}
+
+	public void setReplyForm(String replyForm) {
+		this.replyForm = replyForm;
 	}
 
 }

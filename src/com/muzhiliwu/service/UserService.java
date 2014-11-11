@@ -13,14 +13,12 @@ import org.nutz.lang.Files;
 import org.nutz.lang.Strings;
 import org.nutz.mvc.upload.TempFile;
 
-import com.muzhiliwu.model.MessUnreadReply;
-import com.muzhiliwu.model.ShareUnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
-import com.muzhiliwu.utils.Integral;
 import com.muzhiliwu.utils.MD5;
+import com.muzhiliwu.utils.MuzhiCoin;
 import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
@@ -51,29 +49,50 @@ public class UserService {
 	 * @param pass
 	 * @return
 	 */
-	public String registOrEditUser(User user, String pass) {
-		if (Strings.isBlank(user.getId())) {// 注册
-			// 账号已被注册
-			if (!checkRepeat(user.getCode())) {
-				return ActionMessage.fail;
-			}
-			// 一些系统自修改的信息
-			user.setCode(user.getCode().trim());
-			user.setId(NumGenerator.getUuid());// 生成id
-			user.setPass(MD5.toMD5(pass.trim()));// 密码加密
-			user.setDate(DateUtils.now());// 注册时间
-			user.setIntegral(Integral.Integral_For_New_User);// 积分初始化
-			dao.insert(user);
-		} else {
-			User u = dao.fetch(User.class, Cnd.where("id", "=", user.getId()));
-			// 避免修改一些不能修改的信息
+	public String registUser(User user) {
+
+		// 账号已被注册
+		if (!checkRepeat(user.getCode())) {
+			return ActionMessage.fail;
+		}
+		// 一些系统自修改的信息
+		user.setCode(user.getCode().trim());
+		user.setId(NumGenerator.getUuid());// 生成id
+		user.setPass(MD5.toMD5(user.getPass().trim()));// 密码加密
+		user.setDate(DateUtils.now());// 注册时间
+		user.setMuzhiCoin(MuzhiCoin.MuzhiCoin_For_New_User);// 积分初始化
+		user.setPopularityRank(1);
+		user.setPopularityValue(0);
+		user.setSendGiftRank(1);
+		user.setSendGiftValue(0);
+		dao.insert(user);
+		return ActionMessage.success;
+	}
+
+	/**
+	 * 用户的信息修改
+	 * 
+	 * @param user
+	 * @param pass
+	 * @return
+	 */
+	public String editUser(User user, String pass) {
+		User u = dao.fetch(User.class, Cnd.where("id", "=", user.getId()));
+		if (u.getPass().equals(MD5.toMD5(pass))) {
+			// 避免修改一些不能修改的信息,例如：拇指币数,送礼物数,送礼物等级,人气值,人气等级等..都是不能让用户自行修改
 			user.setCode(u.getCode());
 			user.setPass(u.getPass());
 			user.setPhone(u.getPhone() == null ? null : u.getPhone());
 			user.setDate(DateUtils.now());
+			user.setMuzhiCoin(u.getMuzhiCoin());
+			user.setPopularityRank(u.getPopularityRank());
+			user.setPopularityValue(u.getPopularityValue());
+			user.setSendGiftRank(u.getSendGiftRank());
+			user.setSendGiftValue(u.getSendGiftValue());
 			dao.update(user);
+			return ActionMessage.success;
 		}
-		return ActionMessage.success;
+		return ActionMessage.fail;
 	}
 
 	public boolean checkRepeat(String code) {
@@ -146,6 +165,7 @@ public class UserService {
 
 	public User getUserById(String id) {
 		User user = dao.fetch(User.class, id);
+		
 		return user;
 	}
 
@@ -158,10 +178,10 @@ public class UserService {
 	 *            积分增量
 	 * @return
 	 */
-	public boolean okIntegral(User user, int increment, HttpSession session) {
+	public boolean okMuzhiCoin(User user, int muzhiCoin, HttpSession session) {
 		user = dao.fetch(User.class, user.getId());
-		if (user.getIntegral() + increment >= 0) {// 积分足够
-			user.setIntegral(user.getIntegral() + increment);
+		if (user.getMuzhiCoin() + muzhiCoin >= 0) {// 积分足够
+			user.setMuzhiCoin(user.getMuzhiCoin() + muzhiCoin);
 			dao.update(user);
 			session.setAttribute("t_user", user);
 			return true;

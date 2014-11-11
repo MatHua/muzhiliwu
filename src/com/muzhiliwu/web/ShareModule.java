@@ -45,9 +45,9 @@ public class ShareModule {
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("分享发表成功~");
 			am.setType(ActionMessage.success);
-		} else if (ActionMessage.Not_Integral.equals(result)) {
+		} else if (ActionMessage.Not_MuzhiCoin.equals(result)) {
 			am.setMessage("积分不够,不能发表~");
-			am.setType(ActionMessage.Not_Integral);
+			am.setType(ActionMessage.Not_MuzhiCoin);
 		}
 		return am;
 	}
@@ -90,9 +90,9 @@ public class ShareModule {
 		} else if (ActionMessage.fail.equals(result)) {
 			am.setMessage("已收藏,请不要重复操作~");
 			am.setType(ActionMessage.fail);
-		} else if (ActionMessage.Not_Integral.equals(result)) {
+		} else if (ActionMessage.Not_MuzhiCoin.equals(result)) {
 			am.setMessage("积分不够,不能收藏~");
-			am.setType(ActionMessage.Not_Integral);
+			am.setType(ActionMessage.Not_MuzhiCoin);
 		}
 		return am;
 	}
@@ -179,9 +179,9 @@ public class ShareModule {
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("评论成功~");
 			am.setType(ActionMessage.success);
-		} else if (ActionMessage.Not_Integral.equals(result)) {
+		} else if (ActionMessage.Not_MuzhiCoin.equals(result)) {
 			am.setMessage("评论失败,积分不够~");
-			am.setType(ActionMessage.Not_Integral);
+			am.setType(ActionMessage.Not_MuzhiCoin);
 		}
 		return am;
 	}
@@ -240,62 +240,65 @@ public class ShareModule {
 	}
 
 	// 获取@我的点赞类消息
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
-			HttpSession session) {
-		User user = (User) session.getAttribute("t_user");
-
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
-
-		QueryResult result = shareService.getMyUnreadPraiseReply(user, page);
-
-		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
-		ams.setPageNum(result.getPager().getPageNumber());
-		ams.setPageSize(result.getPager().getPageSize());
-		ams.setObject(result.getList());
-		return ams;
-	}
-
-	// 获取@我的评论类的消息
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
-			HttpSession session) {
-		User user = (User) session.getAttribute("t_user");
-
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
-
-		QueryResult result = shareService.getMyUnreadCommentReply(user, page);
-
-		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
-		ams.setPageNum(result.getPager().getPageNumber());
-		ams.setPageSize(result.getPager().getPageSize());
-		ams.setObject(result.getList());
-		return ams;
-	}
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
+	// }))
+	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
+	// HttpSession session) {
+	// User user = (User) session.getAttribute("t_user");
+	//
+	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+	//
+	// QueryResult result = shareService.getMyUnreadPraiseReply(user, page);
+	//
+	// ActionMessages ams = new ActionMessages();
+	// ams.setPageCount(result.getPager().getRecordCount());
+	// ams.setPageNum(result.getPager().getPageNumber());
+	// ams.setPageSize(result.getPager().getPageSize());
+	// ams.setObject(result.getList());
+	// return ams;
+	// }
 
 	// 获取@我的评论类的消息
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
-	public Object getMyUnreadCollectReply(@Param("::page.") Pager page,
-			HttpSession session) {
-		User user = (User) session.getAttribute("t_user");
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
+	// }))
+	// public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
+	// HttpSession session) {
+	// User user = (User) session.getAttribute("t_user");
+	//
+	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+	//
+	// QueryResult result = shareService.getMyUnreadCommentReply(user, page);
+	//
+	// ActionMessages ams = new ActionMessages();
+	// ams.setPageCount(result.getPager().getRecordCount());
+	// ams.setPageNum(result.getPager().getPageNumber());
+	// ams.setPageSize(result.getPager().getPageSize());
+	// ams.setObject(result.getList());
+	// return ams;
+	// }
 
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
-
-		QueryResult result = shareService.getMyUnreadCollectReply(user, page);
-
-		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
-		ams.setPageNum(result.getPager().getPageNumber());
-		ams.setPageSize(result.getPager().getPageSize());
-		ams.setObject(result.getList());
-		return ams;
-	}
+	// 获取@我的评论类的消息
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
+	// }))
+	// public Object getMyUnreadCollectReply(@Param("::page.") Pager page,
+	// HttpSession session) {
+	// User user = (User) session.getAttribute("t_user");
+	//
+	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+	//
+	// QueryResult result = shareService.getMyUnreadCollectReply(user, page);
+	//
+	// ActionMessages ams = new ActionMessages();
+	// ams.setPageCount(result.getPager().getRecordCount());
+	// ams.setPageNum(result.getPager().getPageNumber());
+	// ams.setPageSize(result.getPager().getPageSize());
+	// ams.setObject(result.getList());
+	// return ams;
+	// }
 }
