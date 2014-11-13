@@ -7,13 +7,15 @@ import javax.servlet.http.HttpSession;
 
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Files;
-import org.nutz.lang.Strings;
 import org.nutz.mvc.upload.TempFile;
 
+import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
@@ -165,7 +167,8 @@ public class UserService {
 
 	public User getUserById(String id) {
 		User user = dao.fetch(User.class, id);
-		
+		user.setUnreadReplyNum(countUnreadReplyNum(id));// 获取未读信息数
+		user.setNewlyWish(getNewlyWish(id));// 获取最近的许愿
 		return user;
 	}
 
@@ -187,6 +190,25 @@ public class UserService {
 			return true;
 		}
 		return false;
+	}
+
+	// 获取未读信息数
+	private int countUnreadReplyNum(String receiverId) {
+		return dao.count(
+				UnreadReply.class,
+				Cnd.where("receiverId", "=", receiverId).and("state", "=",
+						UnreadReply.Unread));
+	}
+
+	// 获取最近的那条许愿
+	private Wish getNewlyWish(String wisherId) {
+		Wish wish = dao
+				.fetch(Wish.class,
+						Cnd.wrap("wisherId='"
+								+ wisherId
+								+ "' and date in (select max(date) from t_wish where wisherId='"
+								+ wisherId + "')"));
+		return wish;
 	}
 
 	// 检查密码

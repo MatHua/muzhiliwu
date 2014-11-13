@@ -227,6 +227,8 @@ public class ShareService {
 	public QueryResult getShares(Pager page, User user) {
 		List<Share> shares = dao.query(Share.class, Cnd.orderBy().desc("date"),
 				page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(Share.class));
 
 		// 加载分享发表者
@@ -259,6 +261,8 @@ public class ShareService {
 	public QueryResult getMyShares(User user, Pager page) {
 		List<Share> shares = dao.query(Share.class,
 				Cnd.where("sharerId", "=", user.getId()).desc("date"), page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(Share.class,
 				Cnd.where("sharerId", "=", user.getId())));
 
@@ -329,6 +333,8 @@ public class ShareService {
 	// .and("type", "=", ShareUnreadReply.Praise)
 	// .desc("date"), page);
 	// // 保存未读的消息条数
+	// if(page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// ShareUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -356,6 +362,8 @@ public class ShareService {
 	// .and("type", "=", ShareUnreadReply.Comment)
 	// .desc("date"), page);
 	// // 保存未读的消息条数
+	// if(page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// ShareUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -384,6 +392,8 @@ public class ShareService {
 	// .and("type", "=", ShareUnreadReply.Collect)
 	// .desc("date"), page);
 	// // 保存未读的消息条数
+	// if(page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// ShareUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -404,12 +414,12 @@ public class ShareService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(share.getSharerId());
 		unread.setReplierId(collecter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Collect);
 		unread.setLinkId(share.getId());
 		unread.setLinkTitle(share.getTitle());
-		unread.setReplyForm(UnreadReply.Share);
+		unread.setReplyFrom(UnreadReply.FromShare);
 		dao.insert(unread);
 	}
 
@@ -439,7 +449,7 @@ public class ShareService {
 				Cnd.where("replierId", "=", collecter.getId())
 						.and("linkId", "=", share.getId())
 						.and("type", "=", UnreadReply.Collect)
-						.and("replyForm", "=", UnreadReply.FormShare));
+						.and("replyFrom", "=", UnreadReply.FromShare));
 		dao.delete(reply);
 	}
 
@@ -495,12 +505,12 @@ public class ShareService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(fatherCommenter.getId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Comment);
 		unread.setLinkId(share.getId());
 		unread.setLinkTitle(share.getTitle());
-		unread.setReplyForm(UnreadReply.FormShare);
+		unread.setReplyFrom(UnreadReply.FromShare);
 		dao.insert(unread);
 	}
 
@@ -516,12 +526,12 @@ public class ShareService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(share.getSharerId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Comment);
 		unread.setLinkId(share.getId());
 		unread.setLinkTitle(share.getTitle());
-		unread.setReplyForm(UnreadReply.FormShare);
+		unread.setReplyFrom(UnreadReply.FromShare);
 		dao.insert(unread);
 	}
 
@@ -535,12 +545,12 @@ public class ShareService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(share.getSharerId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Praise);
 		unread.setLinkId(share.getId());
 		unread.setLinkTitle(share.getTitle());
-		unread.setReplyForm(UnreadReply.FormShare);
+		unread.setReplyFrom(UnreadReply.FromShare);
 		dao.insert(unread);
 	}
 
@@ -551,7 +561,7 @@ public class ShareService {
 				Cnd.where("replierId", "=", praiser.getId())
 						.and("linkId", "=", share.getId())
 						.and("type", "=", UnreadReply.Praise)
-						.and("replyForm", "=", UnreadReply.FormShare));
+						.and("replyFrom", "=", UnreadReply.FromShare));
 		dao.delete(reply);
 	}
 

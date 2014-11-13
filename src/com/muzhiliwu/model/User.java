@@ -11,11 +11,16 @@ import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
 
+import com.muzhiliwu.model.gift.OrderForm;
 import com.muzhiliwu.model.gift.ShoppingCart;
 
 @Table("t_user")
 @TableIndexes({ @Index(name = "idx_user", fields = { "code" }, unique = false) })
 public class User extends IdEntity {
+	public static final String Man = "man";// 男性
+	public static final String Woman = "woman";// 女性
+	public static final String Secret = "secret";// 保密
+
 	@Column
 	private String code;// 账号
 	@Column
@@ -79,9 +84,11 @@ public class User extends IdEntity {
 	@Many(target = Wish.class, field = "wisherId")
 	private List<Wish> myWishes;// 我的许愿,便于找出用户自己许的愿
 
+	private Wish newlyWish;// 最近的许愿
+
 	@Column
 	private int wantorNum;// 愿望实现的申请者数
-	@ManyMany(target = WishRealizationOfWantor.class, relation = "t_wish_realization_of_wantor", from = "wisherId", to = "wantorId")
+	@ManyMany(target = User.class, relation = "t_wish_realization_of_wantor", from = "wisherId", to = "wantorId")
 	private List<User> myWishWantor;// 想要帮忙实现愿望的人
 
 	@Column
@@ -99,8 +106,8 @@ public class User extends IdEntity {
 	// ________________________________________________________________________
 
 	// ************************购物车*********************************************
-	@Many(target = ShoppingCart.class, field = "buyerId")
-	private List<ShoppingCart> carts;
+	@Many(target = OrderForm.class, field = "buyerId")
+	private List<OrderForm> orders;
 
 	// __________________________________________________________________________
 
@@ -356,14 +363,6 @@ public class User extends IdEntity {
 		this.shareNum = shareNum;
 	}
 
-	public List<ShoppingCart> getCarts() {
-		return carts;
-	}
-
-	public void setCarts(List<ShoppingCart> carts) {
-		this.carts = carts;
-	}
-
 	public int getPopularityTop() {
 		return popularityTop;
 	}
@@ -394,6 +393,22 @@ public class User extends IdEntity {
 
 	public void setMyUnreadReplies(List<UnreadReply> myUnreadReplies) {
 		this.myUnreadReplies = myUnreadReplies;
+	}
+
+	public Wish getNewlyWish() {
+		return newlyWish;
+	}
+
+	public void setNewlyWish(Wish newlyWish) {
+		this.newlyWish = newlyWish;
+	}
+
+	public List<OrderForm> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(List<OrderForm> orders) {
+		this.orders = orders;
 	}
 
 }

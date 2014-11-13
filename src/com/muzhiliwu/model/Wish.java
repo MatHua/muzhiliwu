@@ -52,7 +52,8 @@ public class Wish extends IdEntity {
 	@One(target = User.class, field = "wisherId")
 	private User wisher;// 用于记录许愿者
 
-	private boolean collected;// 标记是否已被收藏
+	private boolean isCollected;// 标记是否已被收藏
+	private boolean isPraised;// 标记是否已点赞(喜欢)
 
 	@Column
 	private String wishOrderFormId;// 联结id
@@ -139,14 +140,6 @@ public class Wish extends IdEntity {
 		this.collectNum = collectNum;
 	}
 
-	public boolean isCollected() {
-		return collected;
-	}
-
-	public void setCollected(boolean collected) {
-		this.collected = collected;
-	}
-
 	public int getShareNum() {
 		return shareNum;
 	}
@@ -169,6 +162,22 @@ public class Wish extends IdEntity {
 
 	public void setWishOrderForm(OrderFormForWish wishOrderForm) {
 		this.wishOrderForm = wishOrderForm;
+	}
+
+	public boolean isCollected() {
+		return isCollected;
+	}
+
+	public void setCollected(boolean isCollected) {
+		this.isCollected = isCollected;
+	}
+
+	public boolean isPraised() {
+		return isPraised;
+	}
+
+	public void setPraised(boolean isPraised) {
+		this.isPraised = isPraised;
 	}
 
 }

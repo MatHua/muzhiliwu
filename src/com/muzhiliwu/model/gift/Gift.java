@@ -17,7 +17,7 @@ import org.nutz.dao.entity.annotation.TableIndexes;
 @Table("t_gift")
 @TableIndexes({ @Index(name = "idx_gift", fields = { "shopId" }, unique = false) })
 public class Gift extends IdEntity {
-	private static final DecimalFormat df = new DecimalFormat("0.0");
+	public static final DecimalFormat df = new DecimalFormat("0.0");
 
 	public static final String FromOnlineShop = "from_online_shop";// 来源网店
 	public static final String FromEntityShop = "from_entity_shop";// 来源实体店
@@ -41,7 +41,7 @@ public class Gift extends IdEntity {
 	@ColDefine(type = ColType.TEXT)
 	private String body;// 商品描述
 	@Column
-	private Double price;// 商品价格
+	private float price;// 商品价格
 	@Column
 	private String type;// 商品分类
 	@Column
@@ -53,6 +53,8 @@ public class Gift extends IdEntity {
 	@Column
 	private String saleState;// 销售状态
 
+	private boolean isCollected;// 记录是否已被收藏
+	private boolean isShared;// 记录是否已被分享
 	@Column
 	private int styleNum;// 款式数
 	@Many(target = GiftStyle.class, field = "giftId")
@@ -115,11 +117,11 @@ public class Gift extends IdEntity {
 		this.body = body;
 	}
 
-	public Double getPrice() {
+	public float getPrice() {
 		return price;
 	}
 
-	public void setPrice(Double price) {
+	public void setPrice(float price) {
 		this.price = price;
 	}
 
@@ -273,6 +275,22 @@ public class Gift extends IdEntity {
 
 	public void setShopId(String shopId) {
 		this.shopId = shopId;
+	}
+
+	public boolean isCollected() {
+		return isCollected;
+	}
+
+	public void setCollected(boolean isCollected) {
+		this.isCollected = isCollected;
+	}
+
+	public boolean isShared() {
+		return isShared;
+	}
+
+	public void setShared(boolean isShared) {
+		this.isShared = isShared;
 	}
 
 }

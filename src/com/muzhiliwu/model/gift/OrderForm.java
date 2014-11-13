@@ -13,6 +13,7 @@ import com.muzhiliwu.model.User;
 @Table("t_order_form")
 @TableIndexes({ @Index(name = "idx_order_form", fields = { "buyerId" }, unique = false) })
 public class OrderForm {
+	public static final String WaitForPay = "wait_for_pay";// 等待付款
 	@Name
 	@Column
 	private String orderId;// 订单号

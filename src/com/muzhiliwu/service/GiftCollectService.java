@@ -178,8 +178,11 @@ public class GiftCollectService {
 	public QueryResult getMyGiftCollects(User user, Pager page) {
 		List<GiftCollect> collects = dao.query(GiftCollect.class,
 				Cnd.where("collectorId", "=", user.getId()).desc("date"), page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(GiftCollect.class,
 				Cnd.where("collectorId", "=", user.getId())));
+
 		dao.fetchLinks(collects, "collector");
 		dao.fetchLinks(collects, "gift");
 
@@ -200,6 +203,8 @@ public class GiftCollectService {
 	public QueryResult getGiftCollects(Pager page) {
 		List<GiftCollect> collects = dao.query(GiftCollect.class, Cnd.orderBy()
 				.desc("date"), page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(GiftCollect.class));
 		dao.fetchLinks(collects, "collector");
 		dao.fetchLinks(collects, "gift");
@@ -233,6 +238,15 @@ public class GiftCollectService {
 		return collect;
 	}
 
+	// 判断该商品是否已被该用户收藏~
+	public boolean okCollect(User collector, Gift gift) {
+		GiftCollect collect = dao.fetch(
+				GiftCollect.class,
+				Cnd.where("collectorId", "=", collector.getId()).and("giftId",
+						"=", gift.getId()));
+		return collect == null ? true : false;
+	}
+
 	// /**
 	// * 获取@到自己的点赞类信息
 	// *
@@ -250,6 +264,8 @@ public class GiftCollectService {
 	// .and("type", "=", GiftCollectUnreadReply.Praise)
 	// .desc("date"), page);
 	// // 保存未读的消息条数
+	// if(page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// GiftCollectUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -277,6 +293,8 @@ public class GiftCollectService {
 	// .and("type", "=", GiftCollectUnreadReply.Comment)
 	// .desc("date"), page);
 	// // 保存未读的消息条数
+	// if(page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// GiftCollectUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -312,15 +330,6 @@ public class GiftCollectService {
 		dao.delete(praise);
 	}
 
-	// 判断该商品是否已被该用户收藏~
-	private boolean okCollect(User collector, Gift gift) {
-		GiftCollect collect = dao.fetch(
-				GiftCollect.class,
-				Cnd.where("collectorId", "=", collector.getId()).and("giftId",
-						"=", gift.getId()));
-		return collect == null ? true : false;
-	}
-
 	// 创建一条未读的点赞类信息
 	private void createUnreadPraiseReply(User praiser, GiftCollect collect) {
 		if (Strings.isBlank(collect.getCollectorId())) {
@@ -333,9 +342,9 @@ public class GiftCollectService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(collect.getCollectorId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 		unread.setType(UnreadReply.Praise);
-		unread.setReplyForm(UnreadReply.FormGiftCollect);
+		unread.setReplyFrom(UnreadReply.FromGiftCollect);
 		dao.insert(unread);
 	}
 
@@ -353,9 +362,9 @@ public class GiftCollectService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(fatherCommenter.getId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 		unread.setType(UnreadReply.Comment);
-		unread.setReplyForm(UnreadReply.FormGiftCollect);
+		unread.setReplyFrom(UnreadReply.FromGiftCollect);
 		dao.insert(unread);
 	}
 
@@ -371,11 +380,11 @@ public class GiftCollectService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(collect.getCollectorId());
 		unread.setReceiverId(commenter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 		unread.setType(UnreadReply.Comment);
 		unread.setLinkId(collect.getId());
 		unread.setLinkTitle(collect.getTitle());
-		unread.setReplyForm(UnreadReply.FormGiftCollect);
+		unread.setReplyFrom(UnreadReply.FromGiftCollect);
 		dao.insert(unread);
 	}
 
@@ -393,7 +402,7 @@ public class GiftCollectService {
 				Cnd.where("replierId", "=", praiser.getId())
 						.and("linkId", "=", collect.getId())
 						.and("type", "=", UnreadReply.Praise)
-						.and("replyForm", "=", UnreadReply.FormGiftCollect));
+						.and("replyFrom", "=", UnreadReply.FromGiftCollect));
 		dao.delete(reply);
 	}
 

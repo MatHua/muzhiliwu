@@ -2,6 +2,8 @@ package com.muzhiliwu.web;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nutz.dao.Cnd;
@@ -9,9 +11,13 @@ import org.nutz.dao.Dao;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.mvc.annotation.At;
+import org.nutz.mvc.annotation.By;
+import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
 
+import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.TestDemo;
+import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.utils.ActionMessage;
 
 @IocBean
@@ -20,13 +26,39 @@ public class TestModule {
 	@Inject
 	private Dao dao;
 
-	private static Log log = LogFactory.getLog(TestDemo.class);// Logs.get()
+	private static Log log = LogFactory.getLog(TestDemo.class);
+
+	@At
+	@Ok("json")
+	public Object check() {
+		TestDemo test = dao.fetch(TestDemo.class, "1");
+		dao.fetchLinks(test, "myDemos");
+		return test;
+	}
+
+	@At
+	@Ok("json")
+	public Object getNewly(String wisherId) {
+		// name LIKE 'J%' AND age>20
+		// ELECT * FROM t_person WHERE || name LIKE 'J%' AND age>20;
+		// TestDemo test = dao.fetch(TestDemo.class,
+		// Cnd.wrap("id in (select max(id) from t_test_demo)"));
+		Wish wish = dao
+				.fetch(Wish.class,
+						Cnd.wrap("wisherId='"
+								+ wisherId
+								+ "' and date in (select max(date) from t_wish where wisherId='"
+								+ wisherId + "')"));
+		return wish;
+	}
 
 	@At("/?/name")
 	@Ok("json")
-	public Object myName(String id) {
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object myName(String id, HttpServletRequest request) {
 		ActionMessage am = new ActionMessage();
 		am.setMessage(id);
+		am.setType(request.getRemoteAddr());
 		return am;
 	}
 
@@ -50,7 +82,7 @@ public class TestModule {
 				Cnd.where("name", "=", name));
 		dao.fetchLinks(tests, "myTests");
 		for (TestDemo test : tests) {
-			dao.fetchLinks(test.getMyTests(), "msgs");
+			// dao.fetchLinks(test.getMyTests(), "msgs");
 		}
 		am.setObject(tests);
 		am.setMessage("雅妹蝶~");
@@ -68,9 +100,7 @@ public class TestModule {
 		List<TestDemo> tests = dao.query(TestDemo.class,
 				Cnd.where("name", "=", "name"));
 		dao.fetchLinks(tests, "myTests");
-		for (TestDemo test : tests) {
-			dao.fetchLinks(test.getMyTests(), "msgs");
-		}
+
 		am.setObject(tests);
 		am.setMessage("雅妹蝶~");
 

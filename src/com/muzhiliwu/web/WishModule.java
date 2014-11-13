@@ -1,7 +1,10 @@
 package com.muzhiliwu.web;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nutz.dao.Dao;
 import org.nutz.dao.QueryResult;
 import org.nutz.dao.pager.Pager;
@@ -14,12 +17,15 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 
+import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.WishCollect;
 import com.muzhiliwu.service.WishService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
+import com.muzhiliwu.utils.DateUtils;
+import com.muzhiliwu.utils.IpUtils;
 
 @IocBean
 @At("wish")
@@ -28,11 +34,12 @@ public class WishModule {
 	private WishService wishService;
 	@Inject
 	private Dao dao;// 用于测试而已
+	private static Log log = LogFactory.getLog(WishModule.class);
 
 	// 许愿
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object publish(@Param("::wish.") Wish wish, HttpSession session) {
 
 		User publisher = (User) session.getAttribute("t_user");
@@ -54,7 +61,7 @@ public class WishModule {
 	// 修改愿望
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object update(@Param("::wish.") Wish wish, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
 		// User publisher = dao.fetch(User.class,
@@ -109,6 +116,9 @@ public class WishModule {
 		return am;
 	}
 
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::wish.") Wish wish, HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
 		// User praiser = dao
@@ -129,7 +139,7 @@ public class WishModule {
 	// 点赞或取消点赞
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::wish.") Wish wish, HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
 		// User praiser = dao
@@ -153,14 +163,20 @@ public class WishModule {
 	// 获取某一页许愿
 	@At
 	@Ok("json")
-	public Object list(@Param("::page.") Pager page, HttpSession session) {
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
-
+	public Object list(@Param("::page.") Pager page, HttpSession session,
+			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (user != null ? user.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "首页获取许愿列表]");
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
+
 		QueryResult result = wishService.getWishes(page, user);
 
 		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
@@ -168,18 +184,47 @@ public class WishModule {
 		return ams;
 	}
 
+	// 获取想要帮忙实现愿望的人
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object myWishWantor(@Param("::page.") Pager page,
+			HttpSession session, HttpServletRequest request) {
+
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "获取想要帮我许愿的人]");
+
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
+
+		QueryResult result = wishService.getMyWishWantor(user, page);
+
+		ActionMessages ams = new ActionMessages();
+
+		ams.setMessCount(result.getPager().getPageCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageNum(result.getPager().getPageSize());
+		ams.setObject(result.getList());
+		return ams;
+	}
+
 	// 获取我的许愿
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
 		QueryResult result = wishService.getMyWishes(page, user);
 
 		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
@@ -190,16 +235,18 @@ public class WishModule {
 	// 获取我收藏的愿望
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object myCollectList(@Param("::page.") Pager page,
 			HttpSession session) {
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
 		QueryResult result = wishService.getMyCollectWishes(page, user);
 
 		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
@@ -210,7 +257,7 @@ public class WishModule {
 	// 收藏愿望
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object collect(@Param("::wish.") Wish wish, HttpSession session) {
 		User collecter = (User) session.getAttribute("t_user");
 		// User collecter = dao
@@ -234,7 +281,7 @@ public class WishModule {
 	// 取消收藏
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelCollect(@Param("::collect.") WishCollect collect,
 			HttpSession session) {
 		User collecter = (User) session.getAttribute("t_user");
@@ -255,12 +302,12 @@ public class WishModule {
 	// 获取@我的点赞类消息
 	// @At
 	// @Ok("json")
-	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
-	// }))
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
 	// HttpSession session) {
 	// User user = (User) session.getAttribute("t_user");
-	//
+	// if(page !=null)
 	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 	//
 	// QueryResult result = wishService.getMyUnreadPraiseReply(user, page);
@@ -276,12 +323,12 @@ public class WishModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
-	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
-	// }))
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCollectReply(@Param("::page.") Pager page,
 	// HttpSession session) {
 	// User user = (User) session.getAttribute("t_user");
-	//
+	// if(page !=null)
 	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 	//
 	// QueryResult result = wishService.getMyUnreadCollectReply(user, page);

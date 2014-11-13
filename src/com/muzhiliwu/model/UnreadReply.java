@@ -11,7 +11,7 @@ import org.nutz.dao.entity.annotation.TableIndexes;
 @Table("t_unread_reply")
 @TableIndexes({ @Index(name = "idx_unread_reply", fields = { "receiverId" }, unique = false) })
 public class UnreadReply extends IdEntity {
-	public static final String Nuread = "unread";// 未读
+	public static final String Unread = "unread";// 未读
 	public static final String Read = "read";// 已读
 
 	public static final String Collect = "collect";// 收藏类未读信息
@@ -19,13 +19,13 @@ public class UnreadReply extends IdEntity {
 	public static final String Comment = "comment";// 评论类未读信息
 	public static final String Share = "share";// 分享类未读信息
 
-	public static final String FormMessage = "form_message";// 来源留言墙
-	public static final String FormGiftCollect = "form_gift_collect";// 来源礼品收藏
-	public static final String FormShare = "form_share";// 来源分享
-	public static final String FormWish = "form_wish";// 来源许愿
+	public static final String FromMessage = "from_message";// 来源留言墙
+	public static final String FromGiftCollect = "from_gift_collect";// 来源礼品收藏
+	public static final String FromShare = "from_share";// 来源分享
+	public static final String FromWish = "from_wish";// 来源许愿
 
 	@Column
-	private String replyForm;// 回复来源
+	private String replyFrom;// 回复来源
 
 	@Column
 	private String receiverId;// 接收者id,用于联结"t_user"表
@@ -114,12 +114,12 @@ public class UnreadReply extends IdEntity {
 		this.linkTitle = linkTitle;
 	}
 
-	public String getReplyForm() {
-		return replyForm;
+	public String getReplyFrom() {
+		return replyFrom;
 	}
 
-	public void setReplyForm(String replyForm) {
-		this.replyForm = replyForm;
+	public void setReplyFrom(String replyFrom) {
+		this.replyFrom = replyFrom;
 	}
 
 }

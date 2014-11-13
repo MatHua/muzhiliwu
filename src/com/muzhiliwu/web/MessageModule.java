@@ -14,6 +14,7 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 
+import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.MessComment;
 import com.muzhiliwu.model.Message;
 import com.muzhiliwu.model.User;
@@ -32,11 +33,9 @@ public class MessageModule {
 	// 发表一条留言
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object publish(@Param("::msg.") Message msg, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
-		// User publisher = dao.fetch(User.class,
-		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
 		String result = messageService.publishMessage(publisher, msg, session);
 
@@ -54,11 +53,9 @@ public class MessageModule {
 	// 更新一条留言
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object update(@Param("::msg.") Message msg, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
-		// User publisher = dao.fetch(User.class,
-		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
 		String result = messageService.updateMessage(publisher, msg);
 
@@ -77,13 +74,14 @@ public class MessageModule {
 	@At
 	@Ok("json")
 	public Object list(@Param("::page.") Pager page) {
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
-		// page.setPageSize(Pager.DEFAULT_PAGE_SIZE);
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
 
 		QueryResult result = messageService.getMessages(page);
 
 		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
@@ -93,18 +91,18 @@ public class MessageModule {
 	// 获取用户的留言
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
-		// User user = dao.fetch(User.class,
-		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
 
 		QueryResult result = messageService.getMyMessages(user, page);
 
 		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
@@ -113,11 +111,9 @@ public class MessageModule {
 
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::msg.") Message msg, HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
-		// User praiser = dao
-		// .fetch(User.class, "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
 		String tmp = messageService.cancelPraiseMessage(msg, praiser);
 		ActionMessage am = new ActionMessage();
@@ -134,12 +130,10 @@ public class MessageModule {
 	// 点赞
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::msg.") Message msg, HttpSession session) {
 
 		User praiser = (User) session.getAttribute("t_user");
-		// User praiser = dao
-		// .fetch(User.class, "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 
 		String tmp = messageService.praiseMessage(msg, praiser, session);
 		ActionMessage am = new ActionMessage();
@@ -159,14 +153,12 @@ public class MessageModule {
 	// 评论留言或者评论别人的评论
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object comment(@Param("::msg.") Message msg,
 			@Param("::comment.") MessComment comment,
 			@Param("::fatherCommenter.") User fatherCommenter,
 			HttpSession session) {
 		User commenter = (User) session.getAttribute("t_user");
-		// User commenter = dao.fetch(User.class,
-		// "7f74f863a1474866ac1151bc179c60ab");// 用来测试
 		String result = messageService.commentMessage(msg, commenter, comment,
 				fatherCommenter, session);
 
@@ -196,12 +188,12 @@ public class MessageModule {
 	// 获取@我的点赞类未读信息消息
 	// @At
 	// @Ok("json")
-	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
-	// }))
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
 	// HttpSession session) {
 	// User user = (User) session.getAttribute("t_user");
-	//
+	// if(page !=null)
 	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 	//
 	// QueryResult result = messageService.getMyUnreadPraiseReply(user, page);
@@ -217,12 +209,12 @@ public class MessageModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
-	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
-	// }))
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
 	// HttpSession session) {
 	// User user = (User) session.getAttribute("t_user");
-	//
+	// if(page !=null)
 	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 	//
 	// QueryResult result = messageService.getMyUnreadCommentReply(user, page);

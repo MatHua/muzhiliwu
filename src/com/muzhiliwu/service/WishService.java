@@ -17,6 +17,7 @@ import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.WishCollect;
 import com.muzhiliwu.model.WishPraise;
+import com.muzhiliwu.model.WishRealizationOfWantor;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.MuzhiCoin;
@@ -88,7 +89,7 @@ public class WishService {
 	 * @return
 	 */
 	public String praiseWish(Wish wish, User praiser, HttpSession session) {
-		if (okPraise(wish.getId(), praiser.getId())) {// 点赞
+		if (okPraise(wish, praiser)) {// 点赞
 			if (!userService.okMuzhiCoin(praiser,
 					MuzhiCoin.MuzhiCoin_For_Praise_Wish, session)) {
 				return ActionMessage.Not_MuzhiCoin;
@@ -118,7 +119,7 @@ public class WishService {
 	 * @return
 	 */
 	public String cancelPraiseWish(Wish wish, User praiser) {
-		if (!okPraise(wish.getId(), praiser.getId())) {// 点赞
+		if (!okPraise(wish, praiser)) {// 点赞
 			// 取消点赞
 			deletePraise(wish, praiser);// 删除点赞记录
 			changePraiseNumber(wish, -1);// 点赞数-1
@@ -241,6 +242,8 @@ public class WishService {
 	public QueryResult getMyWishes(Pager page, User user) {
 		List<Wish> wishes = dao.query(Wish.class,
 				Cnd.where("wisherId", "=", user.getId()).desc("date"), page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(Wish.class,
 				Cnd.where("wisherId", "=", user.getId())));
 
@@ -261,6 +264,8 @@ public class WishService {
 	public QueryResult getMyCollectWishes(Pager page, User user) {
 		List<WishCollect> collectes = dao.query(WishCollect.class,
 				Cnd.where("collecterId", "=", user.getId()), page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(WishCollect.class,
 				Cnd.where("collecterId", "=", user.getId())));
 
@@ -273,6 +278,25 @@ public class WishService {
 	}
 
 	/**
+	 * 获取想要帮助实现礼物的人
+	 * 
+	 * @param user
+	 * @param page
+	 * @return
+	 */
+	public QueryResult getMyWishWantor(User user, Pager page) {
+		List<WishRealizationOfWantor> wantors = dao.query(
+				WishRealizationOfWantor.class,
+				Cnd.where("wisherId", "=", user.getId()).desc("date"), page);
+		if (page == null)
+			page = new Pager();
+		page.setRecordCount(dao.count(WishRealizationOfWantor.class,
+				Cnd.where("wisherId", "=", user.getId())));
+		dao.fetchLinks(wantors, "wantor");
+		return new QueryResult(wantors, page);
+	}
+
+	/**
 	 * 获取某一页许愿
 	 * 
 	 * @param page
@@ -281,6 +305,8 @@ public class WishService {
 	public QueryResult getWishes(Pager page, User user) {
 		List<Wish> wishes = dao.query(Wish.class, Cnd.orderBy().desc("date"),
 				page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(Wish.class));
 
 		// 加载分享发表者
@@ -288,9 +314,13 @@ public class WishService {
 		for (Wish wish : wishes) {
 			// 判断用户有没有收藏该分享
 			wish.setCollected(false);
+			wish.setPraised(false);
 			if (user != null) {
 				if (!okCollect(user, wish)) {
 					wish.setCollected(true);
+				}
+				if (!okPraise(wish, user)) {
+					wish.setPraised(true);
 				}
 			}
 		}
@@ -329,6 +359,8 @@ public class WishService {
 	// .and("type", "=", WishUnreadReply.Praise).desc("date"),
 	// page);
 	// // 保存未读的消息条数
+	// if (page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// WishUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -357,6 +389,8 @@ public class WishService {
 	// .and("type", "=", WishUnreadReply.Collect)
 	// .desc("date"), page);
 	// // 保存未读的消息条数
+	// if (page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// WishUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -404,11 +438,11 @@ public class WishService {
 	}
 
 	// 检查是否已点赞
-	private boolean okPraise(String wishId, String praiserId) {
+	private boolean okPraise(Wish wish, User praiser) {
 		WishPraise praise = dao.fetch(
 				WishPraise.class,
-				Cnd.where("wishId", "=", wishId).and("praiserId", "=",
-						praiserId));
+				Cnd.where("wishId", "=", wish.getId()).and("praiserId", "=",
+						praiser.getId()));
 		return praise == null ? true : false;
 	}
 
@@ -422,12 +456,12 @@ public class WishService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(wish.getWisherId());
 		unread.setReplierId(collecter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Collect);
 		unread.setLinkId(wish.getId());
 		unread.setLinkTitle(wish.getTitle());
-		unread.setReplyForm(UnreadReply.FormWish);
+		unread.setReplyFrom(UnreadReply.FromWish);
 		dao.insert(unread);
 	}
 
@@ -441,12 +475,12 @@ public class WishService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(wish.getWisherId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Praise);
 		unread.setLinkId(wish.getId());
 		unread.setLinkTitle(wish.getTitle());
-		unread.setReplyForm(UnreadReply.FormWish);
+		unread.setReplyFrom(UnreadReply.FromWish);
 		dao.insert(unread);
 	}
 
@@ -457,7 +491,7 @@ public class WishService {
 				Cnd.where("replierId", "=", praiser.getId())
 						.and("linkId", "=", wish.getId())
 						.and("type", "=", UnreadReply.Praise)
-						.and("replyForm", "=", UnreadReply.FormWish));
+						.and("replyFrom", "=", UnreadReply.FromWish));
 		dao.delete(reply);
 	}
 
@@ -468,7 +502,7 @@ public class WishService {
 				Cnd.where("replierId", "=", collecter.getId())
 						.and("shareId", "=", wish.getId())
 						.and("type", "=", UnreadReply.Collect)
-						.and("replyForm", "=", UnreadReply.FormWish));
+						.and("replyFrom", "=", UnreadReply.FromWish));
 		dao.delete(reply);
 	}
 

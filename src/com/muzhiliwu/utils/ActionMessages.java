@@ -14,7 +14,7 @@ public class ActionMessages {
 	private Object object;
 	private int pageSize;
 	private int pageNum;
-	private int pageCount;
+	private int messCount;
 
 	public String getType() {
 		return type;
@@ -48,20 +48,20 @@ public class ActionMessages {
 		this.pageNum = pageNum;
 	}
 
-	public int getPageCount() {
-		return pageCount;
-	}
-
-	public void setPageCount(int pageCount) {
-		this.pageCount = pageCount;
-	}
-
 	public int getPageSize() {
 		return pageSize;
 	}
 
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
+	}
+
+	public int getMessCount() {
+		return messCount;
+	}
+
+	public void setMessCount(int messCount) {
+		this.messCount = messCount;
 	}
 
 }

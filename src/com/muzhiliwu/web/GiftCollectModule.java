@@ -14,6 +14,7 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 
+import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.GiftCollect;
 import com.muzhiliwu.model.GiftCollectComment;
 import com.muzhiliwu.model.User;
@@ -33,7 +34,7 @@ public class GiftCollectModule {
 	// 收藏一件礼品商品
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object collect(@Param("::gift.") Gift gift,
 			@Param("::collect.") GiftCollect collect, HttpSession session) {
 		User collector = (User) session.getAttribute("t_user");
@@ -57,7 +58,7 @@ public class GiftCollectModule {
 	// 评论一个礼品收藏
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object comment(@Param("::collect.") GiftCollect collect,
 			@Param("::comment.") GiftCollectComment comment,
 			@Param("::fatherCommenter.") User fatherCommenter,
@@ -81,7 +82,7 @@ public class GiftCollectModule {
 	// 点赞一个礼品收藏
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::collect.") GiftCollect collect,
 			HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
@@ -104,7 +105,7 @@ public class GiftCollectModule {
 
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::collect.") GiftCollect collect,
 			HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
@@ -124,11 +125,12 @@ public class GiftCollectModule {
 	// 获取@我的点赞类未读信息消息
 	// @At
 	// @Ok("json")
-	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
-	// }))
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
 	// HttpSession session) {
 	// User user = (User) session.getAttribute("t_user");
+	// if(page !=null)
 	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 	//
 	// QueryResult result = giftCollectService.getMyUnreadPraiseReply(user,
@@ -145,11 +147,12 @@ public class GiftCollectModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
-	// @Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp"
-	// }))
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
 	// HttpSession session) {
 	// User user = (User) session.getAttribute("t_user");
+	// if(page !=null)
 	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
 	//
 	// QueryResult result = giftCollectService.getMyUnreadCommentReply(user,
@@ -166,16 +169,17 @@ public class GiftCollectModule {
 	// 获取我的礼品收藏
 	@At
 	@Ok("json")
-	@Filters(@By(type = CheckSession.class, args = { "t_user", "/login.jsp" }))
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
-
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
 
 		QueryResult result = giftCollectService.getMyGiftCollects(user, page);
 
 		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
@@ -186,12 +190,14 @@ public class GiftCollectModule {
 	@At
 	@Ok("json")
 	public Object mylist(@Param("::page.") Pager page) {
-		page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page.getPageNumber());
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
 
 		QueryResult result = giftCollectService.getGiftCollects(page);
 
 		ActionMessages ams = new ActionMessages();
-		ams.setPageCount(result.getPager().getRecordCount());
+		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());

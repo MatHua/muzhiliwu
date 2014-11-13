@@ -3,7 +3,7 @@ package com.muzhiliwu.model;
 import java.util.List;
 
 import org.nutz.dao.entity.annotation.Column;
-import org.nutz.dao.entity.annotation.Many;
+import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.Table;
 
 //测试
@@ -14,8 +14,8 @@ public class TestDemo extends IdEntity {
 	@Column
 	private String email;
 
-	@Many(target = MyTest.class, field = "testId")
-	private List<MyTest> myTests;
+	@ManyMany(target = TestDemo.class, relation = "t_midd", from = "testId", to = "demoId")
+	private List<TestDemo> myDemos;
 
 	public String getName() {
 		return name;
@@ -33,11 +33,12 @@ public class TestDemo extends IdEntity {
 		this.email = email;
 	}
 
-	public List<MyTest> getMyTests() {
-		return myTests;
+	public List<TestDemo> getMyDemos() {
+		return myDemos;
 	}
 
-	public void setMyTests(List<MyTest> myTests) {
-		this.myTests = myTests;
+	public void setMyDemos(List<TestDemo> myDemos) {
+		this.myDemos = myDemos;
 	}
+
 }

@@ -7,17 +7,14 @@ import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Table;
 
 //测试用的~
-@Table("t_my_test")
-public class MyTest extends IdEntity {
+@Table("t_midd")
+public class Midd extends IdEntity {
 	@Column
 	private String testId;
 	@Column
-	private String name;
+	private String demoId;
 	@Column
 	private String value;
-
-	@Many(target = MyMsg.class, field = "myTestId")
-	private List<MyMsg> msgs;
 
 	public String getTestId() {
 		return testId;
@@ -27,14 +24,6 @@ public class MyTest extends IdEntity {
 		this.testId = testId;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getValue() {
 		return value;
 	}
@@ -42,13 +31,13 @@ public class MyTest extends IdEntity {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
-	public List<MyMsg> getMsgs() {
-		return msgs;
+	
+	public String getDemoId() {
+		return demoId;
 	}
 
-	public void setMsgs(List<MyMsg> msgs) {
-		this.msgs = msgs;
+	public void setDemoId(String demoId) {
+		this.demoId = demoId;
 	}
 
 }

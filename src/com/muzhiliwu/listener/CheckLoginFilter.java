@@ -1,6 +1,5 @@
 package com.muzhiliwu.listener;
 
-import javax.management.relation.Role;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
@@ -12,6 +11,7 @@ import org.nutz.mvc.ActionContext;
 import org.nutz.mvc.ActionFilter;
 import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.View;
+import org.nutz.mvc.view.ServerRedirectView;
 import org.nutz.mvc.view.UTF8JsonView;
 
 import com.muzhiliwu.model.User;
@@ -23,15 +23,16 @@ import com.muzhiliwu.utils.MD5;
 @IocBean
 public class CheckLoginFilter implements ActionFilter {
 
-	private String name = "t_user";// session中存储用户信息的parameter
+	private static final String name = "t_user";
+	private static final String path = "/index.jsp";
 	@Inject
 	private UserService userService;
 
 	public View match(ActionContext context) {
+		// check cookie
 		UTF8JsonView v = new UTF8JsonView(JsonFormat.compact());
 		ActionMessage am = new ActionMessage();
 
-		HttpSession session = Mvcs.getHttpSession(true);
 		Cookie cookies[] = Mvcs.getReq().getCookies();
 		String username = "";
 		String password = "";
@@ -53,19 +54,21 @@ public class CheckLoginFilter implements ActionFilter {
 				}
 			}
 
+		// check session
+		HttpSession session = Mvcs.getHttpSession(false);
+		if (session == null)
+			return new ServerRedirectView(path);// 连session都找不到,应该是没登陆吧~那就去登陆
 		Object obj = session.getAttribute(name);
-		// 用于跳转到输入密码前的链接
-		if (null == obj) {
-
+		if (obj == null) {// 如果用户名没保存在session中
 			if (!Strings.isBlank(username) && !Strings.isBlank(password)) {
 				User user = userService.checkUser(username, password, false);
-				return null;
+				if (user != null) {// 但cookie有保存
+					session.setAttribute("t_user", user);
+					return null;// 就不用跳到登录页
+				}
 			}
-			am.setMessage("用户没有登陆");
-			am.setType(ActionMessage.Not_Login);
-			v.setData(am);
-			return v;
+			return new ServerRedirectView(path);// session和cookie都没有保存,当然得跳到登陆页
 		}
-		return null;
+		return null;// 如果session有保存,就不用跳到登陆页
 	}
 }

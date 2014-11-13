@@ -172,10 +172,10 @@ public class MessageService {
 	public QueryResult getMessages(Pager page) {
 		List<Message> msgs = dao.query(Message.class, Cnd.orderBy()
 				.desc("date"), page);
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(Message.class));
 		Message msg;
-		List<Message> results = new ArrayList<Message>();
-
 		// 加载发表者
 		dao.fetchLinks(msgs, "publisher");
 		// **********下面是详情~~~~~~~~~~~~~~~~
@@ -200,6 +200,8 @@ public class MessageService {
 		// .orderBy()
 		// .desc("date"), page
 		// dao.fetchLinks(user, "myMessages", Cnd.orderBy().desc("date"));
+		if (page == null)
+			page = new Pager();
 		page.setRecordCount(dao.count(Message.class,
 				Cnd.where("publisherId", "=", user.getId())));
 
@@ -258,6 +260,8 @@ public class MessageService {
 	// .and("type", "=", MessUnreadReply.Praise).desc("date"),
 	// page);
 	// // 保存未读的消息条数
+	// if(page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// MessUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -285,6 +289,8 @@ public class MessageService {
 	// .and("type", "=", MessUnreadReply.Comment)
 	// .desc("date"), page);
 	// // 保存未读的消息条数
+	// if(page == null)
+	// page = new Pager();
 	// page.setRecordCount(dao.count(
 	// MessUnreadReply.class,
 	// Cnd.where("receiverId", "=", user.getId())
@@ -359,12 +365,12 @@ public class MessageService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(fatherCommenter.getId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Comment);
 		unread.setLinkId(msg.getId());
 		unread.setLinkTitle(msg.getTitle());
-		unread.setReplyForm(UnreadReply.FormMessage);
+		unread.setReplyFrom(UnreadReply.FromMessage);
 		dao.insert(unread);
 	}
 
@@ -380,12 +386,12 @@ public class MessageService {
 		unread.setId(NumGenerator.getUuid());
 		unread.setReceiverId(msg.getPublisherId());
 		unread.setReplierId(commenter.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 
 		unread.setType(UnreadReply.Comment);
 		unread.setLinkId(msg.getId());
 		unread.setLinkTitle(msg.getTitle());
-		unread.setReplyForm(UnreadReply.FormMessage);
+		unread.setReplyFrom(UnreadReply.FromMessage);
 		dao.insert(unread);
 	}
 
@@ -401,9 +407,9 @@ public class MessageService {
 		unread.setLinkTitle(msg.getTitle());
 		unread.setReceiverId(msg.getPublisherId());
 		unread.setReplierId(praiser.getId());
-		unread.setState(UnreadReply.Nuread);
+		unread.setState(UnreadReply.Unread);
 		unread.setType(UnreadReply.Praise);
-		unread.setReplyForm(UnreadReply.FormMessage);
+		unread.setReplyFrom(UnreadReply.FromMessage);
 		dao.insert(unread);
 	}
 
@@ -414,7 +420,7 @@ public class MessageService {
 				Cnd.where("replierId", "=", praiser.getId())
 						.and("linkId", "=", msg.getId())
 						.and("type", "=", UnreadReply.Praise)
-						.and("replyForm", "=", "UnreadReply.FormMessage"));
+						.and("replyFrom", "=", UnreadReply.FromMessage));
 		dao.delete(reply);
 	}
 
