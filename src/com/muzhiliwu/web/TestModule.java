@@ -1,7 +1,10 @@
 package com.muzhiliwu.web;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -19,6 +22,7 @@ import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.TestDemo;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.LogFileFilter;
 
 @IocBean
 @At("test")
@@ -140,7 +144,7 @@ public class TestModule {
 		log.info("有新操作~");
 		log.error("错误了~");
 		// log.debug("测试~");
-		TestDemo test = dao.fetch(TestDemo.class, "xxxxx");
-		return test;
+		// TestDemo test = dao.fetch(TestDemo.class, "xxxxx");
+		return "xx";
 	}
 }

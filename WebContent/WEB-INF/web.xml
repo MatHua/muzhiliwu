@@ -4,6 +4,9 @@
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
+  <listener>
+  	<listener-class>com.muzhiliwu.listener.Log4JListener</listener-class>
+  </listener>
   <filter>
     <filter-name>nutz</filter-name>
     <filter-class>org.nutz.mvc.NutFilter</filter-class>
