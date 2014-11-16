@@ -27,6 +27,7 @@ import com.muzhiliwu.utils.LogFileFilter;
 @IocBean
 @At("test")
 public class TestModule {
+	
 	@Inject
 	private Dao dao;
 	private static Log log = LogFactory.getLog(TestDemo.class);
