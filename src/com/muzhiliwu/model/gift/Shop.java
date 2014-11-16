@@ -60,6 +60,16 @@ public class Shop extends IdEntity {
 	@Many(target = Gift.class, field = "shopId")
 	private List<Gift> gifts;// 商品
 
+	@Column
+	private int unpayOrderNum;// 未完成订单数
+	@Many(target = OrderForm.class, field = "shopId")
+	private List<OrderForm> unpayOrders;// 未完成订单数
+
+	@Column
+	private int historyOrderNum;// 历史订单
+	@Many(target = OrderForm.class, field = "shopId")
+	private List<OrderForm> historyOrders;// 历史订单数
+
 	public String getMobile() {
 		return mobile;
 	}
@@ -178,6 +188,38 @@ public class Shop extends IdEntity {
 
 	public void setPass(String pass) {
 		this.pass = pass;
+	}
+
+	public int getUnpayOrderNum() {
+		return unpayOrderNum;
+	}
+
+	public void setUnpayOrderNum(int unpayOrderNum) {
+		this.unpayOrderNum = unpayOrderNum;
+	}
+
+	public List<OrderForm> getUnpayOrders() {
+		return unpayOrders;
+	}
+
+	public void setUnpayOrders(List<OrderForm> unpayOrders) {
+		this.unpayOrders = unpayOrders;
+	}
+
+	public int getHistoryOrderNum() {
+		return historyOrderNum;
+	}
+
+	public void setHistoryOrderNum(int historyOrderNum) {
+		this.historyOrderNum = historyOrderNum;
+	}
+
+	public List<OrderForm> getHistoryOrders() {
+		return historyOrders;
+	}
+
+	public void setHistoryOrders(List<OrderForm> historyOrders) {
+		this.historyOrders = historyOrders;
 	}
 
 }

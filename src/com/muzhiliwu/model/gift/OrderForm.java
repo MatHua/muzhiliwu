@@ -14,6 +14,7 @@ import com.muzhiliwu.model.User;
 @TableIndexes({ @Index(name = "idx_order_form", fields = { "buyerId" }, unique = false) })
 public class OrderForm {
 	public static final String WaitForPay = "wait_for_pay";// 等待付款
+
 	@Name
 	@Column
 	private String orderId;// 订单号
@@ -22,6 +23,11 @@ public class OrderForm {
 
 	@Column
 	private String cartId;// 联结字段
+
+	@Column
+	private String shopId;// 该订单所属卖家的id
+	@One(target = Shop.class, field = "shopId")
+	private Shop shop;// 该订单所属卖家的id
 
 	@Column
 	private String buyerId;// 创建者id
@@ -55,6 +61,11 @@ public class OrderForm {
 
 	@Column
 	private String state;// 订单状态
+
+	@Column
+	private String payType;// 付款类型(网银,支付宝,财付通)等~网银还分各种银行...
+	@Column
+	private String payCode;// 支付的账号...
 
 	public String getOrderId() {
 		return orderId;
@@ -182,6 +193,38 @@ public class OrderForm {
 
 	public void setBuyer(User buyer) {
 		this.buyer = buyer;
+	}
+
+	public String getPayType() {
+		return payType;
+	}
+
+	public void setPayType(String payType) {
+		this.payType = payType;
+	}
+
+	public String getPayCode() {
+		return payCode;
+	}
+
+	public void setPayCode(String payCode) {
+		this.payCode = payCode;
+	}
+
+	public String getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(String shopId) {
+		this.shopId = shopId;
+	}
+
+	public Shop getShop() {
+		return shop;
+	}
+
+	public void setShop(Shop shop) {
+		this.shop = shop;
 	}
 
 }

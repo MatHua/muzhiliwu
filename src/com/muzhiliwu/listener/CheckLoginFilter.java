@@ -3,6 +3,8 @@ package com.muzhiliwu.listener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.json.JsonFormat;
@@ -17,11 +19,15 @@ import org.nutz.mvc.view.UTF8JsonView;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.service.UserService;
 import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.DateUtils;
+import com.muzhiliwu.utils.IpUtils;
 import com.muzhiliwu.utils.MD5;
+import com.muzhiliwu.web.UserModule;
 
 //检查用户有没有登录
 @IocBean
 public class CheckLoginFilter implements ActionFilter {
+	private static Log log = LogFactory.getLog(CheckLoginFilter.class);
 
 	private static final String name = "t_user";
 	private static final String path = "/index.jsp";
@@ -67,6 +73,9 @@ public class CheckLoginFilter implements ActionFilter {
 					return null;// 就不用跳到登录页
 				}
 			}
+			log.info("[ip:" + IpUtils.getIpAddr(context.getRequest())
+					+ "]  [用户:" + "游客" + "]  [时间:" + DateUtils.now()
+					+ "]  [操作:" + "正在尝试恶意访问~_~]");
 			return new ServerRedirectView(path);// session和cookie都没有保存,当然得跳到登陆页
 		}
 		return null;// 如果session有保存,就不用跳到登陆页

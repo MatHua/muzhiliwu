@@ -25,6 +25,17 @@ public class Gift extends IdEntity {
 	public static final String OnSale = "on_sale";// 在销售
 	public static final String NotSale = "not_sale";// 商品下架
 
+	public static final String AuditSuccess = "Audit_Success";// 审核成功
+	public static final String AuditFail = "Audit_Fail";// 审核失败
+	public static final String Auditing = "Auditing";// 审核中
+
+	@Column
+	private String auditState;// 审核状态
+	@Column
+	private String auditMess;// 记录审核失败原因
+	@Column
+	private boolean isDelete;// 被删除标识
+
 	@Column
 	private String fromType;// 来源~网店、实体店
 	@Column
@@ -291,6 +302,30 @@ public class Gift extends IdEntity {
 
 	public void setShared(boolean isShared) {
 		this.isShared = isShared;
+	}
+
+	public String getAuditState() {
+		return auditState;
+	}
+
+	public void setAuditState(String auditState) {
+		this.auditState = auditState;
+	}
+
+	public boolean isDelete() {
+		return isDelete;
+	}
+
+	public void setDelete(boolean isDelete) {
+		this.isDelete = isDelete;
+	}
+
+	public String getAuditMess() {
+		return auditMess;
+	}
+
+	public void setAuditMess(String auditMess) {
+		this.auditMess = auditMess;
 	}
 
 }

@@ -46,27 +46,42 @@ public class UserModule {
 	// 测试
 	@At
 	@Ok("json")
-	public Object login(String code, String pass, HttpSession session,
-			HttpServletResponse response) {
-		if (Strings.isBlank(code) || Strings.isBlank(pass)) {
+	public Object login(@Param("::user.") User user, HttpSession session,
+			HttpServletResponse response, HttpServletRequest request) {
+		if (user == null || Strings.isBlank(user.getCode())
+				|| Strings.isBlank(user.getPass())) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+					+ "用户名或密码不能为空]");
+
 			ActionMessage am = new ActionMessage();
-			am.setMessage("用户不存在或者密码错误");
-			am.setType(ActionMessage.Account_Fail);
+			am.setMessage("用户名或密码不能为空");
+			am.setType(ActionMessage.fail);
 			return am;
 		}
-		code = code.trim();
-		pass = pass.trim();
-		User user = userService.checkUser(code, pass, true);
-		if (user == null) {
+		user.setCode(user.getCode().trim());
+		user.setPass(user.getPass().trim());
+
+		User u = userService.checkUser(user.getCode(), user.getPass(), true);
+		if (u == null) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+					+ "用户名不存在或者密码错误]");
+
 			ActionMessage am = new ActionMessage();
 			am.setMessage("用户名不存在或者密码错误");
 			am.setType(ActionMessage.Account_Fail);
 			return am;
 		}
-		session.setAttribute("t_user", user);// 登录用户信息
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "登录成功]");
+
+		session.setAttribute("t_user", u);// 登录用户信息
 		ActionMessage am = new ActionMessage();
 		am.setType(ActionMessage.success);
-		am.setObject(user);
+		am.setMessage("登录成功~");
+		// am.setObject(u);
 
 		// Cookie cookie = new Cookie("t_code", user.getCode());
 		// Cookie cookie1 = new Cookie("t_pass", user.getPass());
@@ -98,20 +113,35 @@ public class UserModule {
 	// 注册
 	@At
 	@Ok("json")
-	public Object regist(@Param("::user.") User user) {
+	public Object regist(@Param("::user.") User user, String repass,
+			HttpServletRequest request) {
 		ActionMessage am = new ActionMessage();
-		if (Strings.isBlank(user.getCode()) || Strings.isBlank(user.getPass())) {
+		if (user == null || Strings.isBlank(user.getCode())
+				|| Strings.isBlank(user.getPass()) || Strings.isBlank(repass)) {
 			am.setMessage("注册失败,账号或密码不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		if (!repass.equals(user.getPass())) {
+			am.setMessage("注册失败,两次密码输入不一致~");
 			am.setType(ActionMessage.fail);
 			return am;
 		}
 		String tmp = userService.registUser(user);
 		if (ActionMessage.success.equals(tmp)) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+					+ "注册成功]");
 			am.setMessage("注册成功~");
 			am.setType(ActionMessage.success);
 		} else {
 			am.setMessage("注册失败,账号已被注册~");
 			am.setType(ActionMessage.fail);
+		}
+		if (am.getType().equals(ActionMessage.fail)) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+					+ "注册失败T_T]");
 		}
 		return am;
 	}
