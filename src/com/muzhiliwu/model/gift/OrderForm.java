@@ -13,7 +13,10 @@ import com.muzhiliwu.model.User;
 @Table("t_order_form")
 @TableIndexes({ @Index(name = "idx_order_form", fields = { "buyerId" }, unique = false) })
 public class OrderForm {
-	public static final String WaitForPay = "wait_for_pay";// 等待付款
+	public static final String WaitBuyerPay = "WAIT_BUYER_PAY";// 等待付款
+	public static final String WaitSellerSendGoods = "WAIT_SELLER_SEND_GOODS";// 等待卖家发货
+	public static final String WaitBuyerConfirmGoods = "WAIT_BUYER_CONFIRM_GOODS";// 等待卖家确认收货
+	public static final String TradeFinished = "TRADE_FINISHED";// 交易完成
 
 	@Name
 	@Column
@@ -60,7 +63,7 @@ public class OrderForm {
 	private float subtotal;// 小计
 
 	@Column
-	private String state;// 订单状态
+	private String payState;// 订单状态
 
 	@Column
 	private String payType;// 付款类型(网银,支付宝,财付通)等~网银还分各种银行...
@@ -147,14 +150,6 @@ public class OrderForm {
 		this.subtotal = subtotal;
 	}
 
-	public String getState() {
-		return state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
-
 	public String getContactWayId() {
 		return contactWayId;
 	}
@@ -225,6 +220,14 @@ public class OrderForm {
 
 	public void setShop(Shop shop) {
 		this.shop = shop;
+	}
+
+	public String getPayState() {
+		return payState;
+	}
+
+	public void setPayState(String payState) {
+		this.payState = payState;
 	}
 
 }

@@ -15,9 +15,9 @@ import org.nutz.lang.Strings;
 import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
-import com.muzhiliwu.model.WishCollect;
 import com.muzhiliwu.model.WishPraise;
 import com.muzhiliwu.model.WishRealizationOfWantor;
+import com.muzhiliwu.model.WishShare;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.MuzhiCoin;
@@ -99,7 +99,7 @@ public class WishService {
 			praise.setDate(DateUtils.now());
 			praise.setWishId(wish.getId());// 被点赞愿望的id
 			praise.setPraiserId(praiser.getId());// 点赞者的id
-			changePraiseNumber(wish, 1);// 点赞数+1
+			// changePraiseNumber(wish, 1);// 点赞数+1
 
 			createUnreadPraiseReply(praiser, wish);// 给许愿者发送点赞类未读信息
 
@@ -122,7 +122,7 @@ public class WishService {
 		if (!okPraise(wish, praiser)) {// 点赞
 			// 取消点赞
 			deletePraise(wish, praiser);// 删除点赞记录
-			changePraiseNumber(wish, -1);// 点赞数-1
+			// changePraiseNumber(wish, -1);// 点赞数-1
 			deletePraise(wish, praiser);// 删除对应的点赞信息
 			return ActionMessage.cancel;
 		}
@@ -143,7 +143,7 @@ public class WishService {
 						MuzhiCoin.MuzhiCoin_for_Share_Wish, session)) {
 			return ActionMessage.Not_MuzhiCoin;
 		}
-		changeShareNumber(wish, 1);
+		// changeShareNumber(wish, 1);
 		return ActionMessage.success;
 	}
 
@@ -157,26 +157,27 @@ public class WishService {
 	 * @param session
 	 * @return
 	 */
-	public String collectWish(User collecter, Wish wish, HttpSession session) {
-		if (okCollect(collecter, wish)) {
-			if (!userService.okMuzhiCoin(collecter,
-					MuzhiCoin.MuzhiCoin_For_Collect_Wish, session)) {
-				return ActionMessage.Not_MuzhiCoin;// 不够积分
-			}
-			// 模拟一次收藏
-			WishCollect collect = new WishCollect();
-			collect.setId(NumGenerator.getUuid());
-			collect.setDate(DateUtils.now());
-			collect.setCollecterId(collecter.getId());
-			collect.setWishId(wish.getId());
-			changeCollectNumber(wish, 1);// 被收藏数+1
-			dao.insert(collect);
-
-			createUnreadCollectReply(collecter, wish);// 给许愿者发送一个收藏类未读信息
-			return ActionMessage.success;
-		}
-		return ActionMessage.fail;
-	}
+	// public String collectWish(User collecter, Wish wish, HttpSession session)
+	// {
+	// if (okCollect(collecter, wish)) {
+	// if (!userService.okMuzhiCoin(collecter,
+	// MuzhiCoin.MuzhiCoin_For_Collect_Wish, session)) {
+	// return ActionMessage.Not_MuzhiCoin;// 不够积分
+	// }
+	// // 模拟一次收藏
+	// WishCollect collect = new WishCollect();
+	// collect.setId(NumGenerator.getUuid());
+	// collect.setDate(DateUtils.now());
+	// collect.setCollecterId(collecter.getId());
+	// collect.setWishId(wish.getId());
+	// // changeCollectNumber(wish, 1);// 被收藏数+1
+	// dao.insert(collect);
+	//
+	// createUnreadCollectReply(collecter, wish);// 给许愿者发送一个收藏类未读信息
+	// return ActionMessage.success;
+	// }
+	// return ActionMessage.fail;
+	// }
 
 	/**
 	 * 取消愿望收藏
@@ -187,15 +188,15 @@ public class WishService {
 	 *            一条收藏
 	 * @return
 	 */
-	public boolean cancelCollectWish(User collecter, WishCollect collect) {
-		if (okCancelCollect(collecter, collect)) {
-			dao.delete(WishCollect.class, collect.getId());
-			Wish wish = dao.fetch(Wish.class, collect.getWishId());
-			deleteUnreadCollectReply(collecter, wish);// 删除对应的未读信息
-			return true;
-		}
-		return false;
-	}
+	// public boolean cancelCollectWish(User collecter, WishCollect collect) {
+	// if (okCancelCollect(collecter, collect)) {
+	// dao.delete(WishCollect.class, collect.getId());
+	// Wish wish = dao.fetch(Wish.class, collect.getWishId());
+	// deleteUnreadCollectReply(collecter, wish);// 删除对应的未读信息
+	// return true;
+	// }
+	// return false;
+	// }
 
 	/**
 	 * 获取一个许愿的详细信息
@@ -207,11 +208,12 @@ public class WishService {
 		wish = dao.fetch(Wish.class, wish.getId());
 
 		// 判断用户有没有收藏该分享
-		wish.setCollected(false);
+		wish.setShared(false);
 		if (user != null) {
-			if (!okCollect(user, wish)) {
-				wish.setCollected(true);
-			}
+			// if (!okCollect(user, wish)) {
+			// wish.setCollected(true);
+			// }
+			// 到时候要判断是否被分享,点赞
 		}
 		dao.fetchLinks(wish, "wisher");
 		dao.fetchLinks(wish, "praises");// 加载点赞信息
@@ -223,7 +225,7 @@ public class WishService {
 		dao.fetchLinks(wish, "collectes");
 
 		// 获取所有收藏者信息
-		dao.fetchLinks(wish.getCollectes(), "collecter");
+		dao.fetchLinks(wish.getShares(), "sharer");
 
 		// 还有一些详细信息
 		// 加载评论
@@ -261,21 +263,21 @@ public class WishService {
 	 * @param user
 	 * @return
 	 */
-	public QueryResult getMyCollectWishes(Pager page, User user) {
-		List<WishCollect> collectes = dao.query(WishCollect.class,
-				Cnd.where("collecterId", "=", user.getId()), page);
-		if (page == null)
-			page = new Pager();
-		page.setRecordCount(dao.count(WishCollect.class,
-				Cnd.where("collecterId", "=", user.getId())));
-
-		dao.fetchLinks(collectes, "collecter");
-		dao.fetchLinks(collectes, "wish");
-		for (WishCollect collect : collectes) {
-			dao.fetchLinks(collect.getWish(), "wisher");
-		}
-		return new QueryResult(collectes, page);
-	}
+	// public QueryResult getMyCollectWishes(Pager page, User user) {
+	// List<WishCollect> collectes = dao.query(WishCollect.class,
+	// Cnd.where("collecterId", "=", user.getId()), page);
+	// if (page == null)
+	// page = new Pager();
+	// page.setRecordCount(dao.count(WishCollect.class,
+	// Cnd.where("collecterId", "=", user.getId())));
+	//
+	// dao.fetchLinks(collectes, "collecter");
+	// dao.fetchLinks(collectes, "wish");
+	// for (WishCollect collect : collectes) {
+	// dao.fetchLinks(collect.getWish(), "wisher");
+	// }
+	// return new QueryResult(collectes, page);
+	// }
 
 	/**
 	 * 获取想要帮助实现礼物的人
@@ -311,13 +313,19 @@ public class WishService {
 
 		// 加载分享发表者
 		dao.fetchLinks(wishes, "wisher");
+		// 加载
+		dao.fetchLinks(wishes, "wishOrderForm");
 		for (Wish wish : wishes) {
+			// 获取配送地址
+			dao.fetchLinks(wish.getWishOrderForm(), "contactWay");
 			// 判断用户有没有收藏该分享
-			wish.setCollected(false);
+			wish.setShared(false);
 			wish.setPraised(false);
 			if (user != null) {
-				if (!okCollect(user, wish)) {
-					wish.setCollected(true);
+				// 到时候要判断是否被分享
+
+				if (!okShare(user, wish)) {
+					wish.setShared(true);
 				}
 				if (!okPraise(wish, user)) {
 					wish.setPraised(true);
@@ -334,13 +342,13 @@ public class WishService {
 	 *            一个收藏
 	 * @return
 	 */
-	public WishCollect getDetail(WishCollect collect) {
-		collect = dao.fetch(WishCollect.class, collect.getId());
-		dao.fetchLinks(collect, "collecter");
-		dao.fetchLinks(collect, "wish");
-		dao.fetchLinks(collect.getWish(), "wisher");
-		return collect;
-	}
+	// public WishCollect getDetail(WishCollect collect) {
+	// collect = dao.fetch(WishCollect.class, collect.getId());
+	// dao.fetchLinks(collect, "collecter");
+	// dao.fetchLinks(collect, "wish");
+	// dao.fetchLinks(collect.getWish(), "wisher");
+	// return collect;
+	// }
 
 	// /**
 	// * 获取@到自己的点赞类消息
@@ -409,17 +417,17 @@ public class WishService {
 	// }
 
 	// 判断这个是否为收藏的分享
-	private boolean okCancelCollect(User collecter, WishCollect collect) {
-		collect = dao.fetch(WishCollect.class, collect.getId());// 获取这条收藏
-		if (collect != null
-				&& collect.getCollecterId().equals(collecter.getId())) {
-			Wish from = dao.fetch(Wish.class, collect.getWishId());
-			from.setCollectNum(from.getCollectNum() - 1);// 被收藏数-1
-			dao.update(from);
-			return true;
-		}
-		return false;
-	}
+	// private boolean okCancelCollect(User collecter, WishCollect collect) {
+	// collect = dao.fetch(WishCollect.class, collect.getId());// 获取这条收藏
+	// if (collect != null
+	// && collect.getCollecterId().equals(collecter.getId())) {
+	// Wish from = dao.fetch(Wish.class, collect.getWishId());
+	// from.setCollectNum(from.getCollectNum() - 1);// 被收藏数-1
+	// dao.update(from);
+	// return true;
+	// }
+	// return false;
+	// }
 
 	// 删除点赞记录
 	private void deletePraise(Wish wish, User praiser) {
@@ -431,11 +439,11 @@ public class WishService {
 	}
 
 	// 点赞数增减
-	private void changePraiseNumber(Wish wish, int i) {
-		wish = dao.fetch(Wish.class, wish.getId());
-		wish.setPraiseNum(wish.getPraiseNum() + i);
-		dao.update(wish);
-	}
+	// private void changePraiseNumber(Wish wish, int i) {
+	// wish = dao.fetch(Wish.class, wish.getId());
+	// wish.setPraiseNum(wish.getPraiseNum() + i);
+	// dao.update(wish);
+	// }
 
 	// 检查是否已点赞
 	private boolean okPraise(Wish wish, User praiser) {
@@ -507,25 +515,25 @@ public class WishService {
 	}
 
 	// 修改被收藏数
-	private void changeCollectNumber(Wish wish, int increment) {
-		wish = dao.fetch(Wish.class, wish.getId());
-		wish.setCollectNum(wish.getCollectNum() + increment);
-		dao.update(wish);
-	}
+	// private void changeCollectNumber(Wish wish, int increment) {
+	// wish = dao.fetch(Wish.class, wish.getId());
+	// wish.setCollectNum(wish.getCollectNum() + increment);
+	// dao.update(wish);
+	// }
 
 	// 修改被分享数
-	private void changeShareNumber(Wish wish, int increment) {
-		wish = dao.fetch(Wish.class, wish.getId());
-		wish.setShareNum(wish.getShareNum() + increment);
-		dao.update(wish);
-	}
+	// private void changeShareNumber(Wish wish, int increment) {
+	// wish = dao.fetch(Wish.class, wish.getId());
+	// wish.setShareNum(wish.getShareNum() + increment);
+	// dao.update(wish);
+	// }
 
-	// 检查是否已经收藏
-	private boolean okCollect(User collecter, Wish wish) {
-		WishCollect tmp = dao.fetch(
-				WishCollect.class,
-				Cnd.where("collecterId", "=", collecter.getId()).and("wishId",
-						"=", wish.getId()));
+	// 检查是否已经分享
+	private boolean okShare(User sharer, Wish wish) {
+		WishShare tmp = dao.fetch(
+				WishShare.class,
+				Cnd.where("sharerId", "=", sharer.getId()).and("wishId", "=",
+						wish.getId()));
 		return tmp == null ? true : false;
 	}
 }

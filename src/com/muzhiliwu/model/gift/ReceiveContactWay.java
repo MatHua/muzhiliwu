@@ -20,14 +20,27 @@ public class ReceiveContactWay extends IdEntity {
 	private User creator;// 创建者
 
 	@Column
-	private String name;// 收货人姓名
+	private String fullName;// 收货人姓名
+
+	@Column
+	private String townName;// 镇
+	@Column
+	private String areaName;// 区
+	@Column
+	private String cityName;// 城市
+	@Column
+	private String provinceName;// 省
+	@Column
+	private boolean defaultAddress;// 是否是默认地址
 
 	@Column
 	@ColDefine(type = ColType.TEXT)
-	private String address;// 收货人地址
+	private String addressDetail;// 收货人地址
 
 	@Column
 	private String mobile;// 收货人手机
+	@Column
+	private String postCode;// 邮政编码
 
 	public String getCreatorId() {
 		return creatorId;
@@ -45,20 +58,60 @@ public class ReceiveContactWay extends IdEntity {
 		this.creator = creator;
 	}
 
-	public String getName() {
-		return name;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
-	public String getAddress() {
-		return address;
+	public String getTownName() {
+		return townName;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setTownName(String townName) {
+		this.townName = townName;
+	}
+
+	public String getAreaName() {
+		return areaName;
+	}
+
+	public void setAreaName(String areaName) {
+		this.areaName = areaName;
+	}
+
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+
+	public String getProvinceName() {
+		return provinceName;
+	}
+
+	public void setProvinceName(String provinceName) {
+		this.provinceName = provinceName;
+	}
+
+	public boolean isDefaultAddress() {
+		return defaultAddress;
+	}
+
+	public void setDefaultAddress(boolean defaultAddress) {
+		this.defaultAddress = defaultAddress;
+	}
+
+	public String getAddressDetail() {
+		return addressDetail;
+	}
+
+	public void setAddressDetail(String addressDetail) {
+		this.addressDetail = addressDetail;
 	}
 
 	public String getMobile() {
@@ -67,6 +120,14 @@ public class ReceiveContactWay extends IdEntity {
 
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
+	}
+
+	public String getPostCode() {
+		return postCode;
+	}
+
+	public void setPostCode(String postCode) {
+		this.postCode = postCode;
 	}
 
 }

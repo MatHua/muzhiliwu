@@ -72,33 +72,28 @@ public class User extends IdEntity {
 	private int sendGiftTop;// 当前级数送出礼物最多分
 
 	// *********************留言************************************************
-	@Column
 	private int messNum;// 留言数
 	@Many(target = Message.class, field = "publisherId")
 	private List<Message> myMessages;// 我的留言,便于找出用户自己发表的留言
 	// ________________________________________________________________________
 
 	// ********************许愿**************************************************
-	@Column
 	private int wishNum;// 许愿数
 	@Many(target = Wish.class, field = "wisherId")
 	private List<Wish> myWishes;// 我的许愿,便于找出用户自己许的愿
 
 	private Wish newlyWish;// 最近的许愿
 
-	@Column
 	private int wantorNum;// 愿望实现的申请者数
 	@ManyMany(target = User.class, relation = "t_wish_realization_of_wantor", from = "wisherId", to = "wantorId")
 	private List<User> myWishWantor;// 想要帮忙实现愿望的人
 
-	@Column
-	private int wishCollectNum;// 收藏数
-	@Many(target = WishCollect.class, field = "collecterId")
-	private List<WishCollect> myWishCollectes;// 我收集的愿望,便于找出用户所收集到的愿望
+	private int wishShareNum;// 收藏数
+	@Many(target = WishShare.class, field = "sharerId")
+	private List<WishShare> myWishShares;// 我收集的愿望,便于找出用户所收集到的愿望
 	// ________________________________________________________________________
 
-	// ************************分享墙*********************************************
-	@Column
+	// ************************分享墙********************************************
 	private int shareNum;// 分享数
 	@Many(target = Share.class, field = "sharerId")
 	private List<Share> myShares;// 我的分享,便于找出用户自己发表的分享
@@ -106,6 +101,7 @@ public class User extends IdEntity {
 	// ________________________________________________________________________
 
 	// ************************购物车*********************************************
+	private int orderNum;// 订单数
 	@Many(target = OrderForm.class, field = "buyerId")
 	private List<OrderForm> orders;
 
@@ -267,14 +263,6 @@ public class User extends IdEntity {
 		this.myShares = myShares;
 	}
 
-	public List<WishCollect> getMyWishCollectes() {
-		return myWishCollectes;
-	}
-
-	public void setMyWishCollectes(List<WishCollect> myWishCollectes) {
-		this.myWishCollectes = myWishCollectes;
-	}
-
 	public int getMuzhiCoin() {
 		return muzhiCoin;
 	}
@@ -347,14 +335,6 @@ public class User extends IdEntity {
 		this.myWishWantor = myWishWantor;
 	}
 
-	public int getWishCollectNum() {
-		return wishCollectNum;
-	}
-
-	public void setWishCollectNum(int wishCollectNum) {
-		this.wishCollectNum = wishCollectNum;
-	}
-
 	public int getShareNum() {
 		return shareNum;
 	}
@@ -409,6 +389,30 @@ public class User extends IdEntity {
 
 	public void setOrders(List<OrderForm> orders) {
 		this.orders = orders;
+	}
+
+	public int getWishShareNum() {
+		return wishShareNum;
+	}
+
+	public void setWishShareNum(int wishShareNum) {
+		this.wishShareNum = wishShareNum;
+	}
+
+	public List<WishShare> getMyWishShares() {
+		return myWishShares;
+	}
+
+	public void setMyWishShares(List<WishShare> myWishShares) {
+		this.myWishShares = myWishShares;
+	}
+
+	public int getOrderNum() {
+		return orderNum;
+	}
+
+	public void setOrderNum(int orderNum) {
+		this.orderNum = orderNum;
 	}
 
 }

@@ -36,23 +36,20 @@ public class Wish extends IdEntity {
 	@Column
 	private String state;// 许愿状态
 
-	@Column
 	private int praiseNum;// 点赞数
 	@Many(target = WishPraise.class, field = "wishId")
 	private List<WishPraise> praises;// 便于记录点赞记录
 
-	@Column
 	private int collectNum;// 收藏数
-	@Many(target = WishCollect.class, field = "wishId")
-	private List<WishCollect> collectes;// 便于记录愿望的收集者
+	@Many(target = WishShare.class, field = "wishId")
+	private List<WishShare> shares;// 便于记录愿望的收集者
 
-	@Column
 	private int shareNum;// 分享数
 
 	@One(target = User.class, field = "wisherId")
 	private User wisher;// 用于记录许愿者
 
-	private boolean isCollected;// 标记是否已被收藏
+	private boolean isShared;// 标记是否已被收藏
 	private boolean isPraised;// 标记是否已点赞(喜欢)
 
 	@Column
@@ -98,14 +95,6 @@ public class Wish extends IdEntity {
 
 	public void setPraises(List<WishPraise> praises) {
 		this.praises = praises;
-	}
-
-	public List<WishCollect> getCollectes() {
-		return collectes;
-	}
-
-	public void setCollectes(List<WishCollect> collectes) {
-		this.collectes = collectes;
 	}
 
 	public User getWisher() {
@@ -164,20 +153,28 @@ public class Wish extends IdEntity {
 		this.wishOrderForm = wishOrderForm;
 	}
 
-	public boolean isCollected() {
-		return isCollected;
-	}
-
-	public void setCollected(boolean isCollected) {
-		this.isCollected = isCollected;
-	}
-
 	public boolean isPraised() {
 		return isPraised;
 	}
 
 	public void setPraised(boolean isPraised) {
 		this.isPraised = isPraised;
+	}
+
+	public List<WishShare> getShares() {
+		return shares;
+	}
+
+	public void setShares(List<WishShare> shares) {
+		this.shares = shares;
+	}
+
+	public boolean isShared() {
+		return isShared;
+	}
+
+	public void setShared(boolean isShared) {
+		this.isShared = isShared;
 	}
 
 }

@@ -55,17 +55,14 @@ public class Shop extends IdEntity {
 	@Column
 	private String okBusiness;// 超级管理员控制该店是否可营业
 
-	@Column
 	private int giftNum;// 商品数量
 	@Many(target = Gift.class, field = "shopId")
 	private List<Gift> gifts;// 商品
 
-	@Column
 	private int unpayOrderNum;// 未完成订单数
 	@Many(target = OrderForm.class, field = "shopId")
 	private List<OrderForm> unpayOrders;// 未完成订单数
 
-	@Column
 	private int historyOrderNum;// 历史订单
 	@Many(target = OrderForm.class, field = "shopId")
 	private List<OrderForm> historyOrders;// 历史订单数

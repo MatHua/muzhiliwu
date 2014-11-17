@@ -15,12 +15,11 @@ import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
-import org.nutz.mvc.filter.CheckSession;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
-import com.muzhiliwu.model.WishCollect;
+import com.muzhiliwu.model.WishShare;
 import com.muzhiliwu.service.WishService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
@@ -43,8 +42,6 @@ public class WishModule {
 	public Object publish(@Param("::wish.") Wish wish, HttpSession session) {
 
 		User publisher = (User) session.getAttribute("t_user");
-		// User publisher = dao.fetch(User.class,
-		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 		String result = wishService.publishWish(publisher, wish, session);
 
 		ActionMessage am = new ActionMessage();
@@ -106,15 +103,15 @@ public class WishModule {
 	}
 
 	// 获取收藏的愿望的详细信息
-	@At
-	@Ok("json")
-	public Object detail(@Param("::collect.") WishCollect collect) {
-		ActionMessage am = new ActionMessage();
-		am.setMessage("获取愿望的详细信息");
-		am.setObject(wishService.getDetail(collect));
-		am.setType(ActionMessage.success);
-		return am;
-	}
+	// @At
+	// @Ok("json")
+	// public Object detail(@Param("::collect.") WishShare share) {
+	// ActionMessage am = new ActionMessage();
+	// am.setMessage("获取愿望的详细信息");
+	// am.setObject(wishService.getDetail(share));
+	// am.setType(ActionMessage.success);
+	// return am;
+	// }
 
 	@At
 	@Ok("json")
@@ -233,71 +230,74 @@ public class WishModule {
 	}
 
 	// 获取我收藏的愿望
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object myCollectList(@Param("::page.") Pager page,
-			HttpSession session) {
-		if (page != null)
-			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
-					.getPageNumber());
-
-		User user = (User) session.getAttribute("t_user");
-		QueryResult result = wishService.getMyCollectWishes(page, user);
-
-		ActionMessages ams = new ActionMessages();
-		ams.setMessCount(result.getPager().getRecordCount());
-		ams.setPageNum(result.getPager().getPageNumber());
-		ams.setPageSize(result.getPager().getPageSize());
-		ams.setObject(result.getList());
-
-		return ams;
-	}
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
+	// public Object myCollectList(@Param("::page.") Pager page,
+	// HttpSession session) {
+	// if (page != null)
+	// page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+	// .getPageNumber());
+	//
+	// User user = (User) session.getAttribute("t_user");
+	// QueryResult result = wishService.getMyCollectWishes(page, user);
+	//
+	// ActionMessages ams = new ActionMessages();
+	// ams.setMessCount(result.getPager().getRecordCount());
+	// ams.setPageNum(result.getPager().getPageNumber());
+	// ams.setPageSize(result.getPager().getPageSize());
+	// ams.setObject(result.getList());
+	//
+	// return ams;
+	// }
 
 	// 收藏愿望
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object collect(@Param("::wish.") Wish wish, HttpSession session) {
-		User collecter = (User) session.getAttribute("t_user");
-		// User collecter = dao
-		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-		String result = wishService.collectWish(collecter, wish, session);
-
-		ActionMessage am = new ActionMessage();
-		if (ActionMessage.Not_MuzhiCoin.equals(result)) {
-			am.setMessage("积分不够,不能收藏~");
-			am.setType(ActionMessage.Not_MuzhiCoin);
-		} else if (ActionMessage.success.equals(result)) {
-			am.setMessage("愿望收藏成功~");
-			am.setType(ActionMessage.success);
-		} else if (ActionMessage.fail.equals(result)) {
-			am.setMessage("该愿望您已经收藏,不能重复收藏~");
-			am.setType(ActionMessage.fail);
-		}
-		return am;
-	}
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
+	// public Object collect(@Param("::wish.") Wish wish, HttpSession session) {
+	// User collecter = (User) session.getAttribute("t_user");
+	// // User collecter = dao
+	// // .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+	// String result = wishService.collectWish(collecter, wish, session);
+	//
+	// ActionMessage am = new ActionMessage();
+	// if (ActionMessage.Not_MuzhiCoin.equals(result)) {
+	// am.setMessage("积分不够,不能收藏~");
+	// am.setType(ActionMessage.Not_MuzhiCoin);
+	// } else if (ActionMessage.success.equals(result)) {
+	// am.setMessage("愿望收藏成功~");
+	// am.setType(ActionMessage.success);
+	// } else if (ActionMessage.fail.equals(result)) {
+	// am.setMessage("该愿望您已经收藏,不能重复收藏~");
+	// am.setType(ActionMessage.fail);
+	// }
+	// return am;
+	// }
 
 	// 取消收藏
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object cancelCollect(@Param("::collect.") WishCollect collect,
-			HttpSession session) {
-		User collecter = (User) session.getAttribute("t_user");
-		// User collecter = dao.fetch(User.class,
-		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
-
-		ActionMessage am = new ActionMessage();
-		if (wishService.cancelCollectWish(collecter, collect)) {
-			am.setMessage("收藏取消成功~");
-			am.setType(ActionMessage.success);
-		} else {
-			am.setMessage("该收藏不存在~");
-			am.setType(ActionMessage.fail);
-		}
-		return am;
-	}
+	// @At
+	// @Ok("json")
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
+	// public Object cancelCollect(@Param("::collect.") WishCollect collect,
+	// HttpSession session) {
+	// User collecter = (User) session.getAttribute("t_user");
+	// // User collecter = dao.fetch(User.class,
+	// // "360c732435c84ab48ea16fe02b9ba420");// 用来测试
+	//
+	// ActionMessage am = new ActionMessage();
+	// if (wishService.cancelCollectWish(collecter, collect)) {
+	// am.setMessage("收藏取消成功~");
+	// am.setType(ActionMessage.success);
+	// } else {
+	// am.setMessage("该收藏不存在~");
+	// am.setType(ActionMessage.fail);
+	// }
+	// return am;
+	// }
 
 	// 获取@我的点赞类消息
 	// @At

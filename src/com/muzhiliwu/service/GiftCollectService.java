@@ -54,8 +54,6 @@ public class GiftCollectService {
 			collect.setCollectorId(collector.getId());// 收藏者id
 			collect.setGiftId(gift.getId());// 礼品id
 
-			collect.setPraiseNum(0);// 点赞数为0
-			collect.setCommentNum(0);// 评论数为0
 			dao.insert(collect);
 
 			giftService.changeGiftCollectNum(gift, 1);// 被收藏的礼品商品被收藏数+1
@@ -112,7 +110,6 @@ public class GiftCollectService {
 					collect);// 给评论者发送一条评论类未读信息
 		}
 		createUnreadCommentReply(commenter, comment, collect);// 给礼品收藏者发送一条评论类未读信息
-		changeCommentNumber(collect, 1);// 评论数+1
 		dao.insert(comment);// 插入一条评论
 		return ActionMessage.success;
 	}
@@ -140,7 +137,7 @@ public class GiftCollectService {
 			praise.setCollectId(collect.getId());// 被点赞的礼品收藏的id
 			praise.setPraiserId(praiser.getId());// 点赞者的id
 
-			changeGiftCollectPraiseNum(collect, 1);// 对应商品收藏的点赞数+1
+			// changeGiftCollectPraiseNum(collect, 1);// 对应商品收藏的点赞数+1
 			createUnreadPraiseReply(praiser, collect);// 给礼品收藏者发送一条点赞类未读信息
 			return ActionMessage.success;
 		}
@@ -159,7 +156,7 @@ public class GiftCollectService {
 	public String cancelPraiseGiftCollect(User praiser, GiftCollect collect) {
 		if (!okPraise(praiser, collect)) {
 			deletePraise(praiser, collect);// 删除对应的点赞记录
-			changeGiftCollectPraiseNum(collect, -1);// 对应的点赞数-1
+			// changeGiftCollectPraiseNum(collect, -1);// 对应的点赞数-1
 			deleteUnreadPraiseReply(praiser, collect);// 删除对应的点赞类未读信息
 			return ActionMessage.cancel;
 		}
@@ -223,7 +220,7 @@ public class GiftCollectService {
 
 		dao.fetchLinks(collect, "praises");// 加载点赞信息
 		dao.fetchLinks(collect.getPraises(), "praiser");// 加载点赞者信息
-
+		// 获取评论数~
 		dao.fetchLinks(collect, "comments");// 加载评论信息
 		dao.fetchLinks(collect.getComments(), "commenter");// 加载所有评论者信息
 		dao.fetchLinks(collect.getComments(), "fatherCommenter");// 加载父评论信息
@@ -305,12 +302,13 @@ public class GiftCollectService {
 	// return new QueryResult(replies, page);
 	// }
 
-	// 改变礼品收藏的点赞数
-	private void changeGiftCollectPraiseNum(GiftCollect collect, int increment) {
-		collect = dao.fetch(GiftCollect.class, collect.getId());
-		collect.setPraiseNum(collect.getPraiseNum() + increment);
-		dao.update(collect);
-	}
+	// // 改变礼品收藏的点赞数
+	// private void changeGiftCollectPraiseNum(GiftCollect collect, int
+	// increment) {
+	// collect = dao.fetch(GiftCollect.class, collect.getId());
+	// collect.setPraiseNum(collect.getPraiseNum() + increment);
+	// dao.update(collect);
+	// }
 
 	// 判断是否已点赞
 	private boolean okPraise(User praiser, GiftCollect collect) {
@@ -386,13 +384,6 @@ public class GiftCollectService {
 		unread.setLinkTitle(collect.getTitle());
 		unread.setReplyFrom(UnreadReply.FromGiftCollect);
 		dao.insert(unread);
-	}
-
-	// 修改评论数
-	private void changeCommentNumber(GiftCollect collect, int increment) {
-		collect = dao.fetch(GiftCollect.class, collect.getId());
-		collect.setCommentNum(collect.getCommentNum() + increment);
-		dao.update(collect);
 	}
 
 	// 删除对应的未读的点赞类消息

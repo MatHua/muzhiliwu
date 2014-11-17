@@ -27,7 +27,6 @@ public class ShoppingCart extends IdEntity {
 	@One(target = ReceiveContactWay.class, field = "contactWayId")
 	private ReceiveContactWay contactWay;// 保存联系方式
 
-	@Column
 	private int orderNum;// 订单数
 	@Many(target = OrderForm.class, field = "cartId")
 	private List<OrderForm> orders;// 放进购物车的订单

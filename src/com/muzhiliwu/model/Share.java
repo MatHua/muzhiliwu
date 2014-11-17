@@ -38,17 +38,14 @@ public class Share extends IdEntity {
 	private String collectId;// 记录收藏的分享id
 	private boolean collected;// 标记是否被当前用户收藏
 
-	@Column
 	private int commentNum;// 评论数
 	@Many(target = ShareComment.class, field = "shareId")
 	private List<ShareComment> comments;// 该分享的所有评论
 
-	@Column
 	private int praiseNum;// 点赞数
 	@Many(target = SharePraise.class, field = "shareId")
 	private List<SharePraise> praises;// 便于找到该分享的所有点赞者
 
-	@Column
 	private int collectNum;// 被收藏数
 
 	// @Many(target = ShareCollect.class, field = "shareId")

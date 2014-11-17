@@ -112,7 +112,7 @@ public class ShareService {
 			collect.setPraiseNum(0);// 被点赞数
 			collect.setCommentNum(0);// 被评论数
 
-			changeCollectNumber(share, 1);// 被收藏数+1
+			// changeCollectNumber(share, 1);// 被收藏数+1
 			createUnreadCollectReply(collecter, share);// 给分享的发表者发送一条收藏类的未读信息
 
 			dao.insert(collect);
@@ -153,7 +153,7 @@ public class ShareService {
 			praise.setDate(DateUtils.now());
 			praise.setShareId(share.getId());// 这是联结的id
 			praise.setPraiserId(praiser.getId());// 这是联结id
-			changePraiseNumber(share, 1);
+			// changePraiseNumber(share, 1);
 
 			createUnreadPraiseReply(praiser, share);// 给分享的发表者发送一条未读的点赞信息
 			dao.insert(praise);
@@ -175,7 +175,7 @@ public class ShareService {
 		if (!okPraise(share, praiser)) {
 			// 删除点赞记录
 			deletePraise(share, praiser);
-			changePraiseNumber(share, -1);
+			// changePraiseNumber(share, -1);
 
 			deleteUnreadPraiseReply(praiser, share);// 给分享的发表者发送一条未读的点赞信息
 			return ActionMessage.cancel;
@@ -213,7 +213,7 @@ public class ShareService {
 			createUnreadCommentReply(commenter, fatherCommenter, comment, share);// 给父评论者发送一条未读信息
 		}
 		createUnreadCommentReply(commenter, comment, share);// 给分享的发表者发送一条未读信息
-		changeCommentNumber(share, 1);// 评论数+1
+		// changeCommentNumber(share, 1);// 评论数+1
 		dao.insert(comment);// 插入一条评论
 		return ActionMessage.success;
 	}
@@ -454,11 +454,11 @@ public class ShareService {
 	}
 
 	// 修改被收藏数
-	private void changeCollectNumber(Share share, int increment) {
-		share = dao.fetch(Share.class, share.getId());
-		share.setCollectNum(share.getCollectNum() + increment);
-		dao.update(share);
-	}
+	// private void changeCollectNumber(Share share, int increment) {
+	// share = dao.fetch(Share.class, share.getId());
+	// share.setCollectNum(share.getCollectNum() + increment);
+	// dao.update(share);
+	// }
 
 	// 删除点赞记录
 	private void deletePraise(Share share, User praiser) {
@@ -471,11 +471,11 @@ public class ShareService {
 	}
 
 	// 点赞数增减
-	private void changePraiseNumber(Share share, int i) {
-		share = dao.fetch(Share.class, share.getId());
-		share.setPraiseNum(share.getPraiseNum() + i);
-		dao.update(share);
-	}
+	// private void changePraiseNumber(Share share, int i) {
+	// share = dao.fetch(Share.class, share.getId());
+	// share.setPraiseNum(share.getPraiseNum() + i);
+	// dao.update(share);
+	// }
 
 	// 检查是否已点赞
 	private boolean okPraise(Share share, User praiser) {
@@ -487,11 +487,11 @@ public class ShareService {
 	}
 
 	// 改变评论数
-	private void changeCommentNumber(Share share, int i) {
-		share = dao.fetch(Share.class, share.getId());
-		share.setCommentNum(share.getCommentNum() + i);
-		dao.update(share);
-	}
+	// private void changeCommentNumber(Share share, int i) {
+	// share = dao.fetch(Share.class, share.getId());
+	// share.setCommentNum(share.getCommentNum() + i);
+	// dao.update(share);
+	// }
 
 	// 给父评论者创建一条未读信息
 	private void createUnreadCommentReply(User commenter, User fatherCommenter,

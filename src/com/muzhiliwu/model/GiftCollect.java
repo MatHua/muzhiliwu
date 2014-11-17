@@ -33,13 +33,11 @@ public class GiftCollect extends IdEntity {
 	private String giftId;// 被收藏的礼品的id
 	@One(target = Gift.class, field = "giftId")
 	private Gift gift;// 被收藏的礼物
-
-	@Column
+	
 	private int commentNum;// 评论数
 	@Many(target = GiftCollectComment.class, field = "collectId")
 	private List<GiftCollectComment> comments;// 评论
 
-	@Column
 	private int praiseNum;// 点赞数
 	@Many(target = GiftCollectPraise.class, field = "collectId")
 	private List<GiftCollectPraise> praises;// 点赞

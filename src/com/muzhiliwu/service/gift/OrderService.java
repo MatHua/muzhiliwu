@@ -22,14 +22,14 @@ public class OrderService {
 		List<OrderForm> orders = dao.query(
 				OrderForm.class,
 				Cnd.where("buyerId", "=", user.getId())
-						.and("state", "=", OrderForm.WaitForPay).desc("date"),
+						.and("state", "=", OrderForm.WaitBuyerPay).desc("date"),
 				page);
 		if (page == null)
 			page = new Pager();
 		page.setRecordCount(dao.count(
 				OrderForm.class,
 				Cnd.where("buyerId", "=", user.getId()).and("state", "=",
-						OrderForm.WaitForPay)));
+						OrderForm.WaitBuyerPay)));
 		dao.fetchLinks(orders, "gift");
 		dao.fetchLinks(orders, "style");
 		for (OrderForm order : orders) {

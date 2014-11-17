@@ -50,48 +50,43 @@ public class Gift extends IdEntity {
 	private String name;// 商品名称
 	@Column
 	@ColDefine(type = ColType.TEXT)
-	private String body;// 商品描述
+	private String descript;// 商品描述
 	@Column
 	private float price;// 商品价格
 	@Column
 	private String type;// 商品分类
 	@Column
 	private int stock;// 库存量
-	@Column
-	private int collectNum;// 收藏数
-	@Column
-	private int shareNum;// 分享数
+
 	@Column
 	private String saleState;// 销售状态
 
 	private boolean isCollected;// 记录是否已被收藏
 	private boolean isShared;// 记录是否已被分享
-	@Column
+
+	private int collectNum;// 收藏数
+	private int shareNum;// 分享数
+
 	private int styleNum;// 款式数
 	@Many(target = GiftStyle.class, field = "giftId")
 	private List<GiftStyle> styles;// 礼物的款式
 
-	@Column
 	private int sizeNum;// 礼品尺寸数
 	@Many(target = GiftStyle.class, field = "giftId")
 	private List<GiftSize> sizes;// 礼品尺寸
 
-	@Column
 	private int tagNum;// 标签数
 	@ManyMany(target = Tag.class, relation = "t_gift_tag", from = "giftId", to = "tagId")
 	private List<Tag> tags;// 获取礼品被标注的标签
 
-	@Column
 	private int commentNum;// 评价数
 	@Many(target = GiftComment.class, field = "giftId")
 	private List<GiftComment> comments;// 商品所有评价
 
-	@Column
 	private int paramNum;// 商品规格参数数
 	@Many(target = GiftParam.class, field = "giftId")
 	private List<GiftParam> params;// 商品所有规格参数
 
-	@Column
 	private int saleRecordNum;// 成交记录数
 	@Many(target = SaleRecord.class, field = "giftId")
 	private List<SaleRecord> records;// 成交记录
@@ -118,14 +113,6 @@ public class Gift extends IdEntity {
 
 	public void setSeller(Shop seller) {
 		this.seller = seller;
-	}
-
-	public String getBody() {
-		return body;
-	}
-
-	public void setBody(String body) {
-		this.body = body;
 	}
 
 	public float getPrice() {
@@ -326,6 +313,14 @@ public class Gift extends IdEntity {
 
 	public void setAuditMess(String auditMess) {
 		this.auditMess = auditMess;
+	}
+
+	public String getDescript() {
+		return descript;
+	}
+
+	public void setDescript(String descript) {
+		this.descript = descript;
 	}
 
 }

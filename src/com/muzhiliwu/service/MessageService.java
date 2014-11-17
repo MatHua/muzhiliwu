@@ -99,7 +99,7 @@ public class MessageService {
 			praise.setDate(DateUtils.now());
 			praise.setMessId(msg.getId());// 这是联结的id
 			praise.setPraiserId(praiser.getId());// 这是联结id
-			changePraiseNumber(msg, 1);// 点赞数+1
+			// changePraiseNumber(msg, 1);// 点赞数+1
 			dao.insert(praise);
 
 			createUnreadPraiseReply(praiser, msg);// 给留言发表者发送一条未读的点赞信息
@@ -120,7 +120,7 @@ public class MessageService {
 	public String cancelPraiseMessage(Message msg, User praiser) {
 		if (!okPraise(msg, praiser)) {
 			deletePraise(msg, praiser);// 删除点赞记录
-			changePraiseNumber(msg, -1);// 点赞数-1
+//			changePraiseNumber(msg, -1);// 点赞数-1
 
 			deleteUnreadPraiseReply(praiser, msg);// 删除对应的未读的点赞信息
 			return ActionMessage.cancel;
@@ -158,7 +158,7 @@ public class MessageService {
 			createUnreadCommentReply(commenter, fatherCommenter, comment, msg);// 给父评论者发送一个未读信息
 		}
 		createUnreadCommentReply(commenter, comment, msg);// 给消息发表者发布评论信息
-		changeCommentNumber(msg, 1);// 评论数+1
+//		changeCommentNumber(msg, 1);// 评论数+1
 		dao.insert(comment);// 插入一条评论
 		return ActionMessage.success;
 	}
@@ -331,11 +331,11 @@ public class MessageService {
 	}
 
 	// 点赞数增减
-	private void changePraiseNumber(Message msg, int i) {
-		msg = dao.fetch(Message.class, msg.getId());
-		msg.setPraiseNum(msg.getPraiseNum() + i);
-		dao.update(msg);
-	}
+	// private void changePraiseNumber(Message msg, int i) {
+	// msg = dao.fetch(Message.class, msg.getId());
+	// msg.setPraiseNum(msg.getPraiseNum() + i);
+	// dao.update(msg);
+	// }
 
 	// 检查是否已点赞
 	private boolean okPraise(Message msg, User praiser) {
@@ -347,11 +347,11 @@ public class MessageService {
 	}
 
 	// 改变评论数
-	private void changeCommentNumber(Message msg, int i) {
-		msg = dao.fetch(Message.class, msg.getId());
-		msg.setCommentNum(msg.getCommentNum() + i);
-		dao.update(msg);
-	}
+	// private void changeCommentNumber(Message msg, int i) {
+	// msg = dao.fetch(Message.class, msg.getId());
+	// msg.setCommentNum(msg.getCommentNum() + i);
+	// dao.update(msg);
+	// }
 
 	// 创建一条未读的评论类信息~回复某人的评论
 	private void createUnreadCommentReply(User commenter, User fatherCommenter,

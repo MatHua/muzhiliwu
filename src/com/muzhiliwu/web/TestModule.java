@@ -1,11 +1,13 @@
 package com.muzhiliwu.web;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,17 +19,19 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.view.JspView;
 
+import com.alipay.config.AlipayConfig;
+import com.alipay.util.AlipaySubmit;
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.TestDemo;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.utils.ActionMessage;
-import com.muzhiliwu.utils.LogFileFilter;
 
 @IocBean
 @At("test")
 public class TestModule {
-	
+
 	@Inject
 	private Dao dao;
 	private static Log log = LogFactory.getLog(TestDemo.class);
@@ -146,5 +150,99 @@ public class TestModule {
 		// log.debug("测试~");
 		// TestDemo test = dao.fetch(TestDemo.class, "xxxxx");
 		return "xx";
+	}
+
+	@At
+	public JspView getHtml(HttpServletResponse response) throws IOException {
+		// 支付类型
+		String payment_type = "1";
+		// 必填，不能修改
+		// 服务器异步通知页面路径
+		String notify_url = "http://xx/create_partner_trade_by_buyer-JAVA-UTF-8/notify_url.jsp";
+		// 需http://格式的完整路径，不能加?id=123这类自定义参数
+
+		// 页面跳转同步通知页面路径
+		String return_url = "http://xxx/create_partner_trade_by_buyer-JAVA-UTF-8/return_url.jsp";
+		// 需http://格式的完整路径，不能加?id=123这类自定义参数，不能写成http://localhost/
+
+		// 卖家支付宝帐户
+		String seller_email = "xxx";
+		// 必填
+
+		// 商户订单号
+		String out_trade_no = "xxssaqwq";
+		// 商户网站订单系统中唯一订单号，必填
+
+		// 订单名称
+		String subject = "xxx";
+		// 必填
+
+		// 付款金额
+		String price = "111";
+		// 必填
+
+		// 商品数量
+		String quantity = "1";
+		// 必填，建议默认为1，不改变值，把一次交易看成是一次下订单而非购买一件商品
+		// 物流费用
+		String logistics_fee = "0.00";
+		// 必填，即运费
+		// 物流类型
+		String logistics_type = "EXPRESS";
+		// 必填，三个值可选：EXPRESS（快递）、POST（平邮）、EMS（EMS）
+		// 物流支付方式
+		String logistics_payment = "SELLER_PAY";
+		// 必填，两个值可选：SELLER_PAY（卖家承担运费）、BUYER_PAY（买家承担运费）
+		// 订单描述
+
+		// 商品展示地址
+		String show_url = "http://www.xxx.com/myorder.html";
+
+		// 收货人姓名
+		String receive_name = "xx";
+
+		// 收货人地址
+		String receive_address = "XXXXXXXXXXXXXX";
+
+		// 收货人邮编
+		String receive_zip = "123456";
+
+		// 收货人电话号码
+		String receive_phone = "0571-88158090";
+
+		// 收货人手机号码
+		String receive_mobile = "13312341234";
+
+		// ////////////////////////////////////////////////////////////////////////////////
+
+		// 把请求参数打包成数组
+		Map<String, String> sParaTemp = new HashMap<String, String>();
+		sParaTemp.put("service", "create_partner_trade_by_buyer");
+		sParaTemp.put("partner", AlipayConfig.partner);
+		sParaTemp.put("_input_charset", AlipayConfig.input_charset);
+		sParaTemp.put("payment_type", payment_type);
+		sParaTemp.put("notify_url", notify_url);
+		sParaTemp.put("return_url", return_url);
+		sParaTemp.put("seller_email", seller_email);
+		sParaTemp.put("out_trade_no", out_trade_no);
+		sParaTemp.put("subject", subject);
+		sParaTemp.put("price", price);
+		sParaTemp.put("quantity", quantity);
+		sParaTemp.put("logistics_fee", logistics_fee);
+		sParaTemp.put("logistics_type", logistics_type);
+		sParaTemp.put("logistics_payment", logistics_payment);
+		sParaTemp.put("show_url", show_url);
+		sParaTemp.put("receive_name", receive_name);
+		sParaTemp.put("receive_address", receive_address);
+		sParaTemp.put("receive_zip", receive_zip);
+		sParaTemp.put("receive_phone", receive_phone);
+		sParaTemp.put("receive_mobile", receive_mobile);
+
+		// 建立请求
+		String sHtmlText = AlipaySubmit.buildRequest(sParaTemp, "get", "xx");
+
+		ServletOutputStream out = response.getOutputStream();
+		out.println(sHtmlText);
+		return new JspView("");
 	}
 }
