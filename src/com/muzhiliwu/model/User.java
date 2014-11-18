@@ -20,6 +20,14 @@ public class User extends IdEntity {
 	public static final String Man = "man";// 男性
 	public static final String Woman = "woman";// 女性
 	public static final String Secret = "secret";// 保密
+	public static final int[] Popularity = { 0, 100, 200, 300, 400, 500, 600,
+			700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700,
+			1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
+			2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900,
+			4000 };
+	public static final int[] SendGift = { 0, 2, 4, 6, 8, 10, 12, 14, 16, 18,
+			20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52,
+			54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80 };
 
 	@Column
 	private String code;// 账号
@@ -56,6 +64,15 @@ public class User extends IdEntity {
 	private String emotion;// 情感状况
 	@Column
 	private int muzhiCoin;// 拇指币
+
+	@Column
+	private String townName;// 镇
+	@Column
+	private String areaName;// 区
+	@Column
+	private String cityName;// 城市
+	@Column
+	private String provinceName;// 省
 
 	@Column
 	private int popularityValue;// 当前人气值
@@ -413,6 +430,38 @@ public class User extends IdEntity {
 
 	public void setOrderNum(int orderNum) {
 		this.orderNum = orderNum;
+	}
+
+	public String getTownName() {
+		return townName;
+	}
+
+	public void setTownName(String townName) {
+		this.townName = townName;
+	}
+
+	public String getAreaName() {
+		return areaName;
+	}
+
+	public void setAreaName(String areaName) {
+		this.areaName = areaName;
+	}
+
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+
+	public String getProvinceName() {
+		return provinceName;
+	}
+
+	public void setProvinceName(String provinceName) {
+		this.provinceName = provinceName;
 	}
 
 }

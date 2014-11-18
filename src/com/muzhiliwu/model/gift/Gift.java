@@ -91,6 +91,10 @@ public class Gift extends IdEntity {
 	@Many(target = SaleRecord.class, field = "giftId")
 	private List<SaleRecord> records;// 成交记录
 
+	private int picNum;
+	@Many(target = GiftPic.class, field = "giftId")
+	private List<GiftPic> pics;
+
 	public String getFromType() {
 		return fromType;
 	}
@@ -321,6 +325,22 @@ public class Gift extends IdEntity {
 
 	public void setDescript(String descript) {
 		this.descript = descript;
+	}
+
+	public int getPicNum() {
+		return picNum;
+	}
+
+	public void setPicNum(int picNum) {
+		this.picNum = picNum;
+	}
+
+	public List<GiftPic> getPics() {
+		return pics;
+	}
+
+	public void setPics(List<GiftPic> pics) {
+		this.pics = pics;
 	}
 
 }

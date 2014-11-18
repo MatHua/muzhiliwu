@@ -58,15 +58,18 @@ public class UserService {
 			return ActionMessage.fail;
 		}
 		// 一些系统自修改的信息
-		user.setCode(user.getCode().trim());
 		user.setId(NumGenerator.getUuid());// 生成id
 		user.setPass(MD5.toMD5(user.getPass().trim()));// 密码加密
 		user.setDate(DateUtils.now());// 注册时间
 		user.setMuzhiCoin(MuzhiCoin.MuzhiCoin_For_New_User);// 积分初始化
+		
 		user.setPopularityRank(1);
 		user.setPopularityValue(0);
+		user.setPopularityTop(User.Popularity[1]);
+		
 		user.setSendGiftRank(1);
 		user.setSendGiftValue(0);
+		user.setSendGiftTop(User.SendGift[1]);
 		dao.insert(user);
 		return ActionMessage.success;
 	}

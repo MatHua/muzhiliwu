@@ -169,8 +169,6 @@ public class UserModule {
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object changePass(String oldPass, String newPass, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
-		// User user = new User();// 测试用的
-		// user.setId("673e21df955d4da5930910282fbfeaf2");
 
 		ActionMessage am = new ActionMessage();
 		if (userService.changePass(user, oldPass, newPass)) {
@@ -186,9 +184,21 @@ public class UserModule {
 	// 退出登录
 	@At
 	@Ok("json")
-	public Object logout(HttpSession session) {
+	public Object logout(HttpSession session, HttpServletRequest request,
+			HttpServletResponse response) {
 		if (session.getAttribute("t_user") != null) {
 			session.removeAttribute("t_user");
+		}
+		// 销毁Cookie
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("t_code")
+						|| cookie.getName().equals("t_pass")) {
+					cookie.setMaxAge(0);
+				}
+				response.addCookie(cookie);
+			}
 		}
 		ActionMessage am = new ActionMessage();
 		am.setMessage("成功退出登录~");
@@ -219,8 +229,6 @@ public class UserModule {
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
 	public Object uploadUserPhoto(@Param("userpic") TempFile tfs,
 			ServletContext context, HttpSession session) {
-		// User user = new User();
-		// user.setCode("xxx");// 用于测试
 		User user = (User) session.getAttribute("t_user");
 		boolean result = userService.uploadPhoto(user.getCode(), tfs,
 				context.getRealPath("/"));
@@ -229,7 +237,6 @@ public class UserModule {
 		if (result) {
 			am.setMessage("头像上传成功^_^");
 			am.setType(ActionMessage.success);
-			// am.setObject(context.getRealPath("/"));
 		} else {
 			am.setMessage("头像上传失败,原因可能由于用户不存在~");
 			am.setType(ActionMessage.fail);

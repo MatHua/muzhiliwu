@@ -62,8 +62,13 @@ public class CheckLoginFilter implements ActionFilter {
 
 		// check session
 		HttpSession session = Mvcs.getHttpSession(false);
-		if (session == null)
-			return new ServerRedirectView(path);// 连session都找不到,应该是没登陆吧~那就去登陆
+		if (session == null) {
+			am.setType(ActionMessage.Not_Login);
+			am.setMessage("用户没有登录");
+			v.setData(am);
+			return v;
+		}
+
 		Object obj = session.getAttribute(name);
 		if (obj == null) {// 如果用户名没保存在session中
 			if (!Strings.isBlank(username) && !Strings.isBlank(password)) {
@@ -76,7 +81,11 @@ public class CheckLoginFilter implements ActionFilter {
 			log.info("[ip:" + IpUtils.getIpAddr(context.getRequest())
 					+ "]  [用户:" + "游客" + "]  [时间:" + DateUtils.now()
 					+ "]  [操作:" + "正在尝试恶意访问~_~]");
-			return new ServerRedirectView(path);// session和cookie都没有保存,当然得跳到登陆页
+			am.setType(ActionMessage.Not_Login);
+			am.setMessage("用户没有登录");
+			v.setData(am);
+			return v;
+			// session和cookie都没有保存,当然得跳到登陆页
 		}
 		return null;// 如果session有保存,就不用跳到登陆页
 	}

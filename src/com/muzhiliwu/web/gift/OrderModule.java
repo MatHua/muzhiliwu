@@ -9,6 +9,7 @@ import org.nutz.dao.QueryResult;
 import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
@@ -17,11 +18,12 @@ import org.nutz.mvc.annotation.Param;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.model.gift.OrderForm;
 import com.muzhiliwu.service.gift.OrderService;
+import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.IpUtils;
-import com.muzhiliwu.web.WishModule;
 
 @IocBean
 @At("order")
@@ -51,5 +53,28 @@ public class OrderModule {
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
 		return ams;
+	}
+
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object deleteNotPayOrder(@Param("::order.") OrderForm order,
+			HttpSession session, HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		ActionMessage am = new ActionMessage();
+		if (order == null || Strings.isBlank(order.getOrderId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请求参数order.orderId不能为空~");
+			return am;
+		}
+		String resule = orderService.deleteNotPayOrder(user, order);
+		if (ActionMessage.fail.equals(resule)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("删除失败,您或许不是订单创建者,亦或许该订单不是未付款订单~");
+			return am;
+		}
+		am.setType(ActionMessage.success);
+		am.setMessage("未付款订单删除成功^_^");
+		return am;
 	}
 }

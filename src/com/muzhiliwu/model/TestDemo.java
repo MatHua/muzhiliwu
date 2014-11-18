@@ -14,9 +14,6 @@ public class TestDemo extends IdEntity {
 	@Column
 	private String email;
 
-	@ManyMany(target = TestDemo.class, relation = "t_midd", from = "testId", to = "demoId")
-	private List<TestDemo> myDemos;
-
 	public String getName() {
 		return name;
 	}
@@ -32,13 +29,4 @@ public class TestDemo extends IdEntity {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-	public List<TestDemo> getMyDemos() {
-		return myDemos;
-	}
-
-	public void setMyDemos(List<TestDemo> myDemos) {
-		this.myDemos = myDemos;
-	}
-
 }

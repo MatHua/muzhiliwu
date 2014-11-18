@@ -40,11 +40,9 @@ public class Wish extends IdEntity {
 	@Many(target = WishPraise.class, field = "wishId")
 	private List<WishPraise> praises;// 便于记录点赞记录
 
-	private int collectNum;// 收藏数
+	private int shareNum;// 分享数
 	@Many(target = WishShare.class, field = "wishId")
 	private List<WishShare> shares;// 便于记录愿望的收集者
-
-	private int shareNum;// 分享数
 
 	@One(target = User.class, field = "wisherId")
 	private User wisher;// 用于记录许愿者
@@ -119,14 +117,6 @@ public class Wish extends IdEntity {
 
 	public void setPraiseNum(int praiseNum) {
 		this.praiseNum = praiseNum;
-	}
-
-	public int getCollectNum() {
-		return collectNum;
-	}
-
-	public void setCollectNum(int collectNum) {
-		this.collectNum = collectNum;
 	}
 
 	public int getShareNum() {

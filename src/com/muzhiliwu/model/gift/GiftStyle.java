@@ -21,23 +21,12 @@ public class GiftStyle extends IdEntity {
 	@Column
 	private float price;// 单价
 
-	@Many(target = GiftStylePic.class, field = "styleId")
-	private List<GiftStylePic> stylePics;// 款式对应的图片
-
 	public String getGiftId() {
 		return giftId;
 	}
 
 	public void setGiftId(String giftId) {
 		this.giftId = giftId;
-	}
-
-	public List<GiftStylePic> getStylePics() {
-		return stylePics;
-	}
-
-	public void setStylePics(List<GiftStylePic> stylePics) {
-		this.stylePics = stylePics;
 	}
 
 	public float getPrice() {

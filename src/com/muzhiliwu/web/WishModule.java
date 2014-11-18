@@ -19,7 +19,6 @@ import org.nutz.mvc.annotation.Param;
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
-import com.muzhiliwu.model.WishShare;
 import com.muzhiliwu.service.WishService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
@@ -61,8 +60,6 @@ public class WishModule {
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object update(@Param("::wish.") Wish wish, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
-		// User publisher = dao.fetch(User.class,
-		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		String result = wishService.updateWish(publisher, wish);
 		ActionMessage am = new ActionMessage();
@@ -113,13 +110,12 @@ public class WishModule {
 	// return am;
 	// }
 
+	// 取消点赞
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::wish.") Wish wish, HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
-		// User praiser = dao
-		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		String tmp = wishService.cancelPraiseWish(wish, praiser);
 		ActionMessage am = new ActionMessage();
@@ -133,24 +129,50 @@ public class WishModule {
 		return am;
 	}
 
-	// 点赞或取消点赞
+	@At
+	@Ok("json")
+	public Object getPraiseNum(@Param("::wish.") Wish wish,
+			HttpSession session, HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (user != null ? user.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "获取点赞数~]");
+
+		ActionMessage am = new ActionMessage();
+		am.setType(ActionMessage.success);
+		am.setObject(wishService.getPraiseNumber(wish));
+		return am;
+	}
+
+	// 点赞
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object praise(@Param("::wish.") Wish wish, HttpSession session) {
+	public Object praise(@Param("::wish.") Wish wish, HttpSession session,
+			HttpServletRequest request) {
 		User praiser = (User) session.getAttribute("t_user");
-		// User praiser = dao
-		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		String tmp = wishService.praiseWish(wish, praiser, session);
 		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(tmp)) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
+					+ DateUtils.now() + "]  [操作:" + "点赞成功~]");
+
 			am.setMessage("点赞成功~");
 			am.setType(ActionMessage.success);
 		} else if (ActionMessage.fail.equals(tmp)) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
+					+ DateUtils.now() + "]  [操作:" + "点赞失败,您或许已经点赞~]");
+
 			am.setMessage("点赞失败,您或许已经点赞~");
 			am.setType(ActionMessage.fail);
 		} else if (ActionMessage.Not_MuzhiCoin.equals(tmp)) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
+					+ DateUtils.now() + "]  [操作:" + "点赞失败,积分不够~]");
+
 			am.setMessage("积分不够~");
 			am.setType(ActionMessage.Not_MuzhiCoin);
 		}
@@ -189,6 +211,7 @@ public class WishModule {
 			HttpSession session, HttpServletRequest request) {
 
 		User user = (User) session.getAttribute("t_user");
+
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
 				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
 				+ "获取想要帮我许愿的人]");

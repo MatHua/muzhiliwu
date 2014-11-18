@@ -6,21 +6,13 @@ import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
 
 //商品款式对应的照片
-@Table("t_gift_style_pic")
-@TableIndexes({ @Index(name = "idx_gift_style_pic", fields = { "styleId" }, unique = false) })
-public class GiftStylePic extends IdEntity {
+@Table("t_gift_pic")
+@TableIndexes({ @Index(name = "idx_gift_pic", fields = { "giftId" }, unique = false) })
+public class GiftPic extends IdEntity {
 	@Column
-	private String styleId;// 联结id
+	private String giftId;// 联结id
 	@Column
 	private String picPath;// 图片路径
-
-	public String getStyleId() {
-		return styleId;
-	}
-
-	public void setStyleId(String styleId) {
-		this.styleId = styleId;
-	}
 
 	public String getPicPath() {
 		return picPath;
@@ -28,6 +20,14 @@ public class GiftStylePic extends IdEntity {
 
 	public void setPicPath(String picPath) {
 		this.picPath = picPath;
+	}
+
+	public String getGiftId() {
+		return giftId;
+	}
+
+	public void setGiftId(String giftId) {
+		this.giftId = giftId;
 	}
 
 }

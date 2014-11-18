@@ -53,10 +53,6 @@ public class WishService {
 		wish.setWisherId(publisher.getId());// 许愿者id
 		wish.setState(Wish.Unrealized);// 愿望未实现
 
-		wish.setPraiseNum(0);// 点赞数为0
-		wish.setCollectNum(0);// 被收藏数为0
-		wish.setShareNum(0);
-
 		dao.insert(wish);
 		return ActionMessage.success;
 	}
@@ -99,7 +95,6 @@ public class WishService {
 			praise.setDate(DateUtils.now());
 			praise.setWishId(wish.getId());// 被点赞愿望的id
 			praise.setPraiserId(praiser.getId());// 点赞者的id
-			// changePraiseNumber(wish, 1);// 点赞数+1
 
 			createUnreadPraiseReply(praiser, wish);// 给许愿者发送点赞类未读信息
 
@@ -313,11 +308,9 @@ public class WishService {
 
 		// 加载分享发表者
 		dao.fetchLinks(wishes, "wisher");
-		// 加载
-		dao.fetchLinks(wishes, "wishOrderForm");
 		for (Wish wish : wishes) {
-			// 获取配送地址
-			dao.fetchLinks(wish.getWishOrderForm(), "contactWay");
+			wish.setPraiseNum(getPraiseNumber(wish));
+			wish.setShareNum(getShareNumber(wish));
 			// 判断用户有没有收藏该分享
 			wish.setShared(false);
 			wish.setPraised(false);
@@ -333,6 +326,12 @@ public class WishService {
 			}
 		}
 		return new QueryResult(wishes, page);
+	}
+
+	// 获取点赞数
+	public int getPraiseNumber(Wish wish) {
+		return dao.count(WishPraise.class,
+				Cnd.where("wishId", "=", wish.getId()));
 	}
 
 	/**
@@ -514,19 +513,11 @@ public class WishService {
 		dao.delete(reply);
 	}
 
-	// 修改被收藏数
-	// private void changeCollectNumber(Wish wish, int increment) {
-	// wish = dao.fetch(Wish.class, wish.getId());
-	// wish.setCollectNum(wish.getCollectNum() + increment);
-	// dao.update(wish);
-	// }
-
 	// 修改被分享数
-	// private void changeShareNumber(Wish wish, int increment) {
-	// wish = dao.fetch(Wish.class, wish.getId());
-	// wish.setShareNum(wish.getShareNum() + increment);
-	// dao.update(wish);
-	// }
+	private int getShareNumber(Wish wish) {
+		return dao.count(WishShare.class,
+				Cnd.where("wishId", "=", wish.getId()));
+	}
 
 	// 检查是否已经分享
 	private boolean okShare(User sharer, Wish wish) {
