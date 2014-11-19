@@ -82,31 +82,22 @@ public class WishModule {
 	public Object share(@Param("::wish.") Wish wish, HttpSession session,
 			HttpServletRequest request) {
 		User sharer = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (sharer != null ? sharer.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "将愿望分享到社交网站~]");
 
 		ActionMessage am = new ActionMessage();
 		if (wish == null || Strings.isBlank(wish.getId())) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ (sharer != null ? sharer.getCode() : "游客") + "]  [时间:"
-					+ DateUtils.now() + "]  [操作:" + "普通恶意操作~]");
-
 			am.setType(ActionMessage.fail);
 			am.setMessage("wish.id不能为空~");
 			return am;
 		}
 		String result = wishService.shareWish(wish, sharer, session);
 		if (ActionMessage.success.equals(result)) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ (sharer != null ? sharer.getCode() : "游客") + "]  [时间:"
-					+ DateUtils.now() + "]  [操作:" + "愿望分享成功~]");
-
 			am.setMessage("愿望分享成功~");
 			am.setAddMuZhiCoin(MuzhiCoin.MuzhiCoin_for_Share_Wish);
 			am.setType(ActionMessage.success);
 		} else if (ActionMessage.Not_MuzhiCoin.equals(result)) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ (sharer != null ? sharer.getCode() : "游客") + "]  [时间:"
-					+ DateUtils.now() + "]  [操作:" + "分享失败,拇指币不够用~]");
-			
 			am.setMessage("分享失败,拇指币不够用~");
 			am.setType(ActionMessage.Not_MuzhiCoin);
 		}
@@ -256,6 +247,8 @@ public class WishModule {
 		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
 		ams.setObject(result.getList());
 
 		return ams;
@@ -285,6 +278,8 @@ public class WishModule {
 		ams.setMessCount(result.getPager().getPageCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageNum(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
 		ams.setObject(result.getList());
 		return ams;
 	}
@@ -305,6 +300,8 @@ public class WishModule {
 		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
 		ams.setObject(result.getList());
 
 		return ams;

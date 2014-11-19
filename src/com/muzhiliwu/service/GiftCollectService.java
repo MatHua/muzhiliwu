@@ -18,8 +18,6 @@ import com.muzhiliwu.model.GiftCollectPraise;
 import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.gift.Gift;
-import com.muzhiliwu.model.gift.GiftShare;
-import com.muzhiliwu.model.gift.OrderForm;
 import com.muzhiliwu.service.gift.GiftService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
@@ -44,24 +42,30 @@ public class GiftCollectService {
 	 *            被收藏的礼品商品
 	 * @return
 	 */
-	public String collectGift(User collector, Gift gift, GiftCollect collect,
-			HttpSession session) {
+	public String collectGift(User collector, Gift gift, HttpSession session) {
 		if (okCollect(collector, gift)) {// 可以被收藏
 			if (!userService.okMuzhiCoin(collector,
 					MuzhiCoin.MuzhiCoin_For_Collect_Gift, session)) {
 				return ActionMessage.Not_MuzhiCoin;
 			}
+			GiftCollect collect = new GiftCollect();
 			collect.setId(NumGenerator.getUuid());// 主键id
 			collect.setDate(DateUtils.now());// 被收藏时间
 			collect.setCollectorId(collector.getId());// 收藏者id
 			collect.setGiftId(gift.getId());// 礼品id
-
 			dao.insert(collect);
-
-			giftService.changeGiftCollectNum(gift, 1);// 被收藏的礼品商品被收藏数+1
 			return ActionMessage.success;
 		}
 		return ActionMessage.fail;
+	}
+
+	public void cancelCollect(User collector, Gift gift) {
+		GiftCollect collect = dao.fetch(
+				GiftCollect.class,
+				Cnd.where("collectorId", "=", collector.getId()).and("giftId",
+						"=", gift.getId()));
+		if (collect != null)
+			dao.delete(collect);
 	}
 
 	// 判断该商品是否已被该用户收藏~

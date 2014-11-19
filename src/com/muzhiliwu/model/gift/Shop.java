@@ -27,6 +27,8 @@ public class Shop extends IdEntity {
 	private String code;// 商店账号
 	@Column
 	private String pass;// 密码
+	@Column
+	private String photo;// 商家头像路径
 
 	@Column
 	private String shopName;// 店名
@@ -217,6 +219,14 @@ public class Shop extends IdEntity {
 
 	public void setHistoryOrders(List<OrderForm> historyOrders) {
 		this.historyOrders = historyOrders;
+	}
+
+	public String getPhoto() {
+		return photo;
+	}
+
+	public void setPhoto(String photo) {
+		this.photo = photo;
 	}
 
 }

@@ -14,6 +14,7 @@ public class ActionMessages {
 	private Object object;
 	private int pageSize;
 	private int pageNum;
+	private int pageCount;// 总页数
 	private int messCount;
 
 	public String getType() {
@@ -62,6 +63,14 @@ public class ActionMessages {
 
 	public void setMessCount(int messCount) {
 		this.messCount = messCount;
+	}
+
+	public int getPageCount() {
+		return pageCount;
+	}
+
+	public void setPageCount(int pageCount) {
+		this.pageCount = pageCount;
 	}
 
 }

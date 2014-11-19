@@ -31,6 +31,7 @@ public class OrderService {
 				OrderForm.class,
 				Cnd.where("buyerId", "=", user.getId()).and("payState", "=",
 						OrderForm.WaitBuyerPay)));
+		
 		dao.fetchLinks(orders, "gift");
 		dao.fetchLinks(orders, "style");
 		for (OrderForm order : orders) {

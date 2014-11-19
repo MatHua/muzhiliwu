@@ -2,20 +2,24 @@ package com.muzhiliwu.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.QueryResult;
 import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Files;
+import org.nutz.lang.Strings;
 import org.nutz.mvc.upload.TempFile;
 
 import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.Wish;
+import com.muzhiliwu.model.gift.OrderForm;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
@@ -202,11 +206,40 @@ public class UserService {
 	}
 
 	// 获取未读信息数
-	private int countUnreadReplyNum(String receiverId) {
+	public int countUnreadReplyNum(String receiverId) {
 		return dao.count(
 				UnreadReply.class,
 				Cnd.where("receiverId", "=", receiverId).and("state", "=",
 						UnreadReply.Unread));
+	}
+
+	public QueryResult getMyUnreadReply(User user, Pager page) {
+		List<UnreadReply> replies = dao.query(
+				UnreadReply.class,
+				Cnd.where("receiverId", "=", user.getId())
+						.and("state", "=", UnreadReply.Unread).desc("date"),
+				page);
+		dao.fetchLinks(replies, "replier");// 加载回复者
+		dao.fetchLinks(replies, "shop");
+		if (page == null)
+			page = new Pager();
+		page.setRecordCount(dao.count(
+				UnreadReply.class,
+				Cnd.where("receiverId", "=", user.getId()).and("state", "=",
+						UnreadReply.Unread)));
+		return new QueryResult(replies, page);
+	}
+
+	public QueryResult getMyReply(User user, Pager page) {
+		List<UnreadReply> replies = dao.query(UnreadReply.class,
+				Cnd.where("receiverId", "=", user.getId()).desc("date"), page);
+		dao.fetchLinks(replies, "replier");// 加载回复者
+		dao.fetchLinks(replies, "shop");
+		if (page == null)
+			page = new Pager();
+		page.setRecordCount(dao.count(UnreadReply.class,
+				Cnd.where("receiverId", "=", user.getId())));
+		return new QueryResult(replies, page);
 	}
 
 	// 获取最近的那条许愿

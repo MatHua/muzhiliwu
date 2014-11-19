@@ -84,6 +84,8 @@ public class MessageModule {
 		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
 		ams.setObject(result.getList());
 		return ams;
 	}
@@ -105,6 +107,8 @@ public class MessageModule {
 		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
 		ams.setObject(result.getList());
 		return ams;
 	}

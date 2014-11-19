@@ -1,12 +1,6 @@
 package com.muzhiliwu.web;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +8,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.nutz.dao.QueryResult;
+import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
@@ -23,17 +19,15 @@ import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
-import org.nutz.mvc.filter.CheckSession;
 import org.nutz.mvc.upload.TempFile;
 import org.nutz.mvc.upload.UploadAdaptor;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
-import com.muzhiliwu.model.TestDemo;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.service.UserService;
 import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.ActionMessages;
 import com.muzhiliwu.utils.DateUtils;
-import com.muzhiliwu.utils.FileFilter;
 import com.muzhiliwu.utils.IpUtils;
 
 @IocBean
@@ -227,6 +221,73 @@ public class UserModule {
 		am.setType(ActionMessage.success);
 		am.setObject(userService.getUserById(user.getId()));
 		return am;
+	}
+
+	// 获取未读信息数
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object countUnreadReplyNum(HttpSession session,
+			HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "获取未读信息数]");
+		ActionMessage am = new ActionMessage();
+		am.setType(ActionMessage.success);
+		am.setObject(userService.countUnreadReplyNum(user.getId()));
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object unreadReply(@Param("::page.") Pager page,
+			HttpSession session, HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "获取未读信息]");
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
+
+		QueryResult result = userService.getMyUnreadReply(user, page);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setMessCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
+		ams.setObject(result.getList());
+		return ams;
+	}
+
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object reply(@Param("::page.") Pager page, HttpSession session,
+			HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "获取未读信息]");
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
+
+		QueryResult result = userService.getMyReply(user, page);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setMessCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
+		ams.setObject(result.getList());
+		return ams;
 	}
 
 	// 上传用户头像

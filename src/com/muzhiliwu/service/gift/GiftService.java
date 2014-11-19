@@ -2,6 +2,8 @@ package com.muzhiliwu.service.gift;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.QueryResult;
@@ -11,12 +13,18 @@ import org.nutz.ioc.loader.annotation.IocBean;
 
 import com.muzhiliwu.model.GiftCollect;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.model.Wish;
+import com.muzhiliwu.model.WishShare;
 import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.model.gift.GiftShare;
 import com.muzhiliwu.model.gift.OrderForm;
 import com.muzhiliwu.model.gift.OrderFormForWish;
 import com.muzhiliwu.service.GiftCollectService;
 import com.muzhiliwu.service.UserService;
+import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.DateUtils;
+import com.muzhiliwu.utils.MuzhiCoin;
+import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
 public class GiftService {
@@ -26,22 +34,6 @@ public class GiftService {
 	private UserService userService;
 	@Inject
 	private GiftCollectService giftCollectService;
-
-	/**
-	 * 改变礼品的被收藏数
-	 * 
-	 * @param gift
-	 *            被收藏的礼品
-	 * @param increment
-	 *            被收藏数增量
-	 * @return
-	 */
-	public boolean changeGiftCollectNum(Gift gift, int increment) {
-		gift = dao.fetch(Gift.class, gift.getId());
-		gift.setCollectNum(gift.getCollectNum() + increment);
-		dao.update(gift);
-		return true;
-	}
 
 	/**
 	 * 获取礼物商品列表
@@ -97,6 +89,22 @@ public class GiftService {
 	public int getGiftShareNum(Gift gift) {
 		return dao.count(GiftShare.class,
 				Cnd.where("giftId", "=", gift.getId()));
+	}
+
+	public String shareGift(Gift gift, User sharer, HttpSession session) {
+		// 分享到社交网有一定积分奖励
+		if (sharer != null
+				&& !userService.okMuzhiCoin(sharer,
+						MuzhiCoin.MuzhiCoin_For_Share_Gift, session)) {
+			return ActionMessage.Not_MuzhiCoin;
+		}
+		GiftShare share = new GiftShare();
+		share.setDate(DateUtils.now());
+		share.setId(NumGenerator.getUuid());
+		share.setSharerId(sharer.getId());
+		share.setGiftId(gift.getId());
+		dao.insert(share);
+		return ActionMessage.success;
 	}
 
 	// 判断该商品是否已被该用户收藏~

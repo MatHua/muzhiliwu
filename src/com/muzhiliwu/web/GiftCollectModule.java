@@ -31,30 +31,6 @@ public class GiftCollectModule {
 	@Inject
 	private Dao dao;// 仅用于测试
 
-	// 收藏一件礼品商品
-	@At
-	@Ok("json")
-	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object collect(@Param("::gift.") Gift gift,
-			@Param("::collect.") GiftCollect collect, HttpSession session) {
-		User collector = (User) session.getAttribute("t_user");
-		String tmp = giftCollectService.collectGift(collector, gift, collect,
-				session);
-
-		ActionMessage am = new ActionMessage();
-		if (ActionMessage.Not_MuzhiCoin.equals(tmp)) {
-			am.setMessage("积分不够,收藏失败~");
-			am.setType(ActionMessage.Not_MuzhiCoin);
-		} else if (ActionMessage.success.equals(tmp)) {
-			am.setMessage("收藏成功~");
-			am.setType(ActionMessage.success);
-		} else if (ActionMessage.fail.equals(tmp)) {
-			am.setMessage("该礼品您已收藏,不能重复收藏~");
-			am.setType(ActionMessage.fail);
-		}
-		return am;
-	}
-
 	// 评论一个礼品收藏
 	@At
 	@Ok("json")
@@ -182,6 +158,8 @@ public class GiftCollectModule {
 		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
 		ams.setObject(result.getList());
 		return ams;
 	}
@@ -200,6 +178,8 @@ public class GiftCollectModule {
 		ams.setMessCount(result.getPager().getRecordCount());
 		ams.setPageNum(result.getPager().getPageNumber());
 		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
 		ams.setObject(result.getList());
 		return ams;
 	}
