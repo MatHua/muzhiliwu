@@ -125,24 +125,6 @@ public class WishService {
 	}
 
 	/**
-	 * 被分享,分享数+1
-	 * 
-	 * @param wish
-	 *            被分享的许愿
-	 * @return
-	 */
-	public String shareWish(Wish wish, User sharer, HttpSession session) {
-		// 分享到社交网有一定积分奖励
-		if (sharer != null
-				&& !userService.okMuzhiCoin(sharer,
-						MuzhiCoin.MuzhiCoin_for_Share_Wish, session)) {
-			return ActionMessage.Not_MuzhiCoin;
-		}
-		// changeShareNumber(wish, 1);
-		return ActionMessage.success;
-	}
-
-	/**
 	 * 收藏一个愿望
 	 * 
 	 * @param collecter
@@ -309,15 +291,15 @@ public class WishService {
 		// 加载分享发表者
 		dao.fetchLinks(wishes, "wisher");
 		for (Wish wish : wishes) {
-			wish.setPraiseNum(getPraiseNumber(wish));
-			wish.setShareNum(getShareNumber(wish));
+			wish.setPraiseNum(getPraiseNumber(wish));// 获取点赞数
+			wish.setShareNum(getShareNumber(wish));// 获取分享数
 			// 判断用户有没有收藏该分享
 			wish.setShared(false);
 			wish.setPraised(false);
 			if (user != null) {
 				// 到时候要判断是否被分享
 
-				if (!okShare(user, wish)) {
+				if (hasShared(user, wish)) {
 					wish.setShared(true);
 				}
 				if (!okPraise(wish, user)) {
@@ -332,6 +314,33 @@ public class WishService {
 	public int getPraiseNumber(Wish wish) {
 		return dao.count(WishPraise.class,
 				Cnd.where("wishId", "=", wish.getId()));
+	}
+
+	// 修改被分享数
+	public int getShareNumber(Wish wish) {
+		return dao.count(WishShare.class,
+				Cnd.where("wishId", "=", wish.getId()));
+	}
+
+	/**
+	 * @param wish
+	 *            被分享的许愿
+	 * @return
+	 */
+	public String shareWish(Wish wish, User sharer, HttpSession session) {
+		// 分享到社交网有一定积分奖励
+		if (sharer != null
+				&& !userService.okMuzhiCoin(sharer,
+						MuzhiCoin.MuzhiCoin_for_Share_Wish, session)) {
+			return ActionMessage.Not_MuzhiCoin;
+		}
+		WishShare share = new WishShare();
+		share.setDate(DateUtils.now());
+		share.setId(NumGenerator.getUuid());
+		share.setSharerId(sharer.getId());
+		share.setWishId(wish.getId());
+		dao.insert(share);
+		return ActionMessage.success;
 	}
 
 	/**
@@ -513,18 +522,12 @@ public class WishService {
 		dao.delete(reply);
 	}
 
-	// 修改被分享数
-	private int getShareNumber(Wish wish) {
-		return dao.count(WishShare.class,
-				Cnd.where("wishId", "=", wish.getId()));
-	}
-
 	// 检查是否已经分享
-	private boolean okShare(User sharer, Wish wish) {
-		WishShare tmp = dao.fetch(
+	private boolean hasShared(User sharer, Wish wish) {
+		int tmp = dao.count(
 				WishShare.class,
 				Cnd.where("sharerId", "=", sharer.getId()).and("wishId", "=",
 						wish.getId()));
-		return tmp == null ? true : false;
+		return tmp == 0 ? false : true;
 	}
 }

@@ -9,15 +9,15 @@ import org.nutz.dao.QueryResult;
 import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.mvc.annotation.At;
-import org.nutz.mvc.annotation.By;
-import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 
-import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.service.gift.GiftService;
+import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.IpUtils;
@@ -51,5 +51,27 @@ public class GiftModule {
 		ams.setPageSize(result.getPager().getPageSize());
 		ams.setObject(result.getList());
 		return ams;
+	}
+
+	// 获取某条礼品商品的被收藏数
+	@At
+	@Ok("json")
+	public Object collectNum(@Param("::gift.") Gift gift, HttpSession session,
+			HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (user != null ? user.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "获取某商品的被收藏数~]");
+		
+		ActionMessage am = new ActionMessage();
+		if (gift == null || Strings.isBlank(gift.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("gift.id不能为空~");
+			return am;
+		}
+		am.setType(ActionMessage.success);
+		am.setMessage(gift.getId());
+		am.setObject(giftService.getGiftCollectNum(gift));
+		return am;
 	}
 }

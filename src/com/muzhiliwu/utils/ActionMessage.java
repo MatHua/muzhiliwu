@@ -12,6 +12,7 @@ public class ActionMessage {
 	private String type;
 	private String message;
 	private Object object;
+	private int addMuZhiCoin;
 
 	public ActionMessage() {
 	}
@@ -38,6 +39,14 @@ public class ActionMessage {
 
 	public void setObject(Object object) {
 		this.object = object;
+	}
+
+	public int getAddMuZhiCoin() {
+		return addMuZhiCoin;
+	}
+
+	public void setAddMuZhiCoin(int addMuZhiCoin) {
+		this.addMuZhiCoin = addMuZhiCoin;
 	}
 
 }

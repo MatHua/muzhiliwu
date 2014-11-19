@@ -35,6 +35,8 @@ public class Gift extends IdEntity {
 	private String auditMess;// 记录审核失败原因
 	@Column
 	private boolean isDelete;// 被删除标识
+	@Column
+	private String saleState;// 销售状态
 
 	@Column
 	private String fromType;// 来源~网店、实体店
@@ -52,17 +54,19 @@ public class Gift extends IdEntity {
 	@ColDefine(type = ColType.TEXT)
 	private String descript;// 商品描述
 	@Column
-	private float price;// 商品价格
+	private double price;// 商品价格
 	@Column
 	private String type;// 商品分类
 	@Column
 	private int stock;// 库存量
 
 	@Column
-	private String saleState;// 销售状态
+	private String packagePostal;// 包邮
 
 	private boolean isCollected;// 记录是否已被收藏
 	private boolean isShared;// 记录是否已被分享
+	private boolean isBuyed;// 是否购买过
+	private boolean isWished;// 是否用它许愿过
 
 	private int collectNum;// 收藏数
 	private int shareNum;// 分享数
@@ -86,10 +90,6 @@ public class Gift extends IdEntity {
 	private int paramNum;// 商品规格参数数
 	@Many(target = GiftParam.class, field = "giftId")
 	private List<GiftParam> params;// 商品所有规格参数
-
-	private int saleRecordNum;// 成交记录数
-	@Many(target = SaleRecord.class, field = "giftId")
-	private List<SaleRecord> records;// 成交记录
 
 	private int picNum;
 	@Many(target = GiftPic.class, field = "giftId")
@@ -117,14 +117,6 @@ public class Gift extends IdEntity {
 
 	public void setSeller(Shop seller) {
 		this.seller = seller;
-	}
-
-	public float getPrice() {
-		return price;
-	}
-
-	public void setPrice(float price) {
-		this.price = price;
 	}
 
 	public String getType() {
@@ -231,22 +223,6 @@ public class Gift extends IdEntity {
 		this.shareNum = shareNum;
 	}
 
-	public int getSaleRecordNum() {
-		return saleRecordNum;
-	}
-
-	public void setSaleRecordNum(int saleRecordNum) {
-		this.saleRecordNum = saleRecordNum;
-	}
-
-	public List<SaleRecord> getRecords() {
-		return records;
-	}
-
-	public void setRecords(List<SaleRecord> records) {
-		this.records = records;
-	}
-
 	public int getParamNum() {
 		return paramNum;
 	}
@@ -341,6 +317,38 @@ public class Gift extends IdEntity {
 
 	public void setPics(List<GiftPic> pics) {
 		this.pics = pics;
+	}
+
+	public String getPackagePostal() {
+		return packagePostal;
+	}
+
+	public void setPackagePostal(String packagePostal) {
+		this.packagePostal = packagePostal;
+	}
+
+	public boolean isBuyed() {
+		return isBuyed;
+	}
+
+	public void setBuyed(boolean isBuyed) {
+		this.isBuyed = isBuyed;
+	}
+
+	public boolean isWished() {
+		return isWished;
+	}
+
+	public void setWished(boolean isWished) {
+		this.isWished = isWished;
+	}
+
+	public double getPrice() {
+		return price;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 
 }

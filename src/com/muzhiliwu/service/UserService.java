@@ -62,11 +62,11 @@ public class UserService {
 		user.setPass(MD5.toMD5(user.getPass().trim()));// 密码加密
 		user.setDate(DateUtils.now());// 注册时间
 		user.setMuzhiCoin(MuzhiCoin.MuzhiCoin_For_New_User);// 积分初始化
-		
+
 		user.setPopularityRank(1);
 		user.setPopularityValue(0);
 		user.setPopularityTop(User.Popularity[1]);
-		
+
 		user.setSendGiftRank(1);
 		user.setSendGiftValue(0);
 		user.setSendGiftTop(User.SendGift[1]);
@@ -172,6 +172,12 @@ public class UserService {
 		User user = dao.fetch(User.class, id);
 		user.setUnreadReplyNum(countUnreadReplyNum(id));// 获取未读信息数
 		user.setNewlyWish(getNewlyWish(id));// 获取最近的许愿
+		return user;
+	}
+
+	public User getMyDetail(String id) {
+		User user = dao.fetch(User.class, id);
+		dao.fetchLinks(user, "tags");
 		return user;
 	}
 

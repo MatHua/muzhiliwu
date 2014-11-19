@@ -48,12 +48,11 @@ public class UserModule {
 	@Ok("json")
 	public Object login(@Param("::user.") User user, HttpSession session,
 			HttpServletResponse response, HttpServletRequest request) {
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试登陆~]");
 		if (user == null || Strings.isBlank(user.getCode())
 				|| Strings.isBlank(user.getPass())) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
-					+ "用户名或密码不能为空]");
-
 			ActionMessage am = new ActionMessage();
 			am.setMessage("用户名或密码不能为空");
 			am.setType(ActionMessage.fail);
@@ -73,10 +72,6 @@ public class UserModule {
 			am.setType(ActionMessage.Account_Fail);
 			return am;
 		}
-		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
-				+ "登录成功]");
-
 		session.setAttribute("t_user", u);// 登录用户信息
 		ActionMessage am = new ActionMessage();
 		am.setType(ActionMessage.success);
@@ -129,20 +124,16 @@ public class UserModule {
 		}
 		String tmp = userService.registUser(user);
 		if (ActionMessage.success.equals(tmp)) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
-					+ "注册成功]");
+
 			am.setMessage("注册成功~");
 			am.setType(ActionMessage.success);
 		} else {
 			am.setMessage("注册失败,账号已被注册~");
 			am.setType(ActionMessage.fail);
 		}
-		if (am.getType().equals(ActionMessage.fail)) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
-					+ "注册失败T_T]");
-		}
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试注册~]");
 		return am;
 	}
 
@@ -206,12 +197,28 @@ public class UserModule {
 		return am;
 	}
 
+	// 获取个人详细信息
+	@At
+	@Ok("json")
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object myDetail(HttpSession session, HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "获取个人基本信息]");
+		ActionMessage am = new ActionMessage();
+		am.setType(ActionMessage.success);
+		am.setObject(userService.getMyDetail(user.getId()));
+		return am;
+	}
+
 	// 获取个人信息
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object me(HttpSession session, HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
+
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
 				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
 				+ "获取个人信息]");

@@ -99,8 +99,6 @@ public class ShareModule {
 	public Object cancelCollect(@Param("::share.") Share share,
 			HttpSession session) {
 		User collecter = (User) session.getAttribute("t_user");
-		// User collecter = dao.fetch(User.class,
-		// "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		ActionMessage am = new ActionMessage();
 		if (shareService.cancelCollectShare(collecter, share)) {
@@ -119,8 +117,6 @@ public class ShareModule {
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::share.") Share share, HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
-		// User praiser = dao
-		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		String tmp = shareService.praiseShare(share, praiser);
 		ActionMessage am = new ActionMessage();
@@ -140,8 +136,6 @@ public class ShareModule {
 	public Object cancelPraise(@Param("::share.") Share share,
 			HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
-		// User praiser = dao
-		// .fetch(User.class, "360c732435c84ab48ea16fe02b9ba420");// 用来测试
 
 		String tmp = shareService.cancelPraiseShare(share, praiser);
 		ActionMessage am = new ActionMessage();

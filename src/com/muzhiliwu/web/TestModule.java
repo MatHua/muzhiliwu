@@ -26,7 +26,9 @@ import com.alipay.util.AlipaySubmit;
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.TestDemo;
 import com.muzhiliwu.model.Wish;
+import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.DateUtils;
 
 @IocBean
 @At("test")
@@ -42,6 +44,27 @@ public class TestModule {
 		TestDemo test = dao.fetch(TestDemo.class, "1");
 		dao.fetchLinks(test, "myDemos");
 		return test;
+	}
+
+	@At
+	public void gift() {
+		Gift gift = new Gift();
+		gift.setAuditMess("1");
+		gift.setAuditState(Gift.AuditSuccess);
+		gift.setDate(DateUtils.now());
+		gift.setDescript("1");
+		gift.setFromType("1");
+		gift.setId("1");
+		gift.setName("1");
+		gift.setPackagePostal("全国包邮");
+		gift.setPrice(20.0001);
+		gift.setSaleState(Gift.OnSale);
+		gift.setShopId("1");
+		gift.setStock(1);
+		gift.setType(Gift.FromEntityShop);
+		gift.setUrl("1");
+		gift.setDelete(false);
+		dao.insert(gift);
 	}
 
 	@At

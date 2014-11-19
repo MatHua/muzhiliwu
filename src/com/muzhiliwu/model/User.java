@@ -17,9 +17,9 @@ import com.muzhiliwu.model.gift.ShoppingCart;
 @Table("t_user")
 @TableIndexes({ @Index(name = "idx_user", fields = { "code" }, unique = false) })
 public class User extends IdEntity {
-	public static final String Man = "man";// 男性
-	public static final String Woman = "woman";// 女性
-	public static final String Secret = "secret";// 保密
+	public static final String Man = "男";// 男性
+	public static final String Woman = "女";// 女性
+	public static final String Secret = "保密";// 保密
 	public static final int[] Popularity = { 0, 100, 200, 300, 400, 500, 600,
 			700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700,
 			1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
@@ -33,47 +33,65 @@ public class User extends IdEntity {
 	private String code;// 账号
 	@Column
 	private String pass;// 密码
+
+	@Column
+	private String photo;// 头像
+
+	@Column
+	private String nickName;// 昵称
+	@Column
+	@ColDefine(type = ColType.TEXT)
+	private String sign;// 签名
+	@Column
+	private String emotion;// 情感状况
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String mood;// 心情
-	@Column
-	private String photo;// 头像
+
+	@Many(target = UserTag.class, field = "userId")
+	private List<UserTag> tags;// 用户标签
+
 	@Column
 	private String name;// 姓名
 	@Column
-	private int age;// 年龄
+	private String sex;// 性别
+	@Column
+	private String orientation;// 取向
 	@Column
 	private String birth;// 生日
 	@Column
-	private String sex;// 性别
-	@Column
 	private String star;// 星座
+
+	@Column
+	private String phone;// 手机
+	@Column
+	private String QQ;// QQ
+	@Column
+	private String myUrl;// 个人网址
+	@Column
+	private String email;// 邮箱
+	@Column
+	private String provinceName;// 省
+	@Column
+	private String cityName;// 城市
+	@Column
+	private String areaName;// 区
+	@Column
+	private String townName;// 镇
 	@Column
 	private String school;// 学校
 	@Column
 	private String college;// 学院
 	@Column
 	private String major;// 专业
+
+	@Column
+	private int age;// 年龄
 	@Column
 	private String grade;// 班级
-	@Column
-	private String phone;// 手机
-	@Column
-	private String email;// 邮箱
-	@Column
-	private String emotion;// 情感状况
+
 	@Column
 	private int muzhiCoin;// 拇指币
-
-	@Column
-	private String townName;// 镇
-	@Column
-	private String areaName;// 区
-	@Column
-	private String cityName;// 城市
-	@Column
-	private String provinceName;// 省
-
 	@Column
 	private int popularityValue;// 当前人气值
 	@Column
@@ -150,14 +168,6 @@ public class User extends IdEntity {
 
 	public void setCode(String code) {
 		this.code = code;
-	}
-
-	public String getMood() {
-		return mood;
-	}
-
-	public void setMood(String mood) {
-		this.mood = mood;
 	}
 
 	public String getPhoto() {
@@ -464,4 +474,59 @@ public class User extends IdEntity {
 		this.provinceName = provinceName;
 	}
 
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
+	public String getMood() {
+		return mood;
+	}
+
+	public void setMood(String mood) {
+		this.mood = mood;
+	}
+
+	public List<UserTag> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<UserTag> tags) {
+		this.tags = tags;
+	}
+
+	public String getOrientation() {
+		return orientation;
+	}
+
+	public void setOrientation(String orientation) {
+		this.orientation = orientation;
+	}
+
+	public String getQQ() {
+		return QQ;
+	}
+
+	public void setQQ(String qQ) {
+		QQ = qQ;
+	}
+
+	public String getMyUrl() {
+		return myUrl;
+	}
+
+	public void setMyUrl(String myUrl) {
+		this.myUrl = myUrl;
+	}
 }

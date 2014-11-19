@@ -18,6 +18,8 @@ import com.muzhiliwu.model.GiftCollectPraise;
 import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.gift.Gift;
+import com.muzhiliwu.model.gift.GiftShare;
+import com.muzhiliwu.model.gift.OrderForm;
 import com.muzhiliwu.service.gift.GiftService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
@@ -60,6 +62,15 @@ public class GiftCollectService {
 			return ActionMessage.success;
 		}
 		return ActionMessage.fail;
+	}
+
+	// 判断该商品是否已被该用户收藏~
+	public boolean okCollect(User collector, Gift gift) {
+		GiftCollect collect = dao.fetch(
+				GiftCollect.class,
+				Cnd.where("collectorId", "=", collector.getId()).and("giftId",
+						"=", gift.getId()));
+		return collect == null ? true : false;
 	}
 
 	/**
@@ -233,15 +244,6 @@ public class GiftCollectService {
 			}
 		}
 		return collect;
-	}
-
-	// 判断该商品是否已被该用户收藏~
-	public boolean okCollect(User collector, Gift gift) {
-		GiftCollect collect = dao.fetch(
-				GiftCollect.class,
-				Cnd.where("collectorId", "=", collector.getId()).and("giftId",
-						"=", gift.getId()));
-		return collect == null ? true : false;
 	}
 
 	// /**

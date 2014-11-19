@@ -15,7 +15,8 @@ import org.nutz.dao.entity.annotation.TableIndexes;
 import com.muzhiliwu.model.gift.Gift;
 
 @Table("t_gift_collect")
-@TableIndexes({ @Index(name = "idx_gift_collect", fields = { "collectorId" }, unique = false) })
+@TableIndexes({ @Index(name = "idx_gift_collect", fields = { "collectorId",
+		"giftId" }, unique = false) })
 public class GiftCollect extends IdEntity {
 	@Column
 	private String collectorId;// 收藏者id
@@ -33,7 +34,7 @@ public class GiftCollect extends IdEntity {
 	private String giftId;// 被收藏的礼品的id
 	@One(target = Gift.class, field = "giftId")
 	private Gift gift;// 被收藏的礼物
-	
+
 	private int commentNum;// 评论数
 	@Many(target = GiftCollectComment.class, field = "collectId")
 	private List<GiftCollectComment> comments;// 评论

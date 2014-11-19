@@ -10,6 +10,7 @@ import org.nutz.dao.QueryResult;
 import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
@@ -24,6 +25,7 @@ import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.IpUtils;
+import com.muzhiliwu.utils.MuzhiCoin;
 
 @IocBean
 @At("wish")
@@ -76,13 +78,37 @@ public class WishModule {
 	// 将愿望分享到社交网站
 	@At
 	@Ok("json")
-	public Object share(@Param("::wish.") Wish wish, HttpSession session) {
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object share(@Param("::wish.") Wish wish, HttpSession session,
+			HttpServletRequest request) {
 		User sharer = (User) session.getAttribute("t_user");
-		String result = wishService.shareWish(wish, sharer, session);
+
 		ActionMessage am = new ActionMessage();
+		if (wish == null || Strings.isBlank(wish.getId())) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ (sharer != null ? sharer.getCode() : "游客") + "]  [时间:"
+					+ DateUtils.now() + "]  [操作:" + "普通恶意操作~]");
+
+			am.setType(ActionMessage.fail);
+			am.setMessage("wish.id不能为空~");
+			return am;
+		}
+		String result = wishService.shareWish(wish, sharer, session);
 		if (ActionMessage.success.equals(result)) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ (sharer != null ? sharer.getCode() : "游客") + "]  [时间:"
+					+ DateUtils.now() + "]  [操作:" + "愿望分享成功~]");
+
 			am.setMessage("愿望分享成功~");
+			am.setAddMuZhiCoin(MuzhiCoin.MuzhiCoin_for_Share_Wish);
 			am.setType(ActionMessage.success);
+		} else if (ActionMessage.Not_MuzhiCoin.equals(result)) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ (sharer != null ? sharer.getCode() : "游客") + "]  [时间:"
+					+ DateUtils.now() + "]  [操作:" + "分享失败,拇指币不够用~]");
+			
+			am.setMessage("分享失败,拇指币不够用~");
+			am.setType(ActionMessage.Not_MuzhiCoin);
 		}
 		return am;
 	}
@@ -114,11 +140,20 @@ public class WishModule {
 	@At
 	@Ok("json")
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object cancelPraise(@Param("::wish.") Wish wish, HttpSession session) {
+	public Object cancelPraise(@Param("::wish.") Wish wish,
+			HttpSession session, HttpServletRequest request) {
 		User praiser = (User) session.getAttribute("t_user");
-
-		String tmp = wishService.cancelPraiseWish(wish, praiser);
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "尝试取消点赞~]");
+		
 		ActionMessage am = new ActionMessage();
+		if (wish == null || Strings.isBlank(wish.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("wish.id不能为空~");
+			return am;
+		}
+		String tmp = wishService.cancelPraiseWish(wish, praiser);
 		if (ActionMessage.cancel.equals(tmp)) {
 			am.setMessage("点赞取消成功~");
 			am.setType(ActionMessage.cancel);
@@ -129,6 +164,7 @@ public class WishModule {
 		return am;
 	}
 
+	// 获取某愿望的点赞数
 	@At
 	@Ok("json")
 	public Object getPraiseNum(@Param("::wish.") Wish wish,
@@ -137,10 +173,35 @@ public class WishModule {
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
 				+ (user != null ? user.getCode() : "游客") + "]  [时间:"
 				+ DateUtils.now() + "]  [操作:" + "获取点赞数~]");
-
 		ActionMessage am = new ActionMessage();
+		if (wish == null || Strings.isBlank(wish.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("wish.id不能为空~");
+			return am;
+		}
 		am.setType(ActionMessage.success);
+		am.setMessage(wish.getId());
 		am.setObject(wishService.getPraiseNumber(wish));
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	public Object getShareNum(@Param("::wish.") Wish wish, HttpSession session,
+			HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (user != null ? user.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "获取分享数~]");
+		ActionMessage am = new ActionMessage();
+		if (wish == null || Strings.isBlank(wish.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("wish.id不能为空~");
+			return am;
+		}
+		am.setType(ActionMessage.success);
+		am.setMessage(wish.getId());
+		am.setObject(wishService.getShareNumber(wish));
 		return am;
 	}
 
@@ -151,29 +212,26 @@ public class WishModule {
 	public Object praise(@Param("::wish.") Wish wish, HttpSession session,
 			HttpServletRequest request) {
 		User praiser = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "尝试点赞~]");
+		ActionMessage am = new ActionMessage();
+		if (wish == null || Strings.isBlank(wish.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("wish.id不能为空~");
+			return am;
+		}
 
 		String tmp = wishService.praiseWish(wish, praiser, session);
-		ActionMessage am = new ActionMessage();
 		if (ActionMessage.success.equals(tmp)) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
-					+ DateUtils.now() + "]  [操作:" + "点赞成功~]");
-
 			am.setMessage("点赞成功~");
+			am.setAddMuZhiCoin(MuzhiCoin.MuzhiCoin_For_Praise_Wish);
 			am.setType(ActionMessage.success);
 		} else if (ActionMessage.fail.equals(tmp)) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
-					+ DateUtils.now() + "]  [操作:" + "点赞失败,您或许已经点赞~]");
-
 			am.setMessage("点赞失败,您或许已经点赞~");
 			am.setType(ActionMessage.fail);
 		} else if (ActionMessage.Not_MuzhiCoin.equals(tmp)) {
-			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
-					+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
-					+ DateUtils.now() + "]  [操作:" + "点赞失败,积分不够~]");
-
-			am.setMessage("积分不够~");
+			am.setMessage("拇指币不够~");
 			am.setType(ActionMessage.Not_MuzhiCoin);
 		}
 		return am;
