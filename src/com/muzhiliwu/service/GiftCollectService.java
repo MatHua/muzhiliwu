@@ -331,7 +331,8 @@ public class GiftCollectService {
 				GiftCollectPraise.class,
 				Cnd.where("praiserId", "=", praiser.getId()).and("collectId",
 						"=", collect.getId()));
-		dao.delete(praise);
+		if (praise != null)
+			dao.delete(praise);
 	}
 
 	// 创建一条未读的点赞类信息
@@ -400,7 +401,8 @@ public class GiftCollectService {
 						.and("linkId", "=", collect.getId())
 						.and("type", "=", UnreadReply.Praise)
 						.and("replyFrom", "=", UnreadReply.FromGiftCollect));
-		dao.delete(reply);
+		if (reply != null)
+			dao.delete(reply);
 	}
 
 }

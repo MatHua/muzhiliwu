@@ -13,14 +13,15 @@ import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Files;
-import org.nutz.lang.Strings;
 import org.nutz.mvc.upload.TempFile;
 
 import com.muzhiliwu.model.UnreadReply;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.model.UserTag;
 import com.muzhiliwu.model.Wish;
-import com.muzhiliwu.model.gift.OrderForm;
+import com.muzhiliwu.model.gift.ReceiveContactWay;
 import com.muzhiliwu.utils.ActionMessage;
+import com.muzhiliwu.utils.ActionMessages;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
 import com.muzhiliwu.utils.MD5;
@@ -31,6 +32,120 @@ import com.muzhiliwu.utils.NumGenerator;
 public class UserService {
 	@Inject
 	private Dao dao;
+
+	/**
+	 * 获取我的地址列表
+	 * 
+	 * @param page
+	 * @param user
+	 * @return
+	 */
+	public QueryResult myAddresses(Pager page, User user) {
+		List<ReceiveContactWay> addresses = dao.query(ReceiveContactWay.class,
+				Cnd.where("creatorId", "=", user.getId())
+						.desc("defaultAddress").desc("date"), page);
+		if (page == null)
+			page = new Pager();
+		page.setRecordCount(dao.count(ReceiveContactWay.class,
+				Cnd.where("creatorId", "=", user.getId())));
+		return new QueryResult(addresses, page);
+	}
+
+	/**
+	 * 修改为默认地址
+	 * 
+	 * @param user
+	 *            操作者
+	 * @param address
+	 *            要修改的地址
+	 * @return
+	 */
+	public String setDefaultAddress(User user, ReceiveContactWay address) {
+		address = dao.fetch(ReceiveContactWay.class, address.getId());
+		if (!user.getId().equals(address.getCreatorId())) {
+			return ActionMessage.fail;
+		}
+		// 加载之前为默认地址的地址,变成非默认地址
+		ReceiveContactWay tmp = dao.fetch(
+				ReceiveContactWay.class,
+				Cnd.where("creatorId", "=", user.getId()).and("defaultAddress",
+						"=", true));
+		tmp.setDefaultAddress(false);
+		dao.update(tmp);
+
+		address.setDefaultAddress(true);
+		dao.update(address);
+		return ActionMessage.success;
+	}
+
+	/**
+	 * 修改地址
+	 * 
+	 * @param user
+	 *            操作者
+	 * @param address
+	 *            被修改的地址
+	 * @return
+	 */
+	public String updateAddress(User user, ReceiveContactWay address) {
+		ReceiveContactWay tmpAddress = dao.fetch(ReceiveContactWay.class,
+				address.getId());
+		if (!user.getId().equals(address.getCreatorId())) {
+			return ActionMessage.fail;
+		}
+		address.setCreatorId(tmpAddress.getCreatorId());
+		address.setDate(DateUtils.now());
+		if (address.isDefaultAddress()) {
+			// 将之前的默认地址变为非默认地址
+			ReceiveContactWay tmp = dao.fetch(
+					ReceiveContactWay.class,
+					Cnd.where("creatorId", "=", user.getId()).and(
+							"defaultAddress", "=", true));
+			tmp.setDefaultAddress(false);
+			dao.update(tmp);
+		} else {
+			// 如果总地址数为0,该地址就自动为默认地址
+			int tmp = dao.count(ReceiveContactWay.class,
+					Cnd.where("creatorId", "=", user.getId()));
+			if (tmp == 0)
+				address.setDefaultAddress(true);
+		}
+		dao.update(address);
+		return ActionMessage.success;
+	}
+
+	/**
+	 * 添加新地址
+	 * 
+	 * @param user
+	 *            操作者
+	 * @param address
+	 *            新地址
+	 * @return
+	 */
+	public String addAddress(User user, ReceiveContactWay address) {
+		address.setId(NumGenerator.getUuid());
+		address.setDate(DateUtils.now());
+		address.setCreatorId(user.getId());
+
+		if (address.isDefaultAddress()) {
+			// 将之前的默认地址变为非默认地址
+			ReceiveContactWay tmp = dao.fetch(
+					ReceiveContactWay.class,
+					Cnd.where("creatorId", "=", user.getId()).and(
+							"defaultAddress", "=", true));
+			tmp.setDefaultAddress(false);
+			dao.update(tmp);
+		} else {
+			// 如果总地址数为0,该地址就自动为默认地址
+			int tmp = dao.count(ReceiveContactWay.class,
+					Cnd.where("creatorId", "=", user.getId()));
+			if (tmp == 0)
+				address.setDefaultAddress(true);
+		}
+		dao.insert(address);
+		return ActionMessages.success;
+	}
 
 	/**
 	 * 检查登录用户名的正确性
@@ -78,6 +193,22 @@ public class UserService {
 		return ActionMessage.success;
 	}
 
+	public String editMyTags(User user) {
+		List<UserTag> tags = dao.query(UserTag.class,
+				Cnd.where("userId", "=", user.getId()));
+
+		dao.delete(tags);
+		for (String name : user.getMyTags().split("/")) {
+			UserTag tag = new UserTag();
+			tag.setDate(DateUtils.now());
+			tag.setId(NumGenerator.getUuid());
+			tag.setName(name);
+			tag.setUserId(user.getId());
+			dao.insert(tag);
+		}
+		return ActionMessage.success;
+	}
+
 	/**
 	 * 用户的信息修改
 	 * 
@@ -85,19 +216,23 @@ public class UserService {
 	 * @param pass
 	 * @return
 	 */
-	public String editUser(User user, String pass) {
+	public String editUser(User user) {
 		User u = dao.fetch(User.class, Cnd.where("id", "=", user.getId()));
-		if (u.getPass().equals(MD5.toMD5(pass))) {
+		if (true) {
 			// 避免修改一些不能修改的信息,例如：拇指币数,送礼物数,送礼物等级,人气值,人气等级等..都是不能让用户自行修改
 			user.setCode(u.getCode());
 			user.setPass(u.getPass());
 			user.setPhone(u.getPhone() == null ? null : u.getPhone());
 			user.setDate(DateUtils.now());
 			user.setMuzhiCoin(u.getMuzhiCoin());
+
 			user.setPopularityRank(u.getPopularityRank());
 			user.setPopularityValue(u.getPopularityValue());
+			user.setPopularityTop(u.getPopularityTop());
+
 			user.setSendGiftRank(u.getSendGiftRank());
 			user.setSendGiftValue(u.getSendGiftValue());
+			user.setSendGiftTop(u.getSendGiftTop());
 			dao.update(user);
 			return ActionMessage.success;
 		}

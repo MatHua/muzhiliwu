@@ -50,6 +50,7 @@ public class User extends IdEntity {
 
 	@Many(target = UserTag.class, field = "userId")
 	private List<UserTag> tags;// 用户标签
+	private String myTags;// 我的标签
 
 	@Column
 	private String name;// 姓名
@@ -529,4 +530,13 @@ public class User extends IdEntity {
 	public void setMyUrl(String myUrl) {
 		this.myUrl = myUrl;
 	}
+
+	public String getMyTags() {
+		return myTags;
+	}
+
+	public void setMyTags(String myTags) {
+		this.myTags = myTags;
+	}
+
 }

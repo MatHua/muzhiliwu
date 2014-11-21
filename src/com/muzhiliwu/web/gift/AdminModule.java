@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.view.ViewWrapper;
 
 import com.muzhiliwu.utils.ActionMessage;
@@ -18,6 +19,7 @@ import com.muzhiliwu.utils.LogView;
 public class AdminModule {
 	@At
 	@Ok("json")
+	@POST
 	public Object logList(ServletContext context) {
 		String path = context.getRealPath("/") + "/WEB-INF/logs/";
 		String regx = ".log";
@@ -36,6 +38,7 @@ public class AdminModule {
 	}
 
 	@At
+	@POST
 	public ViewWrapper lookLog(String file) {
 		return new ViewWrapper(new LogView(file), null);
 	}

@@ -11,6 +11,7 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 
@@ -33,6 +34,7 @@ public class MessageModule {
 	// 发表一条留言
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object publish(@Param("::msg.") Message msg, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
@@ -53,6 +55,7 @@ public class MessageModule {
 	// 更新一条留言
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object update(@Param("::msg.") Message msg, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
@@ -73,6 +76,7 @@ public class MessageModule {
 	// 获取某一页留言
 	@At
 	@Ok("json")
+	@POST
 	public Object list(@Param("::page.") Pager page) {
 		if (page != null)
 			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
@@ -93,6 +97,7 @@ public class MessageModule {
 	// 获取用户的留言
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
@@ -115,6 +120,7 @@ public class MessageModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::msg.") Message msg, HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
@@ -134,6 +140,7 @@ public class MessageModule {
 	// 点赞
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::msg.") Message msg, HttpSession session) {
 
@@ -157,6 +164,7 @@ public class MessageModule {
 	// 评论留言或者评论别人的评论
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object comment(@Param("::msg.") Message msg,
 			@Param("::comment.") MessComment comment,
@@ -180,6 +188,7 @@ public class MessageModule {
 	// 获取留言的详细信息
 	@At
 	@Ok("json")
+	@POST
 	public Object detail(@Param("::msg.") Message msg, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
 		ActionMessage am = new ActionMessage();
@@ -192,6 +201,7 @@ public class MessageModule {
 	// 获取@我的点赞类未读信息消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
@@ -213,6 +223,7 @@ public class MessageModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCommentReply(@Param("::page.") Pager page,

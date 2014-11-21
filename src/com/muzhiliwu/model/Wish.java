@@ -7,6 +7,7 @@ import org.nutz.dao.entity.annotation.ColType;
 import org.nutz.dao.entity.annotation.Column;
 import org.nutz.dao.entity.annotation.Index;
 import org.nutz.dao.entity.annotation.Many;
+import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 import org.nutz.dao.entity.annotation.TableIndexes;
@@ -22,7 +23,7 @@ public class Wish extends IdEntity {
 
 	// type
 	public static final String Wish_Gift = "wish_gift";// 许愿要礼物
-	public static final String WIsh_Other = "wish_other";// 许愿非要礼物
+	public static final String Wish_Common = "wish_common";// 许愿非要礼物
 
 	@Column
 	private String wisherId;// 许愿者id
@@ -31,8 +32,8 @@ public class Wish extends IdEntity {
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 许愿内容
-	@Column
-	private String title;// 标题
+	// @Column
+	// private String title;// 标题
 	@Column
 	private String state;// 许愿状态
 
@@ -54,6 +55,10 @@ public class Wish extends IdEntity {
 	private String wishOrderFormId;// 联结id
 	@One(target = OrderFormForWish.class, field = "wishOrderFormId")
 	private OrderFormForWish wishOrderForm;// 对应的许愿订单
+
+	private int wantorNum;// 愿望实现的申请者数
+	@ManyMany(target = User.class, relation = "t_wish_realization_of_wantor", from = "wishId", to = "wantorId")
+	private List<User> wishWantors;// 想要帮忙实现愿望的人
 
 	public String getWisherId() {
 		return wisherId;
@@ -103,13 +108,13 @@ public class Wish extends IdEntity {
 		this.wisher = wisher;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
+	// public String getTitle() {
+	// return title;
+	// }
+	//
+	// public void setTitle(String title) {
+	// this.title = title;
+	// }
 
 	public int getPraiseNum() {
 		return praiseNum;
@@ -165,6 +170,22 @@ public class Wish extends IdEntity {
 
 	public void setShared(boolean isShared) {
 		this.isShared = isShared;
+	}
+
+	public int getWantorNum() {
+		return wantorNum;
+	}
+
+	public void setWantorNum(int wantorNum) {
+		this.wantorNum = wantorNum;
+	}
+
+	public List<User> getWishWantors() {
+		return wishWantors;
+	}
+
+	public void setWishWantors(List<User> wishWantors) {
+		this.wishWantors = wishWantors;
 	}
 
 }

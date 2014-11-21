@@ -31,7 +31,7 @@ public class OrderService {
 				OrderForm.class,
 				Cnd.where("buyerId", "=", user.getId()).and("payState", "=",
 						OrderForm.WaitBuyerPay)));
-		
+
 		dao.fetchLinks(orders, "gift");
 		dao.fetchLinks(orders, "style");
 		for (OrderForm order : orders) {
@@ -47,7 +47,8 @@ public class OrderService {
 				|| !OrderForm.WaitBuyerPay.equals(order.getPayState())) {
 			return ActionMessage.fail;
 		}
-		dao.delete(order);
+		if (order != null)
+			dao.delete(order);
 		return ActionMessage.success;
 	}
 }

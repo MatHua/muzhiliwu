@@ -13,6 +13,7 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 
@@ -35,6 +36,7 @@ public class ShareModule {
 	// 发表一条留言
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object publish(@Param("::share.") Share share, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
@@ -54,6 +56,7 @@ public class ShareModule {
 	// 更新留言信息
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object update(@Param("::share.") Share share, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
@@ -73,6 +76,7 @@ public class ShareModule {
 	// 收藏别人的的分享
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object collect(@Param("::share.") Share share, HttpSession session) {
 		User collecter = (User) session.getAttribute("t_user");
@@ -95,6 +99,7 @@ public class ShareModule {
 	// 取消收藏
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelCollect(@Param("::share.") Share share,
 			HttpSession session) {
@@ -114,6 +119,7 @@ public class ShareModule {
 	// 点赞或取消点赞
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::share.") Share share, HttpSession session) {
 		User praiser = (User) session.getAttribute("t_user");
@@ -132,6 +138,7 @@ public class ShareModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::share.") Share share,
 			HttpSession session) {
@@ -152,6 +159,7 @@ public class ShareModule {
 	// 评论一个分享或者评论别人的评论
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object comment(@Param("::share.") Share share,
 			@Param("::comment.") ShareComment comment,
@@ -176,6 +184,7 @@ public class ShareModule {
 	// 获取某一页留言
 	@At
 	@Ok("json")
+	@POST
 	public Object list(@Param("::page.") Pager page, HttpSession session) {
 		if (page != null)
 			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
@@ -197,6 +206,7 @@ public class ShareModule {
 	// 获取用户的留言
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
@@ -222,6 +232,7 @@ public class ShareModule {
 	// 获取分享详细内容
 	@At
 	@Ok("json")
+	@POST
 	public Object detail(@Param("::share.") Share share, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
 
@@ -235,6 +246,7 @@ public class ShareModule {
 	// 获取@我的点赞类消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
@@ -256,6 +268,7 @@ public class ShareModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
@@ -277,6 +290,7 @@ public class ShareModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCollectReply(@Param("::page.") Pager page,

@@ -11,14 +11,13 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
-import org.nutz.mvc.filter.CheckSession;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.GiftCollect;
 import com.muzhiliwu.model.GiftCollectComment;
 import com.muzhiliwu.model.User;
-import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.service.GiftCollectService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
@@ -34,6 +33,7 @@ public class GiftCollectModule {
 	// 评论一个礼品收藏
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object comment(@Param("::collect.") GiftCollect collect,
 			@Param("::comment.") GiftCollectComment comment,
@@ -58,6 +58,7 @@ public class GiftCollectModule {
 	// 点赞一个礼品收藏
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::collect.") GiftCollect collect,
 			HttpSession session) {
@@ -81,6 +82,7 @@ public class GiftCollectModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::collect.") GiftCollect collect,
 			HttpSession session) {
@@ -101,6 +103,7 @@ public class GiftCollectModule {
 	// 获取@我的点赞类未读信息消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
@@ -123,6 +126,7 @@ public class GiftCollectModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCommentReply(@Param("::page.") Pager page,
@@ -145,6 +149,7 @@ public class GiftCollectModule {
 	// 获取我的礼品收藏
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
@@ -167,6 +172,7 @@ public class GiftCollectModule {
 	// 获取某一页礼品收藏
 	@At
 	@Ok("json")
+	@POST
 	public Object mylist(@Param("::page.") Pager page) {
 		if (page != null)
 			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
@@ -186,6 +192,7 @@ public class GiftCollectModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object detail(@Param("::collect.") GiftCollect collect,
 			HttpSession session) {
 		User user = (User) session.getAttribute("t_user");

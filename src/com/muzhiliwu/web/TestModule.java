@@ -19,14 +19,19 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.view.JspView;
 
 import com.alipay.config.AlipayConfig;
 import com.alipay.util.AlipaySubmit;
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.TestDemo;
+import com.muzhiliwu.model.UserTag;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.gift.Gift;
+import com.muzhiliwu.model.gift.ReceiveContactWay;
+import com.muzhiliwu.service.TestDemoService;
+import com.muzhiliwu.service.WishService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 
@@ -37,9 +42,48 @@ public class TestModule {
 	@Inject
 	private Dao dao;
 	private static Log log = LogFactory.getLog(TestDemo.class);
+	@Inject
+	private TestDemoService testDemoService;
+	@Inject
+	private WishService wishService;
 
 	@At
 	@Ok("json")
+//	@POST
+	public Object addAddress() {
+		ReceiveContactWay address = new ReceiveContactWay();
+		address.setAddressDetail("xx街");
+		address.setAreaName("番禺区");
+		address.setCityName("广州市");
+		address.setCreatorId("1");
+		address.setDate("2");
+		address.setDefaultAddress(true);
+		address.setFullName("马云");
+		address.setId("1");
+		address.setMobile("123482627");
+		address.setPostCode("529500");
+		address.setProvinceName("广东省");
+		address.setRemarks("周末送");
+		dao.insert(address);
+		return "xx";
+	}
+
+	@At
+	@Ok("json")
+	@POST
+	public ActionMessage saveDemo(String name, String email) {
+		testDemoService.saveDemo(name, email);
+		ActionMessage am = new ActionMessage();
+		am.setType("success");
+		am.setMessage("save message ok!");
+
+		am.setObject(name);
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	@POST
 	public Object check() {
 		TestDemo test = dao.fetch(TestDemo.class, "1");
 		dao.fetchLinks(test, "myDemos");
@@ -47,6 +91,7 @@ public class TestModule {
 	}
 
 	@At
+	@POST
 	public void gift() {
 		Gift gift = new Gift();
 		gift.setAuditMess("1");
@@ -54,7 +99,7 @@ public class TestModule {
 		gift.setDate(DateUtils.now());
 		gift.setDescript("1");
 		gift.setFromType("1");
-		gift.setId("1");
+		gift.setId("3");
 		gift.setName("1");
 		gift.setPackagePostal("全国包邮");
 		gift.setPrice(20.0001);
@@ -69,6 +114,7 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object getNewly(String wisherId) {
 		// name LIKE 'J%' AND age>20
 		// ELECT * FROM t_person WHERE || name LIKE 'J%' AND age>20;
@@ -85,6 +131,7 @@ public class TestModule {
 
 	@At("/?/name")
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object myName(String id, HttpServletRequest request) {
 		ActionMessage am = new ActionMessage();
@@ -95,6 +142,7 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object myTest(String name) {
 		ActionMessage am = new ActionMessage();
 		List<TestDemo> tests = dao.query(TestDemo.class,
@@ -107,6 +155,7 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object me(String name) {
 		ActionMessage am = new ActionMessage();
 		List<TestDemo> tests = dao.query(TestDemo.class,
@@ -122,6 +171,7 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object delete(String id) {
 		TestDemo xx = dao.fetch(TestDemo.class, id);
 		dao.fetchLinks(xx, "myTests");
@@ -140,6 +190,7 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object insert() {
 		TestDemo test = new TestDemo();
 		test.setId("xx_xx");
@@ -159,6 +210,7 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object getById1() {
 		TestDemo test = dao.fetch(TestDemo.class, "xx_xx");
 		return test;
@@ -166,6 +218,7 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object getById2() {
 		log.warn("查找一条信息");
 		log.info("有新操作~");
@@ -176,6 +229,7 @@ public class TestModule {
 	}
 
 	@At
+	@POST
 	public JspView getHtml(HttpServletResponse response) throws IOException {
 		// 支付类型
 		String payment_type = "1";

@@ -15,6 +15,7 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
@@ -31,27 +32,47 @@ import com.muzhiliwu.utils.MuzhiCoin;
 @At("wish")
 public class WishModule {
 	@Inject
-	private WishService wishService;
-	@Inject
 	private Dao dao;// 用于测试而已
+	@Inject
+	private WishService wishService;
 	private static Log log = LogFactory.getLog(WishModule.class);
 
 	// 许愿
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object publish(@Param("::wish.") Wish wish, HttpSession session) {
-
+	public Object publish(@Param("::wish.") Wish wish, HttpSession session,
+			HttpServletRequest request) {
 		User publisher = (User) session.getAttribute("t_user");
-		String result = wishService.publishWish(publisher, wish, session);
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (publisher != null ? publisher.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "正在尝试许愿~]");
 
 		ActionMessage am = new ActionMessage();
+
+		if (wish == null
+				|| !(Wish.Wish_Common.equals(wish.getType()) && !Wish.Wish_Gift
+						.equals(wish.getType()))) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您所许愿望类型不是普通愿望和礼物愿望,许愿失败~");
+			return am;
+		}
+		if (Strings.isBlank(wish.getContent())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("许愿内容不能为空~");
+			return am;
+		}
+
+		String result = wishService.publishWish(publisher, wish, session);
+
 		if (ActionMessage.success.equals(result)) {
 			am.setMessage("愿望发表成功~");
 			am.setType(ActionMessage.success);
 		} else if (ActionMessage.Not_MuzhiCoin.equals(result)) {
 			am.setMessage("积分不够,不能发表愿望~");
 			am.setType(ActionMessage.Not_MuzhiCoin);
+			am.setAddMuZhiCoin(MuzhiCoin.MuzhiCoin_For_Publish_No_Gift_Wish);
 		}
 		return am;
 	}
@@ -59,6 +80,7 @@ public class WishModule {
 	// 修改愿望
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object update(@Param("::wish.") Wish wish, HttpSession session) {
 		User publisher = (User) session.getAttribute("t_user");
@@ -78,6 +100,7 @@ public class WishModule {
 	// 将愿望分享到社交网站
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object share(@Param("::wish.") Wish wish, HttpSession session,
 			HttpServletRequest request) {
@@ -107,6 +130,7 @@ public class WishModule {
 	// 获取愿望的详细信息
 	@At
 	@Ok("json")
+	@POST
 	public Object detail(@Param("::wish.") Wish wish, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
 		ActionMessage am = new ActionMessage();
@@ -119,6 +143,7 @@ public class WishModule {
 	// 获取收藏的愿望的详细信息
 	// @At
 	// @Ok("json")
+	// @POST
 	// public Object detail(@Param("::collect.") WishShare share) {
 	// ActionMessage am = new ActionMessage();
 	// am.setMessage("获取愿望的详细信息");
@@ -130,6 +155,7 @@ public class WishModule {
 	// 取消点赞
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelPraise(@Param("::wish.") Wish wish,
 			HttpSession session, HttpServletRequest request) {
@@ -137,7 +163,7 @@ public class WishModule {
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
 				+ (praiser != null ? praiser.getCode() : "游客") + "]  [时间:"
 				+ DateUtils.now() + "]  [操作:" + "尝试取消点赞~]");
-		
+
 		ActionMessage am = new ActionMessage();
 		if (wish == null || Strings.isBlank(wish.getId())) {
 			am.setType(ActionMessage.fail);
@@ -158,6 +184,7 @@ public class WishModule {
 	// 获取某愿望的点赞数
 	@At
 	@Ok("json")
+	@POST
 	public Object getPraiseNum(@Param("::wish.") Wish wish,
 			HttpSession session, HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -178,6 +205,7 @@ public class WishModule {
 
 	@At
 	@Ok("json")
+	@POST
 	public Object getShareNum(@Param("::wish.") Wish wish, HttpSession session,
 			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -199,6 +227,7 @@ public class WishModule {
 	// 点赞
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object praise(@Param("::wish.") Wish wish, HttpSession session,
 			HttpServletRequest request) {
@@ -231,6 +260,7 @@ public class WishModule {
 	// 获取某一页许愿
 	@At
 	@Ok("json")
+	@POST
 	public Object list(@Param("::page.") Pager page, HttpSession session,
 			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -257,6 +287,7 @@ public class WishModule {
 	// 获取想要帮忙实现愿望的人
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object myWishWantor(@Param("::page.") Pager page,
 			HttpSession session, HttpServletRequest request) {
@@ -284,17 +315,80 @@ public class WishModule {
 		return ams;
 	}
 
-	// 获取我的许愿
+	// 获取我的待实现许愿
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object mylist(@Param("::page.") Pager page, HttpSession session) {
+	public Object myUnrealizedWishes(@Param("::page.") Pager page,
+			HttpSession session, HttpServletRequest request) {
 		if (page != null)
 			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
 					.getPageNumber());
 
 		User user = (User) session.getAttribute("t_user");
-		QueryResult result = wishService.getMyWishes(page, user);
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "获取我的待实现愿望]");
+		QueryResult result = wishService.getMyWishes(page, user,
+				Wish.Unrealized);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setMessCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
+		ams.setObject(result.getList());
+
+		return ams;
+	}
+
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object delete(@Param("::wish.") Wish wish, HttpSession session,
+			HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "删除我的愿望]");
+		ActionMessage am = new ActionMessage();
+		if (wish == null || Strings.isBlank(wish.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请求参数wish.id不能为空~");
+			return am;
+		}
+		String resule = wishService.deleteWish(user, wish);
+		if (ActionMessage.fail.equals(resule)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("删除失败,您或许不是愿望创建者~");
+			return am;
+		}
+		am.setType(ActionMessage.success);
+		am.setMessage("愿望删除成功^_^");
+		return am;
+	}
+
+	// 获取我的待实现许愿
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object myRealizedWishes(@Param("::page.") Pager page,
+			HttpSession session, HttpServletRequest request) {
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
+
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "获取我的已实现愿望]");
+
+		QueryResult result = wishService.getMyWishes(page, user, Wish.Realized);
 
 		ActionMessages ams = new ActionMessages();
 		ams.setMessCount(result.getPager().getRecordCount());
@@ -310,6 +404,7 @@ public class WishModule {
 	// 获取我收藏的愿望
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object myCollectList(@Param("::page.") Pager page,
@@ -333,6 +428,7 @@ public class WishModule {
 	// 收藏愿望
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object collect(@Param("::wish.") Wish wish, HttpSession session) {
@@ -358,6 +454,7 @@ public class WishModule {
 	// 取消收藏
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object cancelCollect(@Param("::collect.") WishCollect collect,
@@ -380,6 +477,7 @@ public class WishModule {
 	// 获取@我的点赞类消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadPraiseReply(@Param("::page.") Pager page,
@@ -401,6 +499,7 @@ public class WishModule {
 	// 获取@我的评论类的消息
 	// @At
 	// @Ok("json")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public Object getMyUnreadCollectReply(@Param("::page.") Pager page,

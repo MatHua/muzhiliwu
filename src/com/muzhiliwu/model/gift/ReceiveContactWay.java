@@ -36,6 +36,9 @@ public class ReceiveContactWay extends IdEntity {
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String addressDetail;// 收货人地址
+	@Column
+	@ColDefine(type = ColType.TEXT)
+	private String remarks;// 备注
 
 	@Column
 	private String mobile;// 收货人手机
@@ -130,4 +133,13 @@ public class ReceiveContactWay extends IdEntity {
 		this.postCode = postCode;
 	}
 
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
+	
 }

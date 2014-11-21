@@ -18,12 +18,14 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.upload.TempFile;
 import org.nutz.mvc.upload.UploadAdaptor;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.User;
+import com.muzhiliwu.model.gift.ReceiveContactWay;
 import com.muzhiliwu.service.UserService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
@@ -37,11 +39,143 @@ public class UserModule {
 	private UserService userService;
 	private static Log log = LogFactory.getLog(UserModule.class);
 
+	// 获取用户地址列表
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object myAddresses(@Param("::page.") Pager page,
+			HttpSession session, HttpServletRequest request) {
+		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (user != null ? user.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "获取用户地址列表]");
+		if (page != null)
+			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
+					.getPageNumber());
+
+		QueryResult result = userService.myAddresses(page, user);
+
+		ActionMessages ams = new ActionMessages();
+		ams.setMessCount(result.getPager().getRecordCount());
+		ams.setPageNum(result.getPager().getPageNumber());
+		ams.setPageSize(result.getPager().getPageSize());
+		ams.setPageCount((int) Math.ceil((double) result.getPager()
+				.getRecordCount() / (double) result.getPager().getPageSize()));
+		ams.setObject(result.getList());
+
+		return ams;
+	}
+
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object updateAddress(@Param("::address.") ReceiveContactWay address,
+			HttpServletRequest request, HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试修改收货地址~]");
+		ActionMessage am = new ActionMessage();
+		if (address == null || Strings.isBlank(address.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请求参数address.id不能为空~");
+			return am;
+		} else if (Strings.isBlank(address.getProvinceName())
+				|| Strings.isBlank(address.getCityName())
+				|| Strings.isBlank(address.getAreaName())
+				|| Strings.isBlank(address.getAddressDetail())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("修改失败,省名|市名|区名或详细地址不能为空~");
+			return am;
+		} else if (Strings.isBlank(address.getFullName())
+				|| Strings.isBlank(address.getMobile())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("修改失败,收件人或联系方式不能为空~");
+			return am;
+		}
+
+		String tmp = userService.updateAddress(user, address);
+		if (ActionMessage.fail.equals(tmp)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("修改失败,您或许不是地址创建者~");
+			return am;
+		}
+		am.setType(ActionMessage.success);
+		am.setMessage("地址修改成功^_^");
+		return am;
+	}
+
+	// 改为默认地址
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object setDefaultAddress(
+			@Param("::address.") ReceiveContactWay address,
+			HttpServletRequest request, HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试设置默认收货地址~]");
+		ActionMessage am = new ActionMessage();
+		if (address == null || Strings.isBlank(address.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请求参数address.id不能为空~");
+			return am;
+		}
+		String tmp = userService.setDefaultAddress(user, address);
+		if (ActionMessage.fail.equals(tmp)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("修改失败,您或许不是地址创建者~");
+			return am;
+		}
+		am.setType(ActionMessage.success);
+		am.setMessage("设置为默认地址成功^_^");
+		return am;
+	}
+
+	// 用户新添地址
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object addAddress(@Param("::address.") ReceiveContactWay address,
+			HttpServletRequest request, HttpSession session) {
+		User user = (User) session.getAttribute("t_user");
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试创建收货地址~]");
+		ActionMessage am = new ActionMessage();
+		if (address == null || Strings.isBlank(address.getProvinceName())
+				|| Strings.isBlank(address.getCityName())
+				|| Strings.isBlank(address.getAreaName())
+				|| Strings.isBlank(address.getAddressDetail())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("收货地址创建失败,省名|市名|区名或详细地址不能为空~");
+			return am;
+		} else if (Strings.isBlank(address.getFullName())
+				|| Strings.isBlank(address.getMobile())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("收货地址创建失败,收件人或联系方式不能为空~");
+			return am;
+		}
+		userService.addAddress(user, address);
+		am.setType(ActionMessage.success);
+		am.setMessage("新的收货地址创建成功^_^");
+		return am;
+	}
+
 	// 测试
 	@At
 	@Ok("json")
+	@POST
 	public Object login(@Param("::user.") User user, HttpSession session,
-			HttpServletResponse response, HttpServletRequest request) {
+			HttpServletRequest request) {
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
 				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
 				+ "尝试登陆~]");
@@ -87,6 +221,7 @@ public class UserModule {
 	// 几时检查用户输入的用户名是否已被注册
 	@At
 	@Ok("json")
+	@POST
 	public Object checkRepeat(@Param("::user.") User user) {
 		ActionMessage am = new ActionMessage();
 		if (userService.checkRepeat(user.getCode())) {
@@ -102,6 +237,7 @@ public class UserModule {
 	// 注册
 	@At
 	@Ok("json")
+	@POST
 	public Object regist(@Param("::user.") User user, String repass,
 			HttpServletRequest request) {
 		ActionMessage am = new ActionMessage();
@@ -134,23 +270,44 @@ public class UserModule {
 	// 修改个人资料
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
-	public Object editSelf(@Param("::user.") User user, HttpSession session) {
+	public Object editSelf(@Param("::user.") User user, HttpSession session,
+			HttpServletRequest request) {
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试修改个人资料~]");
 		ActionMessage am = new ActionMessage();
-		String tmp = userService.editUser(user, user.getPass());
-		if (ActionMessage.success.equals(tmp)) {
-			am.setType(ActionMessage.success);
-			am.setMessage("个人信息修改成功~");
-		} else {
-			am.setType(ActionMessage.fail);
-			am.setMessage("个人信息修改失败~");
-		}
+		user.setId(((User) session.getAttribute("t_user")).getId());
+		String tmp = userService.editUser(user);
+		am.setType(ActionMessage.success);
+		am.setMessage("个人信息修改成功~");
+		return am;
+	}
+
+	// 修改个人标签
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
+	public Object editMyTags(@Param("::user.") User user, HttpSession session,
+			HttpServletRequest request) {
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试修改个人标签~]");
+		ActionMessage am = new ActionMessage();
+		user.setId(((User) session.getAttribute("t_user")).getId());
+		String tmp = userService.editMyTags(user);
+		am.setType(ActionMessage.success);
+		am.setMessage("个人标签修改成功~");
 		return am;
 	}
 
 	// 修改密码
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object changePass(String oldPass, String newPass, HttpSession session) {
 		User user = (User) session.getAttribute("t_user");
@@ -169,6 +326,7 @@ public class UserModule {
 	// 退出登录
 	@At
 	@Ok("json")
+	@POST
 	public Object logout(HttpSession session, HttpServletRequest request,
 			HttpServletResponse response) {
 		if (session.getAttribute("t_user") != null) {
@@ -194,6 +352,7 @@ public class UserModule {
 	// 获取个人详细信息
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object myDetail(HttpSession session, HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -209,6 +368,7 @@ public class UserModule {
 	// 获取个人信息
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object me(HttpSession session, HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -226,6 +386,7 @@ public class UserModule {
 	// 获取未读信息数
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object countUnreadReplyNum(HttpSession session,
 			HttpServletRequest request) {
@@ -241,6 +402,7 @@ public class UserModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object unreadReply(@Param("::page.") Pager page,
 			HttpSession session, HttpServletRequest request) {
@@ -267,6 +429,7 @@ public class UserModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object reply(@Param("::page.") Pager page, HttpSession session,
 			HttpServletRequest request) {
@@ -293,6 +456,7 @@ public class UserModule {
 	// 上传用户头像
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
 	public Object uploadUserPhoto(@Param("userpic") TempFile tfs,
@@ -315,6 +479,7 @@ public class UserModule {
 	// 获取用户头像
 	// @At
 	// @Ok("void")
+	// @POST
 	// @Filters(@By(type = CheckLoginFilter.class, args = {
 	// "ioc:checkLoginFilter" }))
 	// public void getUserPic(HttpServletResponse response, String code,

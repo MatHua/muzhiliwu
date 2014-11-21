@@ -120,7 +120,7 @@ public class MessageService {
 	public String cancelPraiseMessage(Message msg, User praiser) {
 		if (!okPraise(msg, praiser)) {
 			deletePraise(msg, praiser);// 删除点赞记录
-//			changePraiseNumber(msg, -1);// 点赞数-1
+			// changePraiseNumber(msg, -1);// 点赞数-1
 
 			deleteUnreadPraiseReply(praiser, msg);// 删除对应的未读的点赞信息
 			return ActionMessage.cancel;
@@ -158,7 +158,7 @@ public class MessageService {
 			createUnreadCommentReply(commenter, fatherCommenter, comment, msg);// 给父评论者发送一个未读信息
 		}
 		createUnreadCommentReply(commenter, comment, msg);// 给消息发表者发布评论信息
-//		changeCommentNumber(msg, 1);// 评论数+1
+		// changeCommentNumber(msg, 1);// 评论数+1
 		dao.insert(comment);// 插入一条评论
 		return ActionMessage.success;
 	}
@@ -312,7 +312,7 @@ public class MessageService {
 	 */
 	// public String deleteMessage(User operator, Message msg) {
 	// msg = dao.fetch(Message.class, msg.getId());
-	// if (msg.getPublisherId().equals(operator.getId())) {// 是发表者才能删
+	// if (operator.getId().equals(msg.getPublisherId())) {// 是发表者才能删
 	// dao.deleteLinks(msg, "praises");// 删除对应的点赞信息
 	// dao.deleteLinks(msg, "comments");// 删除对应的评论信息
 	// dao.delete(msg);
@@ -327,7 +327,8 @@ public class MessageService {
 				MessPraise.class,
 				Cnd.where("messId", "=", msg.getId()).and("praiserId", "=",
 						praiser.getId()));
-		dao.delete(MessPraise.class, praise.getId());
+		if (praise != null)
+			dao.delete(praise);
 	}
 
 	// 点赞数增减
@@ -421,7 +422,8 @@ public class MessageService {
 						.and("linkId", "=", msg.getId())
 						.and("type", "=", UnreadReply.Praise)
 						.and("replyFrom", "=", UnreadReply.FromMessage));
-		dao.delete(reply);
+		if (reply != null)
+			dao.delete(reply);
 	}
 
 	// 根据消息id获取消息的标题

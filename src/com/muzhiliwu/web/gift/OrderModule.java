@@ -14,6 +14,7 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
@@ -34,6 +35,7 @@ public class OrderModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object myNotPayOrders(@Param("::page.") Pager page,
 			HttpSession session, HttpServletRequest request) {
@@ -59,10 +61,14 @@ public class OrderModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object deleteNotPayOrder(@Param("::order.") OrderForm order,
 			HttpSession session, HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "正在尝试删除订单~]");
 		ActionMessage am = new ActionMessage();
 		if (order == null || Strings.isBlank(order.getOrderId())) {
 			am.setType(ActionMessage.fail);

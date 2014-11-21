@@ -43,6 +43,8 @@ public class Shop extends IdEntity {
 	@Column
 	private String alipayCode;// 支付宝账号(用于收款)
 	@Column
+	private String IDCard;// 身份证号
+	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String address;// 地址
 	@Column
@@ -227,6 +229,14 @@ public class Shop extends IdEntity {
 
 	public void setPhoto(String photo) {
 		this.photo = photo;
+	}
+
+	public String getIDCard() {
+		return IDCard;
+	}
+
+	public void setIDCard(String iDCard) {
+		IDCard = iDCard;
 	}
 
 }

@@ -19,6 +19,7 @@
     <filter-name>nutz</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+ 
   <jsp-config>
     <jsp-property-group>
       <url-pattern>*.jsp</url-pattern>

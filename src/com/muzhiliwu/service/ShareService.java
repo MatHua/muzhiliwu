@@ -450,7 +450,8 @@ public class ShareService {
 						.and("linkId", "=", share.getId())
 						.and("type", "=", UnreadReply.Collect)
 						.and("replyFrom", "=", UnreadReply.FromShare));
-		dao.delete(reply);
+		if (reply != null)
+			dao.delete(reply);
 	}
 
 	// 修改被收藏数
@@ -466,8 +467,8 @@ public class ShareService {
 				MessPraise.class,
 				Cnd.where("shareId", "=", share.getId()).and("praiserId", "=",
 						praiser.getId()));
-
-		dao.delete(MessPraise.class, praise.getId());
+		if (praise != null)
+			dao.delete(praise);
 	}
 
 	// 点赞数增减
@@ -562,7 +563,8 @@ public class ShareService {
 						.and("linkId", "=", share.getId())
 						.and("type", "=", UnreadReply.Praise)
 						.and("replyFrom", "=", UnreadReply.FromShare));
-		dao.delete(reply);
+		if (reply != null)
+			dao.delete(reply);
 	}
 
 	// 检查是否已经收藏

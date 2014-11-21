@@ -14,6 +14,7 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
@@ -40,6 +41,7 @@ public class GiftModule {
 	// 首页获取礼物商品列表
 	@At
 	@Ok("json")
+	@POST
 	public Object list(@Param("::page.") Pager page, HttpSession session,
 			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -66,6 +68,7 @@ public class GiftModule {
 	// 获取某条礼品商品的被收藏数
 	@At
 	@Ok("json")
+	@POST
 	public Object collectNum(@Param("::gift.") Gift gift, HttpSession session,
 			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -87,6 +90,7 @@ public class GiftModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object cancelCollect(@Param("::gift.") Gift gift,
 			HttpSession session, HttpServletRequest request) {
@@ -110,6 +114,7 @@ public class GiftModule {
 	// 收藏礼品
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object collect(@Param("::gift.") Gift gift, HttpSession session,
 			HttpServletRequest request) {
@@ -140,6 +145,7 @@ public class GiftModule {
 	// 获取某礼品商品分享数
 	@At
 	@Ok("json")
+	@POST
 	public Object getShareNum(@Param("::gift.") Gift gift, HttpSession session,
 			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
@@ -160,6 +166,7 @@ public class GiftModule {
 
 	@At
 	@Ok("json")
+	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	public Object share(@Param("::gift.") Gift gift, HttpSession session,
 			HttpServletRequest request) {
