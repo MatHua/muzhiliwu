@@ -36,7 +36,7 @@ import com.muzhiliwu.service.WishService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 
-//测试~~~
+//测试
 @IocBean
 @At("test")
 public class TestModule {
