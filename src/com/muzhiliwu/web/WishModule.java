@@ -27,6 +27,7 @@ import com.muzhiliwu.utils.ActionMessages;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.IpUtils;
 import com.muzhiliwu.utils.MuzhiCoin;
+import com.muzhiliwu.utils.WishSearch;
 
 @IocBean
 @At("wish")
@@ -57,13 +58,16 @@ public class WishModule {
 			am.setType(ActionMessage.fail);
 			am.setMessage("您所许愿望类型不是普通愿望和礼物愿望,许愿失败~");
 			return am;
+		} else if (Strings.isBlank(wish.getStyle())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您还没选择许愿的类别~");
+			return am;
 		}
 		if (Strings.isBlank(wish.getContent())) {
 			am.setType(ActionMessage.fail);
 			am.setMessage("许愿内容不能为空~");
 			return am;
 		}
-
 		String result = wishService.publishWish(publisher, wish, session);
 
 		if (ActionMessage.success.equals(result)) {
@@ -261,7 +265,8 @@ public class WishModule {
 	@At
 	@Ok("json")
 	@POST
-	public Object list(@Param("::page.") Pager page, HttpSession session,
+	public Object list(@Param("::page.") Pager page,
+			@Param("::wishSearch.") WishSearch wishSearch, HttpSession session,
 			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
@@ -271,7 +276,7 @@ public class WishModule {
 			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
 					.getPageNumber());
 
-		QueryResult result = wishService.getWishes(page, user);
+		QueryResult result = wishService.getWishes(page, wishSearch, user);
 
 		ActionMessages ams = new ActionMessages();
 		ams.setMessCount(result.getPager().getRecordCount());

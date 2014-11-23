@@ -8,6 +8,7 @@ import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
 import org.nutz.dao.QueryResult;
 import org.nutz.dao.pager.Pager;
+import org.nutz.dao.sql.Criteria;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
@@ -23,6 +24,7 @@ import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.MuzhiCoin;
 import com.muzhiliwu.utils.NumGenerator;
+import com.muzhiliwu.utils.WishSearch;
 
 @IocBean
 public class WishService {
@@ -49,6 +51,11 @@ public class WishService {
 		if (!userService.okMuzhiCoin(publisher, increment, session)) {
 			return ActionMessage.Not_MuzhiCoin;// 不够积分
 		}
+		publisher = dao.fetch(User.class, publisher.getId());
+
+		wish.setSex(publisher.getSex());// 用户性别
+		wish.setStar(publisher.getStar());// 用户星座
+
 		wish.setId(NumGenerator.getUuid());
 		wish.setDate(DateUtils.now());
 		wish.setWisherId(publisher.getId());// 许愿者id
@@ -315,12 +322,34 @@ public class WishService {
 	 * @param page
 	 * @return
 	 */
-	public QueryResult getWishes(Pager page, User user) {
-		List<Wish> wishes = dao.query(Wish.class, Cnd.orderBy().desc("date"),
-				page);
+	public QueryResult getWishes(Pager page, WishSearch wishSearch, User user) {
+		String all = "皆可";
+		Criteria cri = Cnd.cri();
+		if (wishSearch != null) {
+			if (!Strings.isBlank(wishSearch.getSex())
+					&& !all.equals(wishSearch.getSex())) {
+				cri.where().and("sex", "=", wishSearch.getSex());
+			}
+			if (!Strings.isBlank(wishSearch.getStar())
+					&& !all.equals(wishSearch.getStar())) {
+				cri.where().and("star", "=", wishSearch.getStar());
+			}
+			if (!Strings.isBlank(wishSearch.getStyle())
+					&& !all.equals(wishSearch.getStyle())) {
+				cri.where().and("style", "=", wishSearch.getStyle());
+			}
+			if (!Strings.isBlank(wishSearch.getType())
+					&& !all.equals(wishSearch.getType())) {
+				cri.where().and("type", "=", wishSearch.getType());
+			}
+		}
+
 		if (page == null)
 			page = new Pager();
-		page.setRecordCount(dao.count(Wish.class));
+		page.setRecordCount(dao.count(Wish.class, cri));
+
+		cri.getOrderBy().desc("date");
+		List<Wish> wishes = dao.query(Wish.class, cri, page);
 
 		// 加载分享发表者
 		dao.fetchLinks(wishes, "wisher");

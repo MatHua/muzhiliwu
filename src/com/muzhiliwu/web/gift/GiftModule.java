@@ -1,5 +1,6 @@
 package com.muzhiliwu.web.gift;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -10,22 +11,27 @@ import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
+import org.nutz.mvc.annotation.AdaptBy;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Filters;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.POST;
 import org.nutz.mvc.annotation.Param;
+import org.nutz.mvc.upload.TempFile;
+import org.nutz.mvc.upload.UploadAdaptor;
 
 import com.muzhiliwu.listener.CheckLoginFilter;
+import com.muzhiliwu.listener.CheckShopLoginFilter;
 import com.muzhiliwu.model.User;
-import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.gift.Gift;
+import com.muzhiliwu.model.gift.Shop;
 import com.muzhiliwu.service.GiftCollectService;
 import com.muzhiliwu.service.gift.GiftService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.ActionMessages;
 import com.muzhiliwu.utils.DateUtils;
+import com.muzhiliwu.utils.GiftSearch;
 import com.muzhiliwu.utils.IpUtils;
 import com.muzhiliwu.utils.MuzhiCoin;
 
@@ -38,11 +44,141 @@ public class GiftModule {
 	private GiftCollectService giftCollectService;
 	private static Log log = LogFactory.getLog(GiftModule.class);
 
+	// 上传在线商品
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
+	public Object createOnlineGift(@Param("::gift.") Gift gift,
+			HttpSession session, HttpServletRequest request) {
+		Shop shop = (Shop) session.getAttribute("s_shop");
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (shop != null ? shop.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "尝试上传在线商品]");
+
+		ActionMessage am = new ActionMessage();
+		if (gift == null || Strings.isBlank(gift.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("参数gift.id不能为空~");
+			return am;
+		} else if (Strings.isBlank(gift.getBigPic())
+				|| Strings.isBlank(gift.getSamllPic())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请上传商品的大图和小图~");
+			return am;
+		} else if (Strings.isBlank(gift.getName())
+				|| Strings.isBlank(gift.getGiftTag())
+				|| Strings.isBlank(gift.getUrl())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请完善: 商品名称/商品标签/商品完整链接");
+			return am;
+		} else if (gift.getPrice() == null || Strings.isBlank(gift.getType())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请完善:商品价格/商品分类");
+			return am;
+		} else if (Strings.isBlank(gift.getSuitAgeGroup())
+				|| Strings.isBlank(gift.getSuitSex())
+				|| Strings.isBlank(gift.getSuitStar())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请完善:商品适合年龄段/商品适合性别/商品适合星座");
+			return am;
+		} else if (Strings.isBlank(gift.getDescript())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("请完善:商品描述");
+			return am;
+		}
+		giftService.createOnlineGift(shop, gift);
+		am.setType(ActionMessage.success);
+		am.setMessage("商品上传成功^_^");
+		return null;
+	}
+
+	// 生成一个礼品id
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
+	public Object gainGiftId(HttpSession session, HttpServletRequest request) {
+		Shop shop = (Shop) session.getAttribute("s_shop");
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (shop != null ? shop.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "尝试生成一个礼品id~]");
+
+		ActionMessage am = new ActionMessage();
+		am.setType(ActionMessage.success);
+		am.setObject(giftService.gainId());
+		return am;
+	}
+
+	// 上传商品大图
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
+	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
+	public Object uploadGiftBigPic(@Param("bigPic") TempFile tfs,
+			@Param("::gift.") Gift gift, ServletContext context,
+			HttpSession session, HttpServletRequest request) {
+		Shop shop = (Shop) session.getAttribute("s_shop");
+
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (shop != null ? shop.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "商品礼品大图]");
+
+		ActionMessage am = new ActionMessage();
+		if (gift != null || !Strings.isBlank(gift.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("gift.id不能为空~");
+			return am;
+		}
+		String result = giftService.uploadPic(gift, tfs,
+				context.getRealPath("/"), true);
+
+		am.setMessage("商品图片上传成功^_^");
+		am.setType(ActionMessage.success);
+		am.setObject(result);// 返回图片存储路径
+		return am;
+	}
+
+	// 上传小图
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
+	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
+	public Object uploadGiftSmallPic(@Param("smallPic") TempFile tfs,
+			@Param("::gift.") Gift gift, ServletContext context,
+			HttpSession session, HttpServletRequest request) {
+		Shop shop = (Shop) session.getAttribute("s_shop");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ (shop != null ? shop.getCode() : "游客") + "]  [时间:"
+				+ DateUtils.now() + "]  [操作:" + "商品礼品小图]");
+		ActionMessage am = new ActionMessage();
+		if (gift != null || !Strings.isBlank(gift.getId())) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("gift.id不能为空~");
+			return am;
+		}
+		String result = giftService.uploadPic(gift, tfs,
+				context.getRealPath("/"), false);
+
+		am.setMessage("商品图片上传成功^_^");
+		am.setType(ActionMessage.success);
+		am.setObject(result);// 返回图片存储路径
+		return am;
+	}
+
+	// ***************************************上面属于商家*********下面属于普通商户*************************
+
+	// **********************************************************************************************
 	// 首页获取礼物商品列表
 	@At
 	@Ok("json")
 	@POST
-	public Object list(@Param("::page.") Pager page, HttpSession session,
+	public Object list(@Param("::page.") Pager page,
+			@Param("::giftSearch.") GiftSearch giftSearch, HttpSession session,
 			HttpServletRequest request) {
 		User user = (User) session.getAttribute("t_user");
 
@@ -53,7 +189,7 @@ public class GiftModule {
 			page.setPageNumber(page.getPageNumber() <= 0 ? 1 : page
 					.getPageNumber());
 
-		QueryResult result = giftService.getGiftList(user, page);
+		QueryResult result = giftService.getGiftList(user, page, giftSearch);
 
 		ActionMessages ams = new ActionMessages();
 		ams.setMessCount(result.getPager().getRecordCount());

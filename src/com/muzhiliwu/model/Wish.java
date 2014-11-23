@@ -30,6 +30,13 @@ public class Wish extends IdEntity {
 	@Column
 	private String type;// 许愿类型
 	@Column
+	private String style;// 许愿类别
+	@Column
+	private String sex;// 许愿者性别
+	@Column
+	private String star;// 许愿者星座
+
+	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String content;// 许愿内容
 	// @Column
@@ -59,6 +66,30 @@ public class Wish extends IdEntity {
 	private int wantorNum;// 愿望实现的申请者数
 	@ManyMany(target = User.class, relation = "t_wish_realization_of_wantor", from = "wishId", to = "wantorId")
 	private List<User> wishWantors;// 想要帮忙实现愿望的人
+
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	public String getStar() {
+		return star;
+	}
+
+	public void setStar(String star) {
+		this.star = star;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
 
 	public String getWisherId() {
 		return wisherId;

@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.TableName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.mvc.annotation.At;
@@ -26,9 +27,9 @@ import com.alipay.config.AlipayConfig;
 import com.alipay.util.AlipaySubmit;
 import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.model.TestDemo;
-import com.muzhiliwu.model.UserTag;
 import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.gift.Gift;
+import com.muzhiliwu.model.gift.GiftClick;
 import com.muzhiliwu.model.gift.ReceiveContactWay;
 import com.muzhiliwu.service.TestDemoService;
 import com.muzhiliwu.service.WishService;
@@ -49,7 +50,38 @@ public class TestModule {
 
 	@At
 	@Ok("json")
-//	@POST
+	public Object createTable(String year, String month) {
+		Map mp = new HashMap<String, String>();
+		mp.put("year", year);
+		mp.put("month", month);
+
+		TableName.run(mp, new Runnable() {
+			@Override
+			public void run() {
+				dao.create(GiftClick.class, false);
+			}
+		});
+		return "xxx";
+	}
+
+	@At
+	@Ok("json")
+	public Object testNull(String name, Double number) {
+		String tmp = "";
+		if (name == null)
+			tmp += "name is null & ";
+		else
+			tmp += name;
+		if (number == null)
+			tmp += "number is null";
+		else
+			tmp += number.toString();
+		return tmp;
+	}
+
+	@At
+	@Ok("json")
+	// @POST
 	public Object addAddress() {
 		ReceiveContactWay address = new ReceiveContactWay();
 		address.setAddressDetail("xx街");

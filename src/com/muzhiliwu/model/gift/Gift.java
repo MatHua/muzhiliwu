@@ -19,8 +19,8 @@ import org.nutz.dao.entity.annotation.TableIndexes;
 public class Gift extends IdEntity {
 	public static final DecimalFormat df = new DecimalFormat("0.0");
 
-	public static final String FromOnlineShop = "from_online_shop";// 来源网店
-	public static final String FromEntityShop = "from_entity_shop";// 来源实体店
+	public static final String FromOnlineShop = "线上加盟商户";// 来源网店
+	public static final String FromEntityShop = "线下加盟商户";// 来源实体店
 
 	public static final String OnSale = "on_sale";// 在销售
 	public static final String NotSale = "not_sale";// 商品下架
@@ -28,6 +28,43 @@ public class Gift extends IdEntity {
 	public static final String AuditSuccess = "Audit_Success";// 审核成功
 	public static final String AuditFail = "Audit_Fail";// 审核失败
 	public static final String Auditing = "Auditing";// 审核中
+
+	@Column
+	private String bigPic;// 大图
+	@Column
+	private String samllPic;// 小图
+
+	@Column
+	private String name;// 商品名称
+	private int tagNum;// 标签数
+	@ManyMany(target = Tag.class, relation = "t_gift_tag", from = "giftId", to = "tagId")
+	private List<Tag> tags;// 获取礼品被标注的标签
+	private String giftTag;
+
+	@Column
+	private String url;// 商品购买链接~供网店使用
+
+	@Column
+	private Double price;// 商品价格
+	@Column
+	private String type;// 商品分类
+	@Column
+	private String suitSex;// 适合性别
+	@Column
+	private String suitStar;// 适合星座
+	@Column
+	private String suitAgeGroup;// 适合年龄段
+
+	@Column
+	@ColDefine(type = ColType.TEXT)
+	private String descript;// 商品描述
+
+	// **********************************************************
+
+	@Column
+	private String shopState;// 所在店家状态
+	@Column
+	private String shopOnBusiness;// 所在店家是否有被超级管理员禁止营业
 
 	@Column
 	private String auditState;// 审核状态
@@ -40,8 +77,6 @@ public class Gift extends IdEntity {
 
 	@Column
 	private String fromType;// 来源~网店、实体店
-	@Column
-	private String url;// 商品购买链接~供网店使用
 
 	@Column
 	private String shopId;// 商家id
@@ -49,27 +84,9 @@ public class Gift extends IdEntity {
 	private Shop seller;// 商家
 
 	@Column
-	private String name;// 商品名称
-	@Column
-	@ColDefine(type = ColType.TEXT)
-	private String descript;// 商品描述
-	@Column
-	private double price;// 商品价格
-	@Column
-	private String type;// 商品分类
-	@Column
 	private int stock;// 库存量
-
 	@Column
 	private String packagePostal;// 包邮
-
-	private boolean isCollected;// 记录是否已被收藏
-	private boolean isShared;// 记录是否已被分享
-	private boolean isBuyed;// 是否购买过
-	private boolean isWished;// 是否用它许愿过
-
-	private int collectNum;// 收藏数
-	private int shareNum;// 分享数
 
 	private int styleNum;// 款式数
 	@Many(target = GiftStyle.class, field = "giftId")
@@ -78,10 +95,6 @@ public class Gift extends IdEntity {
 	private int sizeNum;// 礼品尺寸数
 	@Many(target = GiftStyle.class, field = "giftId")
 	private List<GiftSize> sizes;// 礼品尺寸
-
-	private int tagNum;// 标签数
-	@ManyMany(target = Tag.class, relation = "t_gift_tag", from = "giftId", to = "tagId")
-	private List<Tag> tags;// 获取礼品被标注的标签
 
 	private int commentNum;// 评价数
 	@Many(target = GiftComment.class, field = "giftId")
@@ -94,6 +107,70 @@ public class Gift extends IdEntity {
 	private int picNum;
 	@Many(target = GiftPic.class, field = "giftId")
 	private List<GiftPic> pics;
+
+	private boolean isCollected;// 记录是否已被收藏
+	private boolean isShared;// 记录是否已被分享
+	private boolean isBuyed;// 是否购买过
+	private boolean isWished;// 是否用它许愿过
+
+	private int collectNum;// 收藏数
+	private int shareNum;// 分享数
+
+	public String getShopOnBusiness() {
+		return shopOnBusiness;
+	}
+
+	public void setShopOnBusiness(String shopOnBusiness) {
+		this.shopOnBusiness = shopOnBusiness;
+	}
+
+	public String getShopState() {
+		return shopState;
+	}
+
+	public void setShopState(String shopState) {
+		this.shopState = shopState;
+	}
+
+	public String getGiftTag() {
+		return giftTag;
+	}
+
+	public void setGiftTag(String giftTag) {
+		this.giftTag = giftTag;
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+
+	public String getSuitSex() {
+		return suitSex;
+	}
+
+	public void setSuitSex(String suitSex) {
+		this.suitSex = suitSex;
+	}
+
+	public String getSuitStar() {
+		return suitStar;
+	}
+
+	public void setSuitStar(String suitStar) {
+		this.suitStar = suitStar;
+	}
+
+	public String getSuitAgeGroup() {
+		return suitAgeGroup;
+	}
+
+	public void setSuitAgeGroup(String suitAgeGroup) {
+		this.suitAgeGroup = suitAgeGroup;
+	}
 
 	public String getFromType() {
 		return fromType;
@@ -343,12 +420,20 @@ public class Gift extends IdEntity {
 		this.isWished = isWished;
 	}
 
-	public double getPrice() {
-		return price;
+	public String getBigPic() {
+		return bigPic;
 	}
 
-	public void setPrice(double price) {
-		this.price = price;
+	public void setBigPic(String bigPic) {
+		this.bigPic = bigPic;
+	}
+
+	public String getSamllPic() {
+		return samllPic;
+	}
+
+	public void setSamllPic(String samllPic) {
+		this.samllPic = samllPic;
 	}
 
 }
