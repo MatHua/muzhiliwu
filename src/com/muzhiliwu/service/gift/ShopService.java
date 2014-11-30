@@ -77,6 +77,28 @@ public class ShopService {
 		return shop;
 	}
 
+	public void setGiftNotSale(Shop shop, String ids) {
+		for (String id : ids.split(",")) {
+			Gift gift = dao.fetch(Gift.class,
+					Cnd.where("id", "=", id).and("shopId", "=", shop.getId()));
+			if (gift != null) {
+				gift.setSaleState(Gift.NotSale);
+				dao.update(gift);
+			}
+		}
+	}
+
+	public void deleteMyGifts(Shop shop, String ids) {
+		for (String id : ids.split(",")) {
+			Gift gift = dao.fetch(Gift.class,
+					Cnd.where("id", "=", id).and("shopId", "=", shop.getId()));
+			if (gift != null) {
+				gift.setDelete(true);
+				dao.update(gift);
+			}
+		}
+	}
+
 	public QueryResult getMyGiftList(Shop shop, Pager page, String orderBy) {
 		String AscClickNum = "AscClickNum";// 点击量升序
 		String DescClickNum = "DescClickNum";// 点击量降序

@@ -10,6 +10,7 @@ import org.nutz.dao.QueryResult;
 import org.nutz.dao.pager.Pager;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.mvc.annotation.AdaptBy;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.By;
@@ -111,6 +112,52 @@ public class ShopModule {
 		String tmp = shopService.editShop(shop);
 		am.setType(ActionMessage.success);
 		am.setMessage("商家信息修改成功~");
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
+	public Object deleteMyGifts(String ids, HttpSession session,
+			HttpServletRequest request) {
+		Shop shop = (Shop) session.getAttribute("s_shop");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "删除自己的商品~]");
+
+		ActionMessage am = new ActionMessage();
+		if (Strings.isBlank(ids)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您未选中删除任何商品~_~");
+			return am;
+		}
+		shopService.deleteMyGifts(shop, ids);
+		am.setType(ActionMessage.success);
+		am.setMessage("商品删除成功^_^");
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
+	public Object setGiftNotSale(String ids, HttpSession session,
+			HttpServletRequest request) {
+		Shop shop = (Shop) session.getAttribute("s_shop");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "下架自己的商品~]");
+
+		ActionMessage am = new ActionMessage();
+		if (Strings.isBlank(ids)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您未选中下架任何商品~_~");
+			return am;
+		}
+		shopService.setGiftNotSale(shop, ids);
+		am.setType(ActionMessage.success);
+		am.setMessage("商品下架成功^_^");
 		return am;
 	}
 
