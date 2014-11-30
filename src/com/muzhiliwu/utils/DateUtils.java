@@ -141,7 +141,8 @@ public class DateUtils {
 		// int year = cal.get(Calendar.YEAR);
 		// System.out.println(year);
 		// System.out.println(month);
-		System.out.println(new Date());
+		// System.out.println(new Date());
+		System.out.println(StringToDate("19931012111", dformat_day_2));
 	}
 
 }

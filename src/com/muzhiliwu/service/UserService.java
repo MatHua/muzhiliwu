@@ -93,8 +93,15 @@ public class UserService {
 		if (!user.getId().equals(address.getCreatorId())) {
 			return ActionMessage.fail;
 		}
-		address.setCreatorId(tmpAddress.getCreatorId());
-		address.setDate(DateUtils.now());
+		tmpAddress.setProvinceName(address.getProvinceName());
+		tmpAddress.setCityName(address.getCityName());
+		tmpAddress.setAreaName(address.getAreaName());
+		tmpAddress.setAddressDetail(address.getAddressDetail());
+		tmpAddress.setPostCode(address.getPostCode());
+		tmpAddress.setFullName(address.getFullName());
+		tmpAddress.setMobile(address.getMobile());
+		tmpAddress.setRemarks(address.getRemarks());
+		tmpAddress.setDefaultAddress(address.isDefaultAddress());
 		if (address.isDefaultAddress()) {
 			// 将之前的默认地址变为非默认地址
 			ReceiveContactWay tmp = dao.fetch(
@@ -108,9 +115,9 @@ public class UserService {
 			int tmp = dao.count(ReceiveContactWay.class,
 					Cnd.where("creatorId", "=", user.getId()));
 			if (tmp == 0)
-				address.setDefaultAddress(true);
+				tmpAddress.setDefaultAddress(true);
 		}
-		dao.update(address);
+		dao.update(tmpAddress);
 		return ActionMessage.success;
 	}
 
@@ -220,20 +227,27 @@ public class UserService {
 		User u = dao.fetch(User.class, Cnd.where("id", "=", user.getId()));
 		if (true) {
 			// 避免修改一些不能修改的信息,例如：拇指币数,送礼物数,送礼物等级,人气值,人气等级等..都是不能让用户自行修改
-			user.setCode(u.getCode());
-			user.setPass(u.getPass());
-			user.setPhone(u.getPhone() == null ? null : u.getPhone());
-			user.setDate(DateUtils.now());
-			user.setMuzhiCoin(u.getMuzhiCoin());
-
-			user.setPopularityRank(u.getPopularityRank());
-			user.setPopularityValue(u.getPopularityValue());
-			user.setPopularityTop(u.getPopularityTop());
-
-			user.setSendGiftRank(u.getSendGiftRank());
-			user.setSendGiftValue(u.getSendGiftValue());
-			user.setSendGiftTop(u.getSendGiftTop());
-			dao.update(user);
+			u.setNickName(user.getNickName());
+			u.setSign(user.getSign());
+			u.setEmotion(user.getEmotion());
+			u.setMood(user.getMood());
+			u.setName(user.getName());
+			u.setSex(user.getSex());
+			u.setOrientation(user.getOrientation());
+			u.setBirth(user.getBirth());
+			u.setStar(user.getStar());
+			u.setPhone(user.getPhone());
+			u.setQQ(user.getQQ());
+			u.setMyUrl(user.getMyUrl());
+			u.setEmail(user.getEmail());
+			u.setProvinceName(user.getProvinceName());
+			u.setCityName(user.getCityName());
+			u.setAreaName(user.getAreaName());
+			u.setTownName(user.getTownName());
+			u.setSchool(user.getSchool());
+			u.setCollege(user.getCollege());
+			u.setMajor(user.getMajor());
+			dao.update(u);
 			return ActionMessage.success;
 		}
 		return ActionMessage.fail;

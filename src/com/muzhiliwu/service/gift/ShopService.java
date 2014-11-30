@@ -133,19 +133,15 @@ public class ShopService {
 	public String editShop(Shop shop) {
 		Shop s = dao.fetch(Shop.class, shop.getId());
 		if (true) {
-			shop.setLogo(s.getLogo());// logo路径不能在此修改
-			shop.setBusinessState(s.getBusinessState());// 营业状态
-			shop.setCode(s.getCode());// 账号
-			// shop.setDate(DateUtils.now());
-			shop.setIDCard(s.getIDCard());// 身份证
-			shop.setOkBusiness(s.getOkBusiness());
-			shop.setPass(MD5.toMD5(shop.getPass()));
-			shop.setSalesNumber(s.getSalesNumber());
-			shop.setShopType(s.getShopType());// 商家类型不能改
-			shop.setTolVisitNum(s.getTolVisitNum());
-			shop.setAddress(s.getAddress());
-			shop.setShopStory(s.getShopStory());
-			dao.update(shop);
+			s.setShopName(shop.getShopName());
+			s.setUrl(shop.getUrl());
+			s.setAlipayCode(shop.getAlipayCode());
+			s.setShopIntroduct(shop.getShopIntroduct());
+			s.setPass(MD5.toMD5(shop.getPass()));
+			s.setShopBoss(shop.getShopBoss());
+			s.setMobile(shop.getMobile());
+			s.setEmail(shop.getEmail());
+			dao.update(s);
 			return ActionMessage.success;
 		}
 		return ActionMessage.fail;
