@@ -13,7 +13,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
+import org.nutz.dao.Sqls;
 import org.nutz.dao.TableName;
+import org.nutz.dao.sql.Sql;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.mvc.annotation.At;
@@ -31,6 +33,7 @@ import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.model.gift.GiftClick;
 import com.muzhiliwu.model.gift.ReceiveContactWay;
+import com.muzhiliwu.model.gift.ShopVisit;
 import com.muzhiliwu.service.TestDemoService;
 import com.muzhiliwu.service.WishService;
 import com.muzhiliwu.utils.ActionMessage;
@@ -51,18 +54,76 @@ public class TestModule {
 
 	@At
 	@Ok("json")
+	public Object alertTable() {
+		Sql sql = Sqls
+				.create("alter table t_test_demo add pId varchar(50) (foreign key(pId) references t_gift(id) on delete cascade on update cascade)");
+		dao.execute(sql);
+		return "success";
+	}
+
+	@At
+	@Ok("json")
+	public int countShopVisitNum(String shopId) {
+		// // 获取年月
+		// int year = DateUtils.getYear();
+		// int month = DateUtils.getMonth();
+		//
+		// Map mp = new HashMap<String, Integer>();
+		// mp.put("year", year);
+		// mp.put("month", month);
+		//
+		// TableName.set(mp);
+		// dao.create(ShopVisit.class, false);
+		// // Sql sql = Sqls
+		// //
+		// .create("select count( * ) from $table where visitNum >= ( select visitNum from $table where shopId=@shopId ) ");
+		// // sql.vars().set("table", "t_shop_visit_" + year + "_" + month);
+		// // // sql.vars().set("table2", "t_shop_visit_" + year + "_" + month);
+		// // sql.params().set("shopId", shopId);
+		// // dao.execute(sql);
+		//
+		// int count = dao.count(
+		// ShopVisit.class,
+		// Cnd.wrap("visitNum >= (select visitNum from " + "t_shop_visit_"
+		// + year + "_" + month + " where shopId='" + shopId
+		// + "')"));
+		// TableName.clear();
+		// return count;
+		int year = DateUtils.getYear();
+		int month = DateUtils.getMonth();
+
+		Map mp = new HashMap<String, Integer>();
+		mp.put("year", year);
+		mp.put("month", month);
+
+		TableName.set(mp);
+		dao.create(ShopVisit.class, false);
+		ShopVisit visit = dao.fetch(ShopVisit.class,
+				Cnd.where("shopId", "=", shopId));
+		TableName.clear();
+		return visit.getVisitNum();
+	}
+
+	@At
+	@Ok("json")
 	public Object createTable(String year, String month) {
 		Map mp = new HashMap<String, String>();
 		mp.put("year", year);
 		mp.put("month", month);
 
-		TableName.run(mp, new Runnable() {
-			@Override
-			public void run() {
-				dao.create(GiftClick.class, false);
-			}
-		});
-		return "xxx";
+		// static GiftClick click = null;
+		// TableName.run(mp, new Runnable() {
+		// @Override
+		// public void run() {
+		// dao.create(GiftClick.class, false);
+		// click = dao.fetch(GiftClick.class, "1");
+		// System.out.println(click.getDate() + click.getId());
+		// }
+		// });
+		TableName.set(mp);
+		GiftClick click = dao.fetch(GiftClick.class, "1");
+		TableName.clear();
+		return click;
 	}
 
 	@At

@@ -344,12 +344,12 @@ public class WishService {
 			}
 		}
 
+		cri.getOrderBy().desc("date");
+		List<Wish> wishes = dao.query(Wish.class, cri, page);
+		
 		if (page == null)
 			page = new Pager();
 		page.setRecordCount(dao.count(Wish.class, cri));
-
-		cri.getOrderBy().desc("date");
-		List<Wish> wishes = dao.query(Wish.class, cri, page);
 
 		// 加载分享发表者
 		dao.fetchLinks(wishes, "wisher");

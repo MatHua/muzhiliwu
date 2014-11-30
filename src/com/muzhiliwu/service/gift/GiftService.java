@@ -199,14 +199,14 @@ public class GiftService {
 				cri.where().and("price", "<=", giftSearch.getMaxPrice());
 			}
 		}
-		if (page == null)
-			page = new Pager();
-		page.setRecordCount(dao.count(Gift.class, cri));
-
 		cri.getOrderBy().desc("date");
 
 		// 审核通过的,还没下架的,没被删除的才能被显示
 		List<Gift> gifts = dao.query(Gift.class, cri, page);
+
+		if (page == null)
+			page = new Pager();
+		page.setRecordCount(dao.count(Gift.class, cri));
 
 		dao.fetchLinks(gifts, "tags");// 获取标签
 		// dao.fetchLinks(gifts, "pics");// 获取礼品图片
