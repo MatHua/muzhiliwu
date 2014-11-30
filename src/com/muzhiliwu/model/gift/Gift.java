@@ -47,6 +47,8 @@ public class Gift extends IdEntity {
 	@Column
 	private Double price;// 商品价格
 	@Column
+	private Double cost;// 成本价
+	@Column
 	private String type;// 商品分类
 	@Column
 	private String suitSex;// 适合性别
@@ -77,6 +79,9 @@ public class Gift extends IdEntity {
 
 	@Column
 	private String fromType;// 来源~网店、实体店
+
+	@Column
+	private int clickNum;// 点击量
 
 	@Column
 	private String shopId;// 商家id
@@ -115,6 +120,25 @@ public class Gift extends IdEntity {
 
 	private int collectNum;// 收藏数
 	private int shareNum;// 分享数
+
+	@Column
+	private int saleNum;// 销售总量
+
+	public Double getCost() {
+		return cost;
+	}
+
+	public void setCost(Double cost) {
+		this.cost = cost;
+	}
+
+	public int getSaleNum() {
+		return saleNum;
+	}
+
+	public void setSaleNum(int saleNum) {
+		this.saleNum = saleNum;
+	}
 
 	public String getShopOnBusiness() {
 		return shopOnBusiness;
@@ -434,6 +458,14 @@ public class Gift extends IdEntity {
 
 	public void setSamllPic(String samllPic) {
 		this.samllPic = samllPic;
+	}
+
+	public int getClickNum() {
+		return clickNum;
+	}
+
+	public void setClickNum(int clickNum) {
+		this.clickNum = clickNum;
 	}
 
 }

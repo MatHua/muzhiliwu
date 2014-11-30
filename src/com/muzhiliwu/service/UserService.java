@@ -271,40 +271,36 @@ public class UserService {
 	public boolean uploadPhoto(String code, TempFile tfs, String template) {
 		// 更新数据库信息
 		User u = getUserByCode(code);
-		if (u != null) {
-			// template += "/WEB-INF/userphoto/";
-			template += "/userphoto/";
 
-			// 如果对应的文件夹不存在,就创建该文件夹
-			Files.createDirIfNoExists(template);
+		// template += "/WEB-INF/userphoto/";
+		template += "/userphoto/";
 
-			// 获取文件后缀名
-			int beginIndex = tfs.getFile().getAbsolutePath().lastIndexOf(".");
-			String fileExt = tfs.getFile().getAbsolutePath()
-					.substring(beginIndex);
+		// 如果对应的文件夹不存在,就创建该文件夹
+		Files.createDirIfNoExists(template);
 
-			// 删除原来存在的头像
-			String regx = code + ".*";
-			File f2 = new File(template);
-			File[] s = f2.listFiles(new FileFilter(regx));
-			for (File file : s) {
-				Files.deleteFile(file);
-			}
+		// 获取文件后缀名
+		int beginIndex = tfs.getFile().getAbsolutePath().lastIndexOf(".");
+		String fileExt = tfs.getFile().getAbsolutePath().substring(beginIndex);
 
-			// 上传新的头像文件
-			File f = new File(template + code + fileExt);
-			try {
-				Files.move(tfs.getFile(), f);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			u.setPhoto(code + fileExt);
-			dao.update(u);
-			return true;
+		// 删除原来存在的头像
+		String regx = code + ".*";
+		File f2 = new File(template);
+		File[] s = f2.listFiles(new FileFilter(regx));
+		for (File file : s) {
+			Files.deleteFile(file);
 		}
-		return false;
 
+		// 上传新的头像文件
+		File f = new File(template + code + fileExt);
+		try {
+			Files.move(tfs.getFile(), f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		u.setPhoto(template + code + fileExt);
+		dao.update(u);
+		return true;
 	}
 
 	public User getUserById(String id) {

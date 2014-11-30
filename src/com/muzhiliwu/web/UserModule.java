@@ -459,19 +459,26 @@ public class UserModule {
 	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadUserPhoto(@Param("userpic") TempFile tfs,
-			ServletContext context, HttpSession session) {
+	public Object uploadUserPic(@Param("userpic") TempFile tfs,
+			ServletContext context, HttpSession session,
+			HttpServletRequest request) {
+
 		User user = (User) session.getAttribute("t_user");
-		boolean result = userService.uploadPhoto(user.getCode(), tfs,
-				context.getRealPath("/"));
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "上传头像]");
 
 		ActionMessage am = new ActionMessage();
+		if (tfs == null) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您还没选择头像~");
+			return am;
+		}
+		boolean result = userService.uploadPhoto(user.getCode(), tfs,
+				context.getRealPath("/"));
 		if (result) {
 			am.setMessage("头像上传成功^_^");
 			am.setType(ActionMessage.success);
-		} else {
-			am.setMessage("头像上传失败,原因可能由于用户不存在~");
-			am.setType(ActionMessage.fail);
 		}
 		return am;
 	}

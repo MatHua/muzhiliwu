@@ -14,8 +14,8 @@ import org.nutz.dao.entity.annotation.TableIndexes;
 @Table("t_shop")
 @TableIndexes({ @Index(name = "idx_shop", fields = { "code" }, unique = false) })
 public class Shop extends IdEntity {
-	public static final String EntityShop = "entity_shop";// 实体店
-	public static final String OnlineStore = "online_store";// 网店
+	public static final String EntityShop = "线下加盟商家";// 实体店
+	public static final String OnlineStore = "线上加盟商家";// 网店
 
 	public static final String ShopOpen = "open";// 营业状态
 	public static final String ShopRest = "rest";// 店主休息
@@ -23,37 +23,54 @@ public class Shop extends IdEntity {
 	public static final String CanBusiness = "can_business";// 可营业状态
 	public static final String BanBusiness = "ban_business";// 被超级管理员禁止营业
 
+	// ************************店铺信息************************
 	@Column
-	private String code;// 商店账号
-	@Column
-	private String pass;// 密码
-	@Column
-	private String photo;// 商家头像路径
-
+	private String logo;// 商家头像路径
 	@Column
 	private String shopName;// 店名
 	@Column
 	private String shopType;// 店类型
 	@Column
-	private String shopBoss;// 店主(负责人)
-	@Column
-	private String mobile;// 手机
-	@Column
-	private String email;// 邮箱
+	private String url;// 网址
 	@Column
 	private String alipayCode;// 支付宝账号(用于收款)
 	@Column
+	@ColDefine(type = ColType.TEXT)
+	private String shopIntroduct;// 店家简介
+
+	// ****************个人账号******************************
+	@Column
+	private String code;// 商店账号
+	@Column
+	private String pass;// 密码
+	@Column
+	private String shopBoss;// 店主(负责人)
+	@Column
+	private String mobile;// 联系方式
+	@Column
+	private String email;// 邮箱
+	@Column
 	private String IDCard;// 身份证号
+
+	// *********商家logo(已有)
+	private int unreadReplyNum;// 未读信息数 ------
+	private List<ShopUnreadReply> shopUnreadReplies;
+	// *********店家名称----如:礼品汇(已有)
+	// *********店家类型----如:线上加盟商户(已有)
+	private int monthVisitNum;// 月访问量
+	private int monthVisitRank;// 月访问排行
+
+	@Column
+	private int tolVisitNum;// 店家总访问量
+
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String address;// 地址
 	@Column
 	@ColDefine(type = ColType.TEXT)
 	private String shopStory;// 品牌故事
-
 	@Column
 	private int salesNumber;// 销售数量
-
 	@Column
 	private String businessState;// 营业状态
 	@Column
@@ -70,6 +87,62 @@ public class Shop extends IdEntity {
 	private int historyOrderNum;// 历史订单
 	@Many(target = OrderForm.class, field = "shopId")
 	private List<OrderForm> historyOrders;// 历史订单数
+
+	public int getUnreadReplyNum() {
+		return unreadReplyNum;
+	}
+
+	public void setUnreadReplyNum(int unreadReplyNum) {
+		this.unreadReplyNum = unreadReplyNum;
+	}
+
+	public List<ShopUnreadReply> getShopUnreadReplies() {
+		return shopUnreadReplies;
+	}
+
+	public void setShopUnreadReplies(List<ShopUnreadReply> shopUnreadReplies) {
+		this.shopUnreadReplies = shopUnreadReplies;
+	}
+
+	public int getMonthVisitNum() {
+		return monthVisitNum;
+	}
+
+	public void setMonthVisitNum(int monthVisitNum) {
+		this.monthVisitNum = monthVisitNum;
+	}
+
+	public int getMonthVisitRank() {
+		return monthVisitRank;
+	}
+
+	public void setMonthVisitRank(int monthVisitRank) {
+		this.monthVisitRank = monthVisitRank;
+	}
+
+	public int getTolVisitNum() {
+		return tolVisitNum;
+	}
+
+	public void setTolVisitNum(int tolVisitNum) {
+		this.tolVisitNum = tolVisitNum;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getShopIntroduct() {
+		return shopIntroduct;
+	}
+
+	public void setShopIntroduct(String shopIntroduct) {
+		this.shopIntroduct = shopIntroduct;
+	}
 
 	public String getMobile() {
 		return mobile;
@@ -223,20 +296,20 @@ public class Shop extends IdEntity {
 		this.historyOrders = historyOrders;
 	}
 
-	public String getPhoto() {
-		return photo;
-	}
-
-	public void setPhoto(String photo) {
-		this.photo = photo;
-	}
-
 	public String getIDCard() {
 		return IDCard;
 	}
 
 	public void setIDCard(String iDCard) {
 		IDCard = iDCard;
+	}
+
+	public String getLogo() {
+		return logo;
+	}
+
+	public void setLogo(String logo) {
+		this.logo = logo;
 	}
 
 }

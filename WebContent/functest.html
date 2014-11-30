@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>接口测试</title>
+<script src="jquery-2.0.2.min.js"></script>
+<script>
+$(document).ready(function(e) {
+	$("#test").click(function(){
+		var map={};
+		var ajaxval=$("#ajaxval").val();
+		//map["user.code"]=$("#ajaxname").val();
+		//map["user.pass"]=$("#ajaxpsw").val();
+		//map["repass"]=$("#ajaxrepsw").val();
+		var username=$("#ajaxname").val();
+		var userpsw=$("#ajaxpsw").val();
+		var userrepsw=$("#ajaxrepsw").val();
+		ajaxurl=$("#ajaxurl").val();
+		$.ajax({
+			url:ajaxurl,
+			type:"POST",
+			data:"user.code=xxxxxxxx" +"&" + "user.pass=sss" + "&" + "repass=sss",
+			processData:false,
+			success: function(data){
+				alert("success");
+				$("#testinfo").html(data);
+			},
+			error: function(data){
+				alert(data);
+			}
+		})
+	})
+	
+});
+</script>
+</head>
+
+<body>
+<input id="ajaxname" style="width:100%;height:50px;font-size:24px;" />
+<input id="ajaxpsw" style="width:100%;height:50px;font-size:24px;" />
+<input id="ajaxrepsw" style="width:100%;height:50px;font-size:24px;" />
+<input id="ajaxval" style="width:100%;height:50px;font-size:24px;" />
+<input id="ajaxurl" style="width:100%;height:50px;font-size:24px;"  />
+<input type="button" value="test" id="test" />
+<div id="testinfo"></div>
+</body>
+</html>
