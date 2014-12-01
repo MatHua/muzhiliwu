@@ -36,6 +36,43 @@ public class ShopModule {
 	private ShopService shopService;
 	private static Log log = LogFactory.getLog(ShopModule.class);
 
+	@At
+	@Ok("json")
+	@POST
+	public Object login(@Param("::shop.") Shop shop, HttpSession session,
+			HttpServletRequest request) {
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试登陆~]");
+		if (shop == null || Strings.isBlank(shop.getCode())
+				|| Strings.isBlank(shop.getPass())) {
+			ActionMessage am = new ActionMessage();
+			am.setMessage("账号或密码不能为空");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		shop.setCode(shop.getCode().trim());
+		shop.setPass(shop.getPass().trim());
+
+		Shop s = shopService.checkShop(shop.getCode(), shop.getPass(), true);
+		if (s == null) {
+			log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+					+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+					+ "商家不存在或者密码错误]");
+
+			ActionMessage am = new ActionMessage();
+			am.setMessage("商家不存在或者密码错误");
+			am.setType(ActionMessage.Account_Fail);
+			return am;
+		}
+		session.setAttribute("s_shop", s);// 登录用户信息
+		ActionMessage am = new ActionMessage();
+		am.setType(ActionMessage.success);
+		am.setMessage("登录成功~");
+		// am.setObject(u);
+		return am;
+	}
+
 	// 获取商家详细信息
 	@At
 	@Ok("json")

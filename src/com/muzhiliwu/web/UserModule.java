@@ -459,7 +459,7 @@ public class UserModule {
 	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadUserPic(@Param("userpic") TempFile tfs,
+	public Object uploadUserPic1(@Param("userpic") TempFile tfs,
 			ServletContext context, HttpSession session,
 			HttpServletRequest request) {
 
@@ -476,6 +476,39 @@ public class UserModule {
 		}
 		boolean result = userService.uploadPhoto(user.getCode(), tfs,
 				context.getRealPath("/"));
+		if (result) {
+			am.setMessage("头像上传成功^_^");
+			am.setType(ActionMessage.success);
+		}
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	// @POST
+	// @Filters(@By(type = CheckLoginFilter.class, args = {
+	// "ioc:checkLoginFilter" }))
+	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
+	public Object uploadUserPic2(@Param("userpic") TempFile tfs, int top,
+			int left, int width, int height, ServletContext context,
+			HttpSession session, HttpServletRequest request) {
+
+		// User user = (User) session.getAttribute("t_user");
+		User user = new User();
+		user.setId("1");
+		user.setCode("mathua");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "上传头像]");
+
+		ActionMessage am = new ActionMessage();
+		if (tfs == null) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您还没选择头像~");
+			return am;
+		}
+		boolean result = userService.uploadPhoto(user.getCode(), tfs, top,
+				left, width, height, context.getRealPath("/"));
 		if (result) {
 			am.setMessage("头像上传成功^_^");
 			am.setType(ActionMessage.success);
