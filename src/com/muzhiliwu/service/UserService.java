@@ -1,9 +1,11 @@
 package com.muzhiliwu.service;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.nutz.dao.Cnd;
@@ -308,6 +310,53 @@ public class UserService {
 		File f = new File(template + code + fileExt);
 		try {
 			Files.move(tfs.getFile(), f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		u.setPhoto(template + code + fileExt);
+		dao.update(u);
+		return true;
+	}
+
+	public boolean uploadPhoto(String code, TempFile tfs, int top, int left,
+			int width, int height, String template) {
+		// 更新数据库信息
+		User u = getUserByCode(code);
+
+		// template += "/WEB-INF/userphoto/";
+		template += "/userphoto/";
+
+		// 如果对应的文件夹不存在,就创建该文件夹
+		Files.createDirIfNoExists(template);
+
+		// 获取文件后缀名
+		int beginIndex = tfs.getFile().getAbsolutePath().lastIndexOf(".");
+		String fileExt = tfs.getFile().getAbsolutePath().substring(beginIndex);
+
+		// 删除原来存在的头像
+		String regx = code + ".*";
+		File f2 = new File(template);
+		File[] s = f2.listFiles(new FileFilter(regx));
+		for (File file : s) {
+			Files.deleteFile(file);
+		}
+
+		// 上传新的头像文件
+		File f = new File(template + code + fileExt);
+		try {
+			BufferedImage img = (BufferedImage) ImageIO.read(tfs.getFile());
+			height = Math.min(height, img.getHeight());
+			width = Math.min(width, img.getWidth());
+			if (height <= 0)
+				height = img.getHeight();
+			if (width <= 0)
+				width = img.getWidth();
+			top = Math.max(Math.max(0, top), img.getHeight() - height);
+			left = Math.min(Math.max(0, left), img.getWidth() - width);
+			BufferedImage pic = img.getSubimage(left, top, width, height);
+			ImageIO.write(pic, ".png".equals(fileExt) ? "png" : "jpeg", f);
+			// Files.move(tfs.getFile(), f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
