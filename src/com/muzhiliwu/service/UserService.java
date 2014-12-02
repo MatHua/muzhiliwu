@@ -221,20 +221,26 @@ public class UserService {
 	public String editUser(User user) {
 		User u = dao.fetch(User.class, Cnd.where("id", "=", user.getId()));
 		if (true) {
-			// 避免修改一些不能修改的信息,例如：拇指币数,送礼物数,送礼物等级,人气值,人气等级等..都是不能让用户自行修改
-			user.setCode(u.getCode());
-			user.setPass(u.getPass());
-			user.setPhone(u.getPhone() == null ? null : u.getPhone());
-			user.setDate(DateUtils.now());
-			user.setMuzhiCoin(u.getMuzhiCoin());
-
-			user.setPopularityRank(u.getPopularityRank());
-			user.setPopularityValue(u.getPopularityValue());
-			user.setPopularityTop(u.getPopularityTop());
-
-			user.setSendGiftRank(u.getSendGiftRank());
-			user.setSendGiftValue(u.getSendGiftValue());
-			user.setSendGiftTop(u.getSendGiftTop());
+			u.setNickName(user.getNickName());
+			u.setSign(user.getSign());
+			u.setEmotion(user.getEmotion());
+			u.setMood(user.getMood());
+			u.setName(user.getName());
+			u.setSex(user.getSex());
+			u.setOrientation(user.getOrientation());
+			u.setBirth(user.getBirth());
+			u.setStar(user.getStar());
+			u.setPhone(user.getPhone());
+			u.setQQ(user.getQQ());
+			u.setMyUrl(user.getMyUrl());
+			u.setEmail(user.getEmail());
+			u.setProvinceName(user.getProvinceName());
+			u.setCityName(user.getCityName());
+			u.setAreaName(user.getAreaName());
+			u.setTownName(user.getTownName());
+			u.setSchool(user.getSchool());
+			u.setCollege(user.getCollege());
+			u.setMajor(user.getMajor());
 			dao.update(user);
 			return ActionMessage.success;
 		}
