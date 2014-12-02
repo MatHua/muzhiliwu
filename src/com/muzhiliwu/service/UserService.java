@@ -228,7 +228,6 @@ public class UserService {
 	public String editUser(User user) {
 		User u = dao.fetch(User.class, Cnd.where("id", "=", user.getId()));
 		if (true) {
-			// 避免修改一些不能修改的信息,例如：拇指币数,送礼物数,送礼物等级,人气值,人气等级等..都是不能让用户自行修改
 			u.setNickName(user.getNickName());
 			u.setSign(user.getSign());
 			u.setEmotion(user.getEmotion());
