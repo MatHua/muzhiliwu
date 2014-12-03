@@ -21,9 +21,8 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.upload.TempFile;
 import org.nutz.mvc.upload.UploadAdaptor;
 
-import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.listener.CheckShopLoginFilter;
-import com.muzhiliwu.model.User;
+import com.muzhiliwu.listener.CheckSuperAdminLoginFilter;
 import com.muzhiliwu.model.gift.Shop;
 import com.muzhiliwu.service.gift.ShopService;
 import com.muzhiliwu.utils.ActionMessage;
@@ -37,6 +36,68 @@ public class ShopModule {
 	@Inject
 	private ShopService shopService;
 	private static Log log = LogFactory.getLog(ShopModule.class);
+
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckSuperAdminLoginFilter.class, args = { "ioc:checkSuperAdminLoginFilter" }))
+	public Object regist(@Param("::shop.") Shop shop, String repass,
+			HttpServletRequest request) {
+		ActionMessage am = new ActionMessage();
+		if (shop == null || Strings.isBlank(shop.getCode())
+				|| Strings.isBlank(shop.getPass()) || Strings.isBlank(repass)) {
+			am.setMessage("~账号或密码及重复密码不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		if (Strings.isBlank(shop.getShopBoss())
+				|| Strings.isBlank(shop.getMobile())) {
+			am.setMessage("~店主姓名或联系方式不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		if (Strings.isBlank(shop.getEmail())
+				|| Strings.isBlank(shop.getIDCard())) {
+			am.setMessage("~邮箱或身份证号不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		if (Strings.isBlank(shop.getShopName())
+				|| Strings.isBlank(shop.getShopType())) {
+			am.setMessage("~店名或商户类型不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		if (Strings.isBlank(shop.getUrl())
+				|| Strings.isBlank(shop.getAlipayCode())) {
+			am.setMessage("~网址或支付宝账号不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		if (Strings.isBlank(shop.getShopIntroduct())) {
+			am.setMessage("~店家描述不能为空~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		if (!repass.equals(shop.getPass())) {
+			am.setMessage("~注册失败,两次密码输入不一致~");
+			am.setType(ActionMessage.fail);
+			return am;
+		}
+		String tmp = shopService.registShop(shop);
+		if (ActionMessage.success.equals(tmp)) {
+
+			am.setMessage("~注册成功~");
+			am.setType(ActionMessage.success);
+		} else {
+			am.setMessage("~注册失败,账号已被注册~");
+			am.setType(ActionMessage.fail);
+		}
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
+				+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "尝试注册~]");
+		return am;
+	}
 
 	@At
 	@Ok("json")
@@ -176,6 +237,30 @@ public class ShopModule {
 				+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
 				+ "尝试修改商家资料~]");
 		ActionMessage am = new ActionMessage();
+		if (shop == null || Strings.isBlank(shop.getShopName())
+				|| Strings.isBlank(shop.getUrl())) {
+			am.setType(ActionMessage.Account_Fail);
+			am.setMessage("~店名或网址不能为空~");
+			return am;
+		}
+		if (Strings.isBlank(shop.getAlipayCode())
+				|| Strings.isBlank(shop.getShopIntroduct())) {
+			am.setType(ActionMessage.Account_Fail);
+			am.setMessage("~支付宝账号或店家介绍不能为空~");
+			return am;
+		}
+		if (Strings.isBlank(shop.getPass())
+				|| Strings.isBlank(shop.getShopBoss())) {
+			am.setType(ActionMessage.Account_Fail);
+			am.setMessage("~密码或店主姓名不能为空~");
+			return am;
+		}
+		if (Strings.isBlank(shop.getMobile())
+				|| Strings.isBlank(shop.getEmail())) {
+			am.setType(ActionMessage.Account_Fail);
+			am.setMessage("~联系方式或邮箱不能为空~");
+			return am;
+		}
 		shop.setId(((Shop) session.getAttribute("s_shop")).getId());
 		String tmp = shopService.editShop(shop);
 		am.setType(ActionMessage.success);
