@@ -1,6 +1,5 @@
 package com.muzhiliwu.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -172,8 +171,10 @@ public class MessageService {
 	public QueryResult getMessages(Pager page) {
 		List<Message> msgs = dao.query(Message.class, Cnd.orderBy()
 				.desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(Message.class));
 		Message msg;
 		// 加载发表者
@@ -200,8 +201,10 @@ public class MessageService {
 		// .orderBy()
 		// .desc("date"), page
 		// dao.fetchLinks(user, "myMessages", Cnd.orderBy().desc("date"));
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(Message.class,
 				Cnd.where("publisherId", "=", user.getId())));
 

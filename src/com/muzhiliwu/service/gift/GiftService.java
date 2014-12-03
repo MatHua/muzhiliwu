@@ -272,8 +272,10 @@ public class GiftService {
 		// 审核通过的,还没下架的,没被删除的才能被显示
 		List<Gift> gifts = dao.query(Gift.class, cri, page);
 
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(Gift.class, cri));
 
 		dao.fetchLinks(gifts, "tags");// 获取标签

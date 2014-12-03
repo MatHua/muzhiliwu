@@ -13,7 +13,7 @@ import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.View;
 import org.nutz.mvc.view.UTF8JsonView;
 
-import com.muzhiliwu.model.gift.Shop;
+import com.muzhiliwu.model.gift.Admin;
 import com.muzhiliwu.service.gift.ShopService;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.AdminUtils;
@@ -24,7 +24,7 @@ import com.muzhiliwu.utils.IpUtils;
 public class CheckSuperAdminLoginFilter implements ActionFilter {
 	private static Log log = LogFactory.getLog(CheckLoginFilter.class);
 
-	private static final String name = "s_shop";
+	private static final String name = "a_admin";
 	private static final String path = "/index.jsp";
 	@Inject
 	private ShopService shopService;
@@ -49,7 +49,7 @@ public class CheckSuperAdminLoginFilter implements ActionFilter {
 
 		Object obj = session.getAttribute(name);
 		if (obj == null
-				|| !AdminUtils.superAdminId.equals(((Shop) obj).getId())) {// 如果用户名没保存在session中
+				|| !AdminUtils.superAdminId.equals(((Admin) obj).getId())) {// 如果用户名没保存在session中
 
 			log.info("[ip:" + IpUtils.getIpAddr(context.getRequest())
 					+ "]  [用户:" + "游客" + "]  [时间:" + DateUtils.now()

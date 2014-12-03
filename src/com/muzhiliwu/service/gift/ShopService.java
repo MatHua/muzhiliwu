@@ -21,7 +21,6 @@ import org.nutz.lang.Files;
 import org.nutz.mvc.upload.TempFile;
 
 import com.muzhiliwu.model.UnreadReply;
-import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.model.gift.Shop;
 import com.muzhiliwu.model.gift.ShopUnreadReply;
@@ -30,7 +29,6 @@ import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
 import com.muzhiliwu.utils.MD5;
-import com.muzhiliwu.utils.MuzhiCoin;
 import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
@@ -152,8 +150,10 @@ public class ShopService {
 			cri.where().and("saleState", "=", Gift.NotSale);
 		}
 		List<Gift> gifts = dao.query(Gift.class, cri, page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(Gift.class, cri));
 		return new QueryResult(gifts, page);
 	}
