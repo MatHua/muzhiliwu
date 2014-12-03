@@ -30,11 +30,35 @@ import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
 import com.muzhiliwu.utils.MD5;
+import com.muzhiliwu.utils.MuzhiCoin;
+import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
 public class ShopService {
 	@Inject
 	private Dao dao;
+
+	public String registShop(Shop shop) {
+
+		// 账号已被注册
+		if (!checkRepeat(shop.getCode())) {
+			return ActionMessage.fail;
+		}
+		// 一些系统自修改的信息
+		shop.setId(NumGenerator.getUuid());// 生成id
+		shop.setPass(MD5.toMD5(shop.getPass().trim()));// 密码加密
+		shop.setDate(DateUtils.now());// 注册时间
+
+		shop.setBusinessState(Shop.ShopOpen);
+		shop.setOkBusiness(Shop.CanBusiness);
+		dao.insert(shop);
+		return ActionMessage.success;
+	}
+
+	public boolean checkRepeat(String code) {
+		Shop shop = dao.fetch(Shop.class, Cnd.where("code", "=", code));
+		return shop == null ? true : false;
+	}
 
 	/**
 	 * 检查商户登录
