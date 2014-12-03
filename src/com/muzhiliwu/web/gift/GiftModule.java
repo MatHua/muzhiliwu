@@ -118,9 +118,10 @@ public class GiftModule {
 	@POST
 	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadGiftBigPic(@Param("bigPic") TempFile tfs,
+	public Object uploadGiftPic(@Param("pic") TempFile tfs,
 			@Param("::gift.") Gift gift, ServletContext context,
 			HttpSession session, HttpServletRequest request) {
+
 		Shop shop = (Shop) session.getAttribute("s_shop");
 
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
@@ -128,13 +129,13 @@ public class GiftModule {
 				+ DateUtils.now() + "]  [操作:" + "商品礼品大图]");
 
 		ActionMessage am = new ActionMessage();
-		if (gift != null || !Strings.isBlank(gift.getId())) {
+		if (gift == null || Strings.isBlank(gift.getId())) {
 			am.setType(ActionMessage.fail);
 			am.setMessage("gift.id不能为空~");
 			return am;
 		}
 		String result = giftService.uploadPic(gift, tfs,
-				context.getRealPath("/"), true);
+				context.getRealPath("/"));
 
 		am.setMessage("商品图片上传成功^_^");
 		am.setType(ActionMessage.success);
@@ -142,31 +143,39 @@ public class GiftModule {
 		return am;
 	}
 
-	// 上传小图
 	@At
 	@Ok("json")
 	@POST
 	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadGiftSmallPic(@Param("smallPic") TempFile tfs,
-			@Param("::gift.") Gift gift, ServletContext context,
-			HttpSession session, HttpServletRequest request) {
+	public Object cutGiftPic(@Param("::gift.") Gift gift, String picPath,
+			int top, int left, int width, int height, int smallWidth,
+			int smallHeight, ServletContext context, HttpSession session,
+			HttpServletRequest request) {
 		Shop shop = (Shop) session.getAttribute("s_shop");
+
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
 				+ (shop != null ? shop.getCode() : "游客") + "]  [时间:"
-				+ DateUtils.now() + "]  [操作:" + "商品礼品小图]");
+				+ DateUtils.now() + "]  [操作:" + "商品礼品大图]");
+
 		ActionMessage am = new ActionMessage();
-		if (gift != null || !Strings.isBlank(gift.getId())) {
+		if (gift == null || Strings.isBlank(gift.getId())) {
 			am.setType(ActionMessage.fail);
 			am.setMessage("gift.id不能为空~");
 			return am;
 		}
-		String result = giftService.uploadPic(gift, tfs,
-				context.getRealPath("/"), false);
+		if (Strings.isBlank(picPath)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您还没选择商品图片~");
+			return am;
+		}
+
+		String result = giftService.cutGiftPic(gift, picPath, top, left, width,
+				height, smallWidth, smallHeight, context.getRealPath("/"));
 
 		am.setMessage("商品图片上传成功^_^");
 		am.setType(ActionMessage.success);
-		am.setObject(result);// 返回图片存储路径
+		am.setObject(result);
 		return am;
 	}
 

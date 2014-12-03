@@ -1,10 +1,13 @@
 package com.muzhiliwu.service.gift;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
@@ -18,6 +21,7 @@ import org.nutz.lang.Files;
 import org.nutz.mvc.upload.TempFile;
 
 import com.muzhiliwu.model.UnreadReply;
+import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.gift.Gift;
 import com.muzhiliwu.model.gift.Shop;
 import com.muzhiliwu.model.gift.ShopUnreadReply;
@@ -147,7 +151,7 @@ public class ShopService {
 		return ActionMessage.fail;
 	}
 
-	public boolean uploadPhoto(String code, TempFile tfs, String template) {
+	public String uploadPhoto(String code, TempFile tfs, String template) {
 		// 更新数据库信息
 		Shop shop = getShopByCode(code);
 
@@ -162,7 +166,7 @@ public class ShopService {
 		String fileExt = tfs.getFile().getAbsolutePath().substring(beginIndex);
 
 		// 删除原来存在的头像
-		String regx = code + ".*";
+		String regx = code + "_pic" + ".*";
 		File f2 = new File(template);
 		File[] s = f2.listFiles(new FileFilter(regx));
 		for (File file : s) {
@@ -170,16 +174,62 @@ public class ShopService {
 		}
 
 		// 上传新的头像文件
-		File f = new File(template + code + fileExt);
+		File f = new File(template + code + "_pic" + fileExt);
 		try {
 			Files.move(tfs.getFile(), f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		shop.setLogo(template + code + fileExt);
+		shop.setLogo("/shopLogo/" + code + "_pic" + fileExt);
 		dao.update(s);
-		return true;
+		return "/shopLogo/" + code + "_pic" + fileExt;
+	}
+
+	public String cutLogo(String code, String picPath, int top, int left,
+			int width, int height, String template) {
+		// 更新数据库信息
+		Shop s = getShopByCode(code);
+
+		File pic = new File(template + picPath);
+
+		// 如果对应的文件夹不存在,就创建该文件夹
+		Files.createDirIfNoExists(template);
+
+		// 获取文件后缀名
+		int beginIndex = pic.getAbsolutePath().lastIndexOf(".");
+		String fileExt = pic.getAbsolutePath().substring(beginIndex);
+
+		// 删除原来存在的头像
+		String regx = code + fileExt;
+		File f2 = new File(template + "/shopLogo/" + code + fileExt);
+		Files.deleteFile(f2);
+
+		// 上传新的头像文件
+		File f = new File(template + "/shopLogo/" + code + fileExt);
+		try {
+			BufferedImage img = (BufferedImage) ImageIO.read(pic);
+			height = Math.min(height, img.getHeight());
+			width = Math.min(width, img.getWidth());
+			if (height <= 0)
+				height = img.getHeight();
+			if (width <= 0)
+				width = img.getWidth();
+			top = Math.max(Math.max(0, top), img.getHeight() - height);
+			left = Math.min(Math.max(0, left), img.getWidth() - width);
+			BufferedImage cut = img.getSubimage(left, top, width, height);
+			ImageIO.write(cut, ".png".equals(fileExt) ? "png" : "jpeg", f);
+			// Files.move(tfs.getFile(), f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		f2 = new File(template + picPath);
+		Files.deleteFile(f2);
+
+		s.setLogo(/* template */"/shopLogo/" + code + fileExt);
+		dao.update(s);
+		return "/shopLogo/" + code + fileExt;
 	}
 
 	public Shop getShopByCode(String code) {

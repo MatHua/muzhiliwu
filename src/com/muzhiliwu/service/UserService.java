@@ -317,7 +317,7 @@ public class UserService {
 		User u = getUserByCode(code);
 
 		// template += "/WEB-INF/userphoto/";
-		File pic = new File(template + "/userphoto/" + picPath);
+		File pic = new File(template + picPath);
 		template += "/userphoto/";
 
 		// 如果对应的文件夹不存在,就创建该文件夹

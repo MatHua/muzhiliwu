@@ -21,7 +21,9 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.upload.TempFile;
 import org.nutz.mvc.upload.UploadAdaptor;
 
+import com.muzhiliwu.listener.CheckLoginFilter;
 import com.muzhiliwu.listener.CheckShopLoginFilter;
+import com.muzhiliwu.model.User;
 import com.muzhiliwu.model.gift.Shop;
 import com.muzhiliwu.service.gift.ShopService;
 import com.muzhiliwu.utils.ActionMessage;
@@ -111,14 +113,14 @@ public class ShopModule {
 	@POST
 	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadShopLogo(@Param("userpic") TempFile tfs,
+	public Object uploadShopLogo(@Param("logo") TempFile tfs,
 			ServletContext context, HttpSession session,
 			HttpServletRequest request) {
 
 		Shop shop = (Shop) session.getAttribute("s_shop");
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [商家:"
 				+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
-				+ "上传头像]");
+				+ "上传logo]");
 
 		ActionMessage am = new ActionMessage();
 		if (tfs == null) {
@@ -126,12 +128,41 @@ public class ShopModule {
 			am.setMessage("您还没选择logo~");
 			return am;
 		}
-		boolean result = shopService.uploadPhoto(shop.getCode(), tfs,
+		String result = shopService.uploadPhoto(shop.getCode(), tfs,
 				context.getRealPath("/"));
-		if (result) {
-			am.setMessage("logo上传成功^_^");
-			am.setType(ActionMessage.success);
+
+		am.setMessage("logo上传成功^_^");
+		am.setType(ActionMessage.success);
+		am.setObject(result);
+		return am;
+	}
+
+	@At
+	@Ok("json")
+	@POST
+	@Filters(@By(type = CheckShopLoginFilter.class, args = { "ioc:checkShopLoginFilter" }))
+	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
+	public Object cutShopLogo(String picPath, int top, int left, int width,
+			int height, ServletContext context, HttpSession session,
+			HttpServletRequest request) {
+		Shop shop = (Shop) session.getAttribute("s_shop");
+		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [商家:"
+				+ shop.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
+				+ "上传logo]");
+
+		ActionMessage am = new ActionMessage();
+		if (Strings.isBlank(picPath)) {
+			am.setType(ActionMessage.fail);
+			am.setMessage("您还没选择logo~");
+			return am;
 		}
+
+		String result = shopService.cutLogo(shop.getCode(), picPath, top, left,
+				width, height, context.getRealPath("/"));
+
+		am.setMessage("logo上传成功^_^");
+		am.setType(ActionMessage.success);
+		am.setObject(result);
 		return am;
 	}
 
