@@ -25,8 +25,10 @@ public class OrderService {
 				Cnd.where("buyerId", "=", user.getId())
 						.and("payState", "=", OrderForm.WaitBuyerPay)
 						.desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(
 				OrderForm.class,
 				Cnd.where("buyerId", "=", user.getId()).and("payState", "=",

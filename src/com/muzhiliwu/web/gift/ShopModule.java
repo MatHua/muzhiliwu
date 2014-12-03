@@ -1,7 +1,9 @@
 package com.muzhiliwu.web.gift;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
@@ -36,6 +38,21 @@ public class ShopModule {
 	@Inject
 	private ShopService shopService;
 	private static Log log = LogFactory.getLog(ShopModule.class);
+
+	@At
+	@Ok("json")
+	@POST
+	public Object logout(HttpSession session, HttpServletRequest request,
+			HttpServletResponse response) {
+		if (session.getAttribute("s_shop") != null) {
+			session.removeAttribute("s_shop");
+		}
+
+		ActionMessage am = new ActionMessage();
+		am.setMessage("成功退出登录~");
+		am.setType(ActionMessage.success);
+		return am;
+	}
 
 	@At
 	@Ok("json")

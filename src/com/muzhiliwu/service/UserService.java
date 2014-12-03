@@ -46,8 +46,10 @@ public class UserService {
 		List<ReceiveContactWay> addresses = dao.query(ReceiveContactWay.class,
 				Cnd.where("creatorId", "=", user.getId())
 						.desc("defaultAddress").desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(ReceiveContactWay.class,
 				Cnd.where("creatorId", "=", user.getId())));
 		return new QueryResult(addresses, page);
@@ -415,8 +417,10 @@ public class UserService {
 				page);
 		dao.fetchLinks(replies, "replier");// 加载回复者
 		dao.fetchLinks(replies, "shop");
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(
 				UnreadReply.class,
 				Cnd.where("receiverId", "=", user.getId()).and("state", "=",
@@ -429,8 +433,10 @@ public class UserService {
 				Cnd.where("receiverId", "=", user.getId()).desc("date"), page);
 		dao.fetchLinks(replies, "replier");// 加载回复者
 		dao.fetchLinks(replies, "shop");
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(UnreadReply.class,
 				Cnd.where("receiverId", "=", user.getId())));
 		return new QueryResult(replies, page);
