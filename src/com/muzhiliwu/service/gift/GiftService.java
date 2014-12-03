@@ -1,10 +1,14 @@
 package com.muzhiliwu.service.gift;
 
-import java.awt.Desktop.Action;
+import java.awt.Image;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 
 import org.nutz.dao.Cnd;
@@ -99,8 +103,7 @@ public class GiftService {
 	 *            是否是大图
 	 * @return
 	 */
-	public String uploadPic(Gift gift, TempFile tfs, String template,
-			boolean flag) {
+	public String uploadPic(Gift gift, TempFile tfs, String template) {
 
 		// template += "/WEB-INF/giftPic/";
 		template += "/giftPic/";
@@ -113,7 +116,7 @@ public class GiftService {
 		String fileExt = tfs.getFile().getAbsolutePath().substring(beginIndex);
 
 		// 删除原来存在的图
-		String regx = gift.getId() + (flag ? "_big" : "_small") + ".*";
+		String regx = gift.getId() + ".*";
 		File f2 = new File(template);
 		File[] s = f2.listFiles(new FileFilter(regx));
 		for (File file : s) {
@@ -121,16 +124,81 @@ public class GiftService {
 		}
 
 		// 上传新的图
-		File f = new File(template + gift.getId() + (flag ? "_big" : "_small")
-				+ fileExt);
+		File f = new File(template + gift.getId() + fileExt);
 		try {
 			Files.move(tfs.getFile(), f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "/giftPic/" + gift.getId() + (flag ? "_big" : "_small")
-				+ fileExt;
+		return "/giftPic/" + gift.getId() + fileExt;
 
+	}
+
+	public String cutGiftPic(Gift gift, String picPath, int top, int left,
+			int width, int height,int smallWidth,int smallHeight, String template) {
+
+		File pic = new File(template + picPath);
+
+		// 如果对应的文件夹不存在,就创建该文件夹
+		Files.createDirIfNoExists(template);
+
+		// 获取文件后缀名
+		int beginIndex = pic.getAbsolutePath().lastIndexOf(".");
+		String fileExt = pic.getAbsolutePath().substring(beginIndex);
+
+		// 删除原来存在的头像
+		File f2 = new File(template + gift.getId() + "_big" + fileExt);
+		Files.deleteFile(f2);
+		f2 = new File(template + gift.getId() + "_small" + fileExt);
+		Files.deleteFile(f2);
+
+		// 上传新的头像文件
+		File big = new File(template + gift.getId() + "_big" + fileExt);
+		try {
+			BufferedImage img = (BufferedImage) ImageIO.read(pic);
+			height = Math.min(height, img.getHeight());
+			width = Math.min(width, img.getWidth());
+			if (height <= 0)
+				height = img.getHeight();
+			if (width <= 0)
+				width = img.getWidth();
+			top = Math.max(Math.max(0, top), img.getHeight() - height);
+			left = Math.min(Math.max(0, left), img.getWidth() - width);
+			BufferedImage cut = img.getSubimage(left, top, width, height);
+			ImageIO.write(cut, ".png".equals(fileExt) ? "png" : "jpeg", big);
+			// Files.move(tfs.getFile(), f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		File small = new File(template + gift.getId() + "_small" + fileExt);
+		try {
+			double ratio = 0.0;// 缩放比例
+			BufferedImage bi = ImageIO.read(big);
+			Image img = bi.getScaledInstance(smallWidth, smallHeight,
+					bi.SCALE_SMOOTH);
+			// 计算比例
+			if ((bi.getHeight() > smallHeight) || (bi.getWidth() > smallWidth)) {
+				if (bi.getHeight() > bi.getWidth()) {
+					ratio = (new Integer(smallHeight)).doubleValue()
+							/ bi.getHeight();
+				} else {
+					ratio = (new Integer(smallWidth)).doubleValue()
+							/ bi.getWidth();
+				}
+				AffineTransformOp op = new AffineTransformOp(
+						AffineTransform.getScaleInstance(ratio, ratio), null);
+				img = op.filter(bi, null);
+			}
+			ImageIO.write((BufferedImage) img, "JPEG", small);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		f2 = new File(template + picPath);
+		Files.deleteFile(f2);
+		return "/giftPic/" + gift.getId() + "_big" + fileExt + ","
+				+ "/giftPic/" + gift.getId() + "_small" + fileExt;
 	}
 
 	/**
