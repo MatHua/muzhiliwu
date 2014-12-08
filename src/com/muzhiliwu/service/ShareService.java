@@ -227,8 +227,10 @@ public class ShareService {
 	public QueryResult getShares(Pager page, User user) {
 		List<Share> shares = dao.query(Share.class, Cnd.orderBy().desc("date"),
 				page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(Share.class));
 
 		// 加载分享发表者
@@ -261,8 +263,10 @@ public class ShareService {
 	public QueryResult getMyShares(User user, Pager page) {
 		List<Share> shares = dao.query(Share.class,
 				Cnd.where("sharerId", "=", user.getId()).desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(Share.class,
 				Cnd.where("sharerId", "=", user.getId())));
 

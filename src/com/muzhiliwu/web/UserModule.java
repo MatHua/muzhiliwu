@@ -1,5 +1,7 @@
 package com.muzhiliwu.web;
 
+import java.io.File;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -459,7 +461,7 @@ public class UserModule {
 	@POST
 	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadUserPic1(@Param("userpic") TempFile tfs,
+	public Object uploadUserPic(@Param("userpic") TempFile tfs,
 			ServletContext context, HttpSession session,
 			HttpServletRequest request) {
 
@@ -474,79 +476,41 @@ public class UserModule {
 			am.setMessage("您还没选择头像~");
 			return am;
 		}
-		boolean result = userService.uploadPhoto(user.getCode(), tfs,
+		String result = userService.uploadPhoto(user.getCode(), tfs,
 				context.getRealPath("/"));
-		if (result) {
-			am.setMessage("头像上传成功^_^");
-			am.setType(ActionMessage.success);
-		}
+		am.setMessage("头像上传成功^_^");
+		am.setType(ActionMessage.success);
+		am.setObject(result);
 		return am;
 	}
 
 	@At
 	@Ok("json")
-	// @POST
-	// @Filters(@By(type = CheckLoginFilter.class, args = {
-	// "ioc:checkLoginFilter" }))
+	@POST
+	@Filters(@By(type = CheckLoginFilter.class, args = { "ioc:checkLoginFilter" }))
 	@AdaptBy(type = UploadAdaptor.class, args = { "ioc:myUpload" })
-	public Object uploadUserPic2(@Param("userpic") TempFile tfs, int top,
-			int left, int width, int height, ServletContext context,
-			HttpSession session, HttpServletRequest request) {
+	public Object cutUserPic(String picPath, int top, int left, int width,
+			int height, ServletContext context, HttpSession session,
+			HttpServletRequest request) {
 
-		// User user = (User) session.getAttribute("t_user");
-		User user = new User();
-		user.setId("1");
-		user.setCode("mathua");
+		User user = (User) session.getAttribute("t_user");
 		log.info("[ip:" + IpUtils.getIpAddr(request) + "]  [用户:"
 				+ user.getCode() + "]  [时间:" + DateUtils.now() + "]  [操作:"
 				+ "上传头像]");
 
 		ActionMessage am = new ActionMessage();
-		if (tfs == null) {
+		if (Strings.isBlank(picPath)) {
 			am.setType(ActionMessage.fail);
 			am.setMessage("您还没选择头像~");
 			return am;
 		}
-		boolean result = userService.uploadPhoto(user.getCode(), tfs, top,
+
+		String result = userService.cutPhoto(user.getCode(), picPath, top,
 				left, width, height, context.getRealPath("/"));
-		if (result) {
-			am.setMessage("头像上传成功^_^");
-			am.setType(ActionMessage.success);
-		}
+
+		am.setMessage("头像上传成功^_^");
+		am.setType(ActionMessage.success);
+		am.setObject(result);
 		return am;
 	}
-
-	// 获取用户头像
-	// @At
-	// @Ok("void")
-	// @POST
-	// @Filters(@By(type = CheckLoginFilter.class, args = {
-	// "ioc:checkLoginFilter" }))
-	// public void getUserPic(HttpServletResponse response, String code,
-	// ServletContext context) throws IOException {
-	// ServletOutputStream out = response.getOutputStream();// 获取输出流
-	// response.setContentType("image/gif");
-	// response.setHeader("Pragma", "No-cache");
-	// response.setHeader("Cache-Control", "no-cache");
-	// response.setDateHeader("Expires", 0);
-	//
-	// // 通过过滤查找图片
-	// String regx = code + ".*";
-	// File f2 = new File(context.getRealPath("/") + "/WEB-INF/userphoto/");
-	//
-	// File[] s = f2.listFiles(new FileFilter(regx));
-	// if (s == null || s.length <= 0) {
-	// return;
-	// }
-	//
-	// InputStream fis = new FileInputStream(s[0]);
-	// int i = fis.available();// 得到文件大小
-	// byte buf[] = new byte[i];
-	// int len = 0;
-	// while ((len = fis.read(buf)) != -1) {
-	// out.write(buf, 0, len);
-	// }
-	// out.close();
-	// fis.close();
-	// }
 }

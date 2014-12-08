@@ -25,8 +25,8 @@ public class Gift extends IdEntity {
 	public static final String OnSale = "on_sale";// 在销售
 	public static final String NotSale = "not_sale";// 商品下架
 
-	public static final String AuditSuccess = "Audit_Success";// 审核成功
-	public static final String AuditFail = "Audit_Fail";// 审核失败
+	public static final String AuditSuccess = "AuditSuccess";// 审核成功
+	public static final String AuditFail = "AuditFail";// 审核失败
 	public static final String Auditing = "Auditing";// 审核中
 
 	@Column
@@ -71,6 +71,7 @@ public class Gift extends IdEntity {
 	@Column
 	private String auditState;// 审核状态
 	@Column
+	@ColDefine(type = ColType.TEXT)
 	private String auditMess;// 记录审核失败原因
 	@Column
 	private boolean isDelete;// 被删除标识

@@ -190,8 +190,10 @@ public class GiftCollectService {
 	public QueryResult getMyGiftCollects(User user, Pager page) {
 		List<GiftCollect> collects = dao.query(GiftCollect.class,
 				Cnd.where("collectorId", "=", user.getId()).desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(GiftCollect.class,
 				Cnd.where("collectorId", "=", user.getId())));
 
@@ -215,8 +217,10 @@ public class GiftCollectService {
 	public QueryResult getGiftCollects(Pager page) {
 		List<GiftCollect> collects = dao.query(GiftCollect.class, Cnd.orderBy()
 				.desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(GiftCollect.class));
 		dao.fetchLinks(collects, "collector");
 		dao.fetchLinks(collects, "gift");

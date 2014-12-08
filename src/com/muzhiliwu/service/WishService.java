@@ -19,7 +19,6 @@ import com.muzhiliwu.model.Wish;
 import com.muzhiliwu.model.WishPraise;
 import com.muzhiliwu.model.WishRealizationOfWantor;
 import com.muzhiliwu.model.WishShare;
-import com.muzhiliwu.model.gift.OrderForm;
 import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.MuzhiCoin;
@@ -256,8 +255,10 @@ public class WishService {
 				Wish.class,
 				Cnd.where("wisherId", "=", user.getId())
 						.and("state", "=", state).desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(
 				Wish.class,
 				Cnd.where("wisherId", "=", user.getId()).and("state", "=",
@@ -308,8 +309,10 @@ public class WishService {
 		List<WishRealizationOfWantor> wantors = dao.query(
 				WishRealizationOfWantor.class,
 				Cnd.where("wisherId", "=", user.getId()).desc("date"), page);
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(WishRealizationOfWantor.class,
 				Cnd.where("wisherId", "=", user.getId())));
 		dao.fetchLinks(wantors, "wantor");
@@ -347,8 +350,10 @@ public class WishService {
 		cri.getOrderBy().desc("date");
 		List<Wish> wishes = dao.query(Wish.class, cri, page);
 		
-		if (page == null)
+		if (page == null) {
 			page = new Pager();
+			page.setPageSize(-1);
+		}
 		page.setRecordCount(dao.count(Wish.class, cri));
 
 		// 加载分享发表者

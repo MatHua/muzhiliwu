@@ -6,6 +6,10 @@ import org.nutz.mvc.NutConfig;
 import org.nutz.mvc.Setup;
 import org.nutz.resource.Scans;
 
+import com.muzhiliwu.model.gift.Admin;
+import com.muzhiliwu.utils.AdminUtils;
+import com.muzhiliwu.utils.MD5;
+
 public class SetupAndInitParam implements Setup {
 
 	private Dao dao;
@@ -27,10 +31,19 @@ public class SetupAndInitParam implements Setup {
 				dao.create(klass, false);
 			}
 		}
-		for (Class<?> klass : Scans.me().scanPackage("com.muzhiliwu.model.gift")) {
+		for (Class<?> klass : Scans.me()
+				.scanPackage("com.muzhiliwu.model.gift")) {
 			if (null != klass.getAnnotation(Table.class)) {
 				dao.create(klass, false);
 			}
+		}
+		Admin superAdmin = dao.fetch(Admin.class, AdminUtils.superAdminId);
+		if (superAdmin == null) {
+			superAdmin = new Admin();
+			superAdmin.setId(AdminUtils.superAdminId);
+			superAdmin.setCode(AdminUtils.superAdminCode);
+			superAdmin.setPass(MD5.toMD5(AdminUtils.superAdminPass));
+			dao.insert(superAdmin);
 		}
 	}
 
