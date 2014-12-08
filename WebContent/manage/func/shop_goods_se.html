@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>拇指礼物-用户后台</title>
+<link type="text/css" rel="stylesheet" href="../css/uikit-muzhiliwu.css" />
+<link type="text/css" rel="stylesheet" href="../css/manage_shop.css" />
+<link type="text/css" rel="stylesheet" href="../css/addons/uikit.almost-flat.addons.min.css" />
+<script src="../js/jquery-2.0.2.min.js"></script>
+<script src="../js/uikit.min.js"></script>
+<script src="../js/manage_normal.js"></script>
+<script src="../js/addons/notify.min.js"></script>
+</head>
+
+<body class="uk-height-1-1">
+<!--head -->
+<nav class="uk-navbar uk-navbar-attached head_navbar_bg">
+	<div class="uk-container-center head_navbar">
+		<a class="uk-navbar-brand head_navbar_logo"><img src="../imgs/manage_logo.png" /></a>
+		<ul class="uk-navbar-nav uk-float-right">
+			<div class="head_navbar_guide head_navbar_guide_act"><span class="uk-icon-user"></span></div>
+			<a class="head_navbar_guide" href="#" id="head_logout">退出</a>
+		</ul>
+	</div>
+</nav>
+<!--head over -->
+<!--manage body -->
+<div class="manage_lay uk-link-muted">
+	<div class="manage_left">
+		<!--user info -->
+		<div class="user_lay">
+			<div class="user_pic_lay">
+				<img class="user_pic" src="" />
+				<div class="user_message_num">3</div>
+			</div>
+			<div class="user_name">礼品汇</div>
+			<div class="user_bar_bg">
+				<div class="user_bar_text" id="user_bar_gift_t">线上加盟商户</div>
+			</div>
+			<div class="user_bar_bg">
+				<div class="user_bar_text" id="user_bar_fan_t">月访问量：3281</div>
+			</div>
+			<div class="user_bar_bg" id="user_bar_coin">
+				月访问排行：13
+			</div>
+		</div>
+		<!--user info -->
+		<!--function menu -->
+		<div class="main_menu_lay">
+			<div class="icon-stackoverflow" id="main_menu_title"></div>
+			<ul class="main_menu_ul">
+				<li id="basic_info" t="shop_basic">
+					<p><a href="../shop.html">基本信息</a></p>
+				</li>
+				<li id="gift_manage">
+					<p>商品管理</p>
+					<ul class="main_menu_ul_s">
+						<li><a href="shop_goods_se.html">商品查改</a></li>
+					</ul>
+				</li>
+				<li id="id_manage">
+					<p>账号管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="shop_user">个人账号</li>
+						<li t="shop_info">店铺信息</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<!--function menu over -->
+		<!--logout -->
+		<div class="main_menu_lay">
+			<p class="main_menu_logout">退出登录</p>
+		</div>
+		<!--logout over -->
+		<!--web info -->
+		<p class="web_info">Development and design by <br />www.rippletec.net<br />Copyrighted © 2014. <br />All rights reserved.</p>
+		<!--web info over -->
+	</div>
+	<div class="manage_right" id="manage_right">
+		<!--goods operation -->
+		<div class="manage_block_title"><div class="manage_block_name">商品查改</div><div class="manage_block_line"></div></div>
+		<div class="goods_operation_lay">
+			<div class="goods_operation_checkall_lay"><input type="checkbox" /></div>
+			<div class="goods_operation_block_lay" id="goods_operation_add"><span class="uk-icon-plus"></span><a href="shop_edit.html">新增</a></div>
+			<div class="goods_operation_block_lay" id="goods_operation_delete"><span class="uk-icon-times"></span>删除</div>
+			<div class="goods_operation_block_lay" id="goods_operation_checknum"><span class="uk-icon-sort-desc"></span>点击量</div>
+			<div class="goods_operation_block_lay" id="goods_operation_sell_price"><span class="uk-icon-sort-desc"></span>销售价</div>
+			<div class="goods_operation_block_lay" id="goods_operation_isremove"><span class="uk-icon-history"></span>已下架</div>
+			<div class="goods_operation_block_lay" id="goods_operation_search_ok"><span class="uk-icon-search"></span>搜索</div>
+			<input class="goods_operation_search" placeholder="请输入搜索内容" />
+		</div>
+		<div class="manage_block_main">
+			<!--<div class="goods_show_block_lay">
+				<input type="checkbox" class="goods_show_checkbox" />
+				<div class="goods_show_lay">
+					<img src="../imgs/test_gifts.jpg" class="goods_show_pic" />
+					<div class="goods_show_info">
+						<p class="goods_show_name">夜空中的星星</p>
+						<p class="goods_show_checknum">点击量：3021</p>
+						<p class="goods_show_price">销售价：￥9999.99</p>
+					</div>
+					<p class="goods_show_checking">审核中</p>
+					<p class="goods_show_cancel">下架</p>
+					<p class="goods_show_edit">修改</p>
+				</div>
+			</div> -->
+		</div>
+		<!--goods operation over -->
+	</div>
+</div>
+<!--manage body over -->
+</body>
+</html>

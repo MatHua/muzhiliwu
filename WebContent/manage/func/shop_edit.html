@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>拇指礼物-用户后台</title>
+<link type="text/css" rel="stylesheet" href="../css/uikit-muzhiliwu.css" />
+<link type="text/css" rel="stylesheet" href="../css/manage_shop_edit.css" />
+<link type="text/css" rel="stylesheet" href="../css/addons/uikit.almost-flat.addons.min.css" />
+<script src="../js/jquery-2.0.2.min.js"></script>
+<script src="../js/uikit.min.js"></script>
+<script src="../js/manage_normal.js"></script>
+<script src="../js/addons/notify.min.js"></script>
+<script src="../editor/ueditor.config.js"></script>
+<script src="../editor/ueditor.all.min.js"></script>
+</head>
+
+<body class="uk-link-muted">
+<!--head -->
+<nav class="uk-navbar uk-navbar-attached head_navbar_bg">
+	<div class="uk-container-center head_navbar">
+		<a class="uk-navbar-brand head_navbar_logo"><img src="../imgs/manage_logo.png" /></a>
+		<ul class="uk-navbar-nav uk-float-right">
+			<div class="head_navbar_guide head_navbar_guide_act"><span class="uk-icon-user"></span></div>
+			<a class="head_navbar_guide" href="#" id="head_logout">退出</a>
+		</ul>
+	</div>
+</nav>
+<!--head over -->
+<!--manage body -->
+<div class="manage_lay">
+	<div class="goods_edit_operation_top">
+		<a href="shop_goods_se.html"><div class="goods_edit_back" >返回</div></a>
+		<div class="goods_edit_save" >保存</div>
+	</div>
+	<div class="manage_left">
+		<div class="goods_edit_show_lay">
+			<div class="goods_edit_show_pic_lay">
+				<img class="goods_edit_show_pic" src="../imgs/goods_edit_operation_show_pic.jpg" />
+				<div class="goods_edit_show_pic_up">上传封面大图</div>
+			</div>
+			<input type="text" placeholder="销售价格:￥"  class="goods_edit_show_price"/>
+			<select  class="goods_edit_show_select">
+				<option>商品分类</option>
+				<option>服装配饰</option>
+				<option>珠宝首饰</option>
+				<option>护理护肤</option>
+				<option>数码科技</option>
+				<option>文具办公</option>
+				<option>创意玩具</option>
+				<option>家居装饰</option>
+				<option>鲜花绿植</option>
+				<option>运动户外</option>
+				<option>其他</option>
+			</select>
+			<select  class="goods_edit_show_select">
+				<option>适宜性别</option>
+				<option>皆可</option>
+				<option>男</option>
+				<option>女</option>
+			</select>
+			<select  class="goods_edit_show_select">
+				<option>适宜星座</option>
+				<option>皆可</option>
+				<option>白羊座</option>
+				<option>金牛座</option>
+				<option>双子座</option>
+				<option>巨蟹座</option>
+				<option>狮子座</option>
+				<option>处女座</option>
+				<option>天秤座</option>
+				<option>天蝎座</option>
+				<option>射手座</option>
+				<option>摩羯座</option>
+				<option>水瓶座</option>
+				<option>双鱼座</option>
+			</select>
+			<select  class="goods_edit_show_select">
+				<option>适宜年龄段</option>
+				<option>皆可</option>
+				<option>0~6</option>
+				<option>7~12</option>
+				<option>13~17</option>
+				<option>17~25</option>
+				<option>26~35</option>
+				<option>36~∞</option>
+			</select>
+		</div>
+	</div>
+	<div class="manage_right">
+		<div class="goods_edit_info">
+				<div class="goods_edit_info_pic_lay">
+					<img src="../imgs/test_gifts.jpg" class="goods_edit_info_pic" />
+					<div class="goods_edit_info_pic_up">上传小图</div>
+				</div>
+				<div class="goods_edit_text">
+					<input class="goods_edit_name" placeholder="请输入商品名称，最好不超过13个汉字长度，最大长度不超过15个字符" maxlength="15" />
+					<input class="goods_edit_tips" placeholder="请输入关键字，多个标签之间请用英文逗号','隔开，如：双鱼座,男朋友,生日" />
+					<input class="goods_edit_link" placeholder="请输入完整商品链接" />
+				</div>
+		</div>
+		<div class="manage_block_main">
+		<script id="editor" type="text/plain" style="width:776px;height:500px;"></script>
+		<script type="text/javascript">
+			var ue = UE.getEditor('editor');
+		</script>
+		</div>
+		<div class="goods_edit_operation_bottom uk-margin-bottom">
+			<a href="shop_goods_se.html"><div class="goods_edit_back" >返回</div></a>
+			<div class="goods_edit_save" >保存</div>
+		</div>
+	</div>
+</div>
+<!--manage body over -->
+</body>
+</html>

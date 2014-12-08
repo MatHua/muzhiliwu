@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<script src="jquery-2.0.2.min.js"></script>
+<script>
+$(document).ready(function(e) {
+	
+	//遍历获取表单数据并且返回map值
+	function getFromInputValMap(formIdObj){
+		//创建map对象
+		var map={};
+		//遍历表格下name=form_input的input并且将其储存进map
+		$(formIdObj).find("input[name=form_input]").each(function(index, element) {
+			//当值不为空时有效
+			if($(this).val()!='')
+				map[$(this).attr("fr")]=$(this).val();
+		});
+		//返回map对象
+		return map;
+	}
+	
+	$("#ok").click(function(){
+		var data=getFromInputValMap($("#testform"));
+		$.ajax({
+			type:"post",
+			url:"http://localhost:8080/muzhiliwu/shop/login",
+			data:data,
+			success: function(data){
+				alert(data)
+			}
+		})
+	})
+});
+</script>
+</head>
+
+<body>
+<form id="testform">
+	<input name="form_input" fr="shop.code" />
+	<input name="form_input" fr="shop.pass" />
+	<button type="button" id="ok">ok</button>
+</form>
+</body>
+</html>

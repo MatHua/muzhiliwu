@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拇指礼物-买礼物，我们更懂你</title>
+<link type="text/css" rel="stylesheet" href="css/uikit-muzhiliwu.css" />
+<link type="text/css" rel="stylesheet" href="css/index.css" />
+<script src="js/jquery-2.0.2.min.js"></script>
+<script src="js/uikit.min.js"></script>
+<script src="js/index_func.js"></script>
+<script src="js/addons/notify.min.js"></script>
+</head>
+
+<body class="uk-height-1-1">
+<!--dailog -->
+<div class="uk-modal uk-vertical-align uk-text-center" id="login_dialog">
+	<div class="uk-modal-dialog uk-vertical-align-middle uk-container-center" style="width:250px;">
+		<form class="uk-panel uk-panel-box uk-form" id="head_login_form">
+			<a class="uk-modal-close uk-close uk-float-right"></a>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="text" placeholder="用户名" fr="user.code" name="form_input" maxlength="10">
+			</div>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="password" placeholder="密码" fr="user.pass" name="form_input" maxlength="15">
+			</div>
+			<div class="uk-form-row">
+				<a class="uk-width-1-1 uk-button uk-button-success uk-button-large ls_input" id="head_login">登录</a>
+			</div>
+			<div class="uk-form-row uk-text-small">
+				<label class="uk-float-left ls_input"><input type="checkbox"> 记住密码</label>
+			<a class="uk-float-right uk-link uk-link-muted ls_input" href="#sign_dialog" id="not_sign">还没注册？</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="uk-modal uk-vertical-align uk-text-center" id="sign_dialog">
+	<div class="uk-modal-dialog uk-vertical-align-middle uk-container-center" style="width:250px;">
+		<form class="uk-panel uk-panel-box uk-form" id="head_sign_form">
+			<a class="uk-modal-close uk-close uk-float-right"></a>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="text" placeholder="用户名" fr="user.code" name="form_input" maxlength="10">
+			</div>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="password" placeholder="密码" fr="user.pass" name="form_input" maxlength="15">
+			</div>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="password" placeholder="重复密码" fr="repass" name="form_input" maxlength="15">
+			</div>
+			<div class="uk-form-row">
+				<a class="uk-width-1-1 uk-button uk-button-danger uk-button-large ls_input" id="head_sign">注册</a>
+			</div>
+			<div class="uk-form-row uk-text-small">
+			<a class="uk-link uk-link-muted ls_input" href="#sign_dialog" id="already_sign">已有帐号</a>
+			</div>
+		</form>
+	</div>
+</div>
+<!--dailog over -->
+<!--head -->
+<nav class="uk-navbar uk-navbar-attached head_navbar_bg">
+	<div class="uk-container uk-container-center head_navbar uk-hidden-small">
+		<a class="uk-navbar-brand head_navbar_logo"><img src="imgs/index/manage_logo.png" /></a>
+		<ul class="uk-navbar-nav uk-float-right">
+			<div class="head_navbar_guide head_navbar_guide_act"><span class="uk-icon-home"></span>首页</div>
+			<!--<div class="head_navbar_guide"><span class="uk-icon-magic"></span>愿望墙</div>
+			<div class="head_navbar_guide"><span class="uk-icon-share-alt"></span>分享墙</div>
+			<div class="head_navbar_guide"><span class="uk-icon-leaf"></span>留言墙</div> -->
+		</ul>
+		<ul class="uk-navbar-nav uk-navbar-center" id="head_not_login_info" style="display:none">
+			<a class="head_navbar_guide" href="#login_dialog" data-uk-modal>登录</a>
+			<a class="head_navbar_guide" href="#sign_dialog" data-uk-modal>注册</a>
+		</ul>
+		<ul class="uk-navbar-nav uk-navbar-center" id="head_login_info" style="display:none">
+			<a class="head_navbar_guide" href="manage/user.html" id="head_username"></a>
+			<a class="head_navbar_guide" href="#" id="head_logout">退出</a>
+		</ul>
+	</div>
+	<div class="uk-container uk-container-center head_navbar uk-visible-small">
+		<div class="uk-navbar-nav uk-icon-navicon head_navbar_guide_toggle" data-uk-offcanvas="{target:'#sideGuide'}"></div>
+		<a class="uk-navbar-brand uk-navbar-center"><img src="imgs/index/manage_logo.png" /></a>
+	</div>
+</nav>
+<div id="sideGuide" class="uk-offcanvas">
+    <div class="uk-offcanvas-bar">
+		<ul class="uk-nav uk-nav-offcanvas uk-nav-parent-icon" data-uk-nav>
+			<li class="uk-nav-header"><span class="uk-icon-navicon"></span>导航菜单</li>
+			<li class="uk-active">
+				<a class="uk-icon-home">首页</a>
+			</li>
+			<li class="uk-nav-divider"></li>
+			<li class="uk-nav-header"><span class="uk-icon-user"></span>用户操作</li>
+			<li><a href="login.html">登录</a></li>
+			<li><a href="sign.html">注册</a></li>
+		</ul>
+	</div>
+</div>
+<!--head over -->
+<!--banner -->
+<div class="banner_bg uk-hidden-small">
+	<div class="uk-container uk-container-center" data-uk-scrollspy="{cls:'uk-animation-scale-up'}">
+		<p class="uk-text-center banner_title">买礼物,我们更懂你</p>
+		<form class="uk-form banner_search_form">
+			<input type="text" placeholder="不知道送什么？试试输入“20岁运动型双鱼座男生”" class="banner_search_input"/>
+			<input type="button" value="智能搜索" class="banner_search_submit" />
+		</form>
+		<div class="banner_hotwords_lay">
+		<div class="banner_hotwords">
+			<div class="banner_hotwords_title">热门搜索：</div>
+			<ul class="banner_hotwords_blocks_lay">
+				<li class="banner_hotwords_blocks">女朋友</li>
+				<li class="banner_hotwords_blocks">男朋友</li>
+				<li class="banner_hotwords_blocks">可爱</li>
+				<li class="banner_hotwords_blocks">典雅的</li>
+				<li class="banner_hotwords_blocks">求爱</li>
+				<li class="banner_hotwords_blocks">道歉</li>
+				<li class="banner_hotwords_blocks">定制</li>
+				<li class="banner_hotwords_blocks">绿色植物</li>
+			</ul>
+		</div>
+		<div class="banner_hotwords_more"><a href="">查看更多热词</a></div>
+	</div>
+	</div>
+</div>
+<!--banner over -->
+<!--search tips -->
+<div class="uk-container uk-container-center" data-uk-sticky>
+	<div class="search_left">
+	<form class="uk-form">
+			<select  class="search_type">
+				<option class="select_hide">礼品类型</option>
+				<option>服装配饰</option>
+				<option>珠宝首饰</option>
+				<option>护理护肤</option>
+				<option>数码科技</option>
+				<option>文具办公</option>
+				<option>创意玩具</option>
+				<option>家居装饰</option>
+				<option>鲜花绿植</option>
+				<option>运动户外</option>
+				<option>其他</option>
+			</select>
+			<select  class="search_sex">
+				<option value="">性别</option>
+				<option>男女皆宜</option>
+				<option>男</option>
+				<option>女</option>
+			</select>
+			<select class="search_astro">
+				<option value="">星座</option>
+				<option value="">不限</option>
+				<option>白羊座</option>
+				<option>金牛座</option>
+				<option>双子座</option>
+				<option>巨蟹座</option>
+				<option>狮子座</option>
+				<option>处女座</option>
+				<option>天秤座</option>
+				<option>天蝎座</option>
+				<option>射手座</option>
+				<option>摩羯座</option>
+				<option>水瓶座</option>
+				<option>双鱼座</option>
+			</select>
+			<select class="search_age">
+				<option>年龄段</option>
+				<option value="">不限</option>
+				<option>0~6</option>
+				<option>7~12</option>
+				<option>13~17</option>
+				<option>17~25</option>
+				<option>26~35</option>
+				<option>36~∞</option>
+			</select>
+			<input class="search_price" id="search_price1" placeholder="最低价格" /><span>_</span><input class="search_price" id="search_price2" placeholder="最高价格" />
+			<input class="search_price_enter" type="button" value="确认" />
+	</form>
+	</div>
+	<div class="search_right">
+		<div class="search_right_button uk-visible-large">随机</div>
+	</div>
+</div>
+<!--search tips over -->
+<!--waterfall -->
+<div class="uk-container uk-container-center uk-margin-top">
+	<div class="uk-grid" data-uk-grid-margin>
+		<!--waterfall block -->
+		<div class="uk-width-small-1-2 uk-width-medium-1-4 uk-width-large-1-5">
+			<div class="uk-panel uk-panel-box waterfall_blocks">
+				<div class="uk-grid">
+					<div class="uk-width-large-1-1 uk-width-medium-1-1 uk-width-small-1-3">
+						<img class="waterfall_blocks_img uk-thumbnail-expand" src="imgs/index/gift.jpg" />
+					</div>
+					<div class="uk-width-large-1-1 uk-width-medium-1-1 uk-width-small-2-3">
+						<p class="uk-width-1-1 uk-float-left uk-panel-title  waterfall_blocks_title">超级无敌苏丹红红枣子谁吃谁倒霉</p>
+						<div class="uk-width-1-1">
+							<span class="uk-width-1-2 waterfall_blocks_price"><span class="uk-icon-cny"></span>9999.99</span>
+							<span class="uk-width-1-2 waterfall_blocks_location">广州</span>
+						</div>
+						<div class="uk-grid uk-margin-small-top">
+							<div class="uk-width-large-1-1 uk-width-medium-1-1 uk-width-small-1-2">
+								<a class="uk-width-1-1 uk-button waterfall_blocks_button waterfall_blocks_button_more uk-hidden-small" href="#gift_dialog" data-uk-modal>查看详情</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--waterfall block over -->
+	</div>
+</div>
+<!--waterfall over -->
+</body>
+</html>

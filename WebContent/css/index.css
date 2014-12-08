@@ -1,0 +1,385 @@
+body {
+	background-color:#efefea;
+}
+
+.head_navbar_bg {
+	background-color:#333;
+	padding:0px;
+}
+
+.head_navbar {
+	padding:0px;
+}
+
+.head_navbar_logo {
+	padding-right:0px;
+}
+
+.head_navbar_guide {
+	color:#ccc;
+	display:inline;	
+	line-height:40px;
+	padding:5px 10px;
+	cursor:pointer;
+	font-family:"Arial","微软雅黑", "黑体";
+	font-size:14px;
+}
+
+.head_navbar_guide:hover {
+	background-color:#fff;
+	border-radius:5px;
+	color:#666;
+}
+
+.head_navbar_guide_act {
+	background-color:#fff;
+	color:#ff4733;
+	border-radius:5px;
+	display:inline;	
+	line-height:40px;
+	padding:5px 10px;
+	cursor:pointer;
+	font-family:"Arial","微软雅黑", "黑体";
+	font-size:14px;
+}
+
+.head_navbar_guide_toggle {
+	color:#ccc;
+	font-size:21px;
+	line-height:40px;
+	display:inline;
+	margin-left:10px;
+}
+
+.banner_bg {
+	background-image:url(../imgs/index/banner_bg.jpg);
+	background-size:cover;
+	background-repeat:no-repeat;
+	height:250px;
+	width:100%;
+}
+
+.banner_title {
+	font-family:Arial, "MS Serif","微软雅黑", "宋体";
+	margin:auto;
+	text-align:center;
+	color:#ffffff;
+	font-size:32px;
+	padding-top:40px;
+	cursor:default;
+	text-shadow:0px 0px 15px #FFFFFF;
+}
+
+.banner_search_form {
+	width:700px;
+	margin:auto;
+	margin-top:40px;
+}
+
+.banner_search_input {
+	width:540px;
+	text-align:center;
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+	color:#333;
+	font-size:16px;
+	border-radius:5px;
+	border:1px solid #7b7b7b;
+	box-shadow:0px 0px 15px #666;
+	background-color:#FFF;
+	cursor:text;
+}
+
+.banner_search_submit {
+	width:130px;
+	height:32px;
+	border-radius:5px;
+	border:0;
+	box-shadow:0px 0px 15px #666;
+	background-color:#eb2914;
+	color:#ffffff;
+	font-size:16px;
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+	cursor:pointer;
+	border:solid 1px #b11505;
+	margin-left:10px;
+}
+
+.banner_search_submit:hover {
+	background-color:#ff4733;
+}
+
+.banner_hotwords_lay {
+	width:680px;
+	height:auto;
+	margin:0 auto;
+	margin-top:20px;
+}
+
+.banner_hotwords {
+	float:left;
+	width:540px;
+	height:auto;
+	color:#ffffff;
+	font-size:16px;
+	font-family:"Arial", "幼圆", "微软雅黑", "黑体";
+	text-shadow:0px 1px 5px #666;
+	cursor:default;
+}
+
+.banner_hotwords_title {
+	float:left;
+}
+
+.banner_hotwords_blocks_lay {
+	float:left;
+	margin:0;
+	padding:0;
+}
+
+.banner_hotwords_blocks {
+	list-style:none;
+	float:left;
+	padding-left:5px;
+	padding-right:5px;
+	cursor:pointer;
+}
+
+.banner_hotwords_blocks:hover {
+	text-shadow:0px 0px 5px #FFFFFF;
+}
+
+.banner_hotwords_more {
+	float:left;
+	width:130px;
+	margin-left:5px;
+	text-align:center;
+}
+
+.banner_hotwords_more a {
+	text-align:center;
+	color:#ffffff;
+	font-size:16px;
+	font-family:"Arial", "幼圆", "微软雅黑", "黑体";
+	text-shadow:0px 1px 5px #666;
+}
+
+.banner_hotwords_more a:hover {
+	text-shadow:0px 0px 5px #FFFFFF;
+}
+
+.banner_hotwords_more a {
+	text-align:center;
+	color:#ffffff;
+	font-size:16px;
+	font-family:"Arial", "幼圆", "微软雅黑", "黑体";
+}
+
+.search_left {
+	width:700px;
+	float:left;
+}
+
+.search_right {
+	float:right;
+}
+
+.search_right_button {
+	height:28px;
+	width:60px;
+	border-radius:5px;
+	background-color:#fff;
+	float:left;
+	margin-top:15px;
+	margin-left:5px;
+	cursor:pointer;
+	border:1px solid #CCC;
+	color:#444;
+	font-size:14px;
+	font-family:"Arial",  "微软雅黑", "黑体";
+	line-height:28px;
+	text-align:center;
+}
+
+.search_right_button:hover {
+	border:1px solid #eb2914;
+}
+
+.search_type {
+	height:26px;
+	width:100px;
+	border-radius:5px;
+	color:#999;
+	font-size:14px;
+	font-family:"Arial",  "微软雅黑", "黑体";
+	margin-top:15px;
+	border:1px solid #CCC;
+	background-color:#fff;
+	cursor:pointer;
+}
+
+.search_type:hover {
+	border:1px solid #eb2914;
+}
+
+.search_sex {
+	height:26px;
+	width:80px;
+	border-radius:5px;
+	color:#999;
+	font-size:14px;
+	font-family:"Arial",  "微软雅黑", "黑体";
+	margin-top:15px;
+	border:1px solid #CCC;
+	background-color:#fff;
+	cursor:pointer;
+}
+
+.search_sex:hover {
+	border:1px solid #eb2914;
+}
+
+.search_astro {
+	height:26px;
+	width:90px;
+	border-radius:5px;
+	color:#999;
+	font-size:14px;
+	font-family:"Arial",  "微软雅黑", "黑体";
+	margin-top:15px;
+	border:1px solid #CCC;
+	background-color:#fff;
+	cursor:pointer;
+}
+
+.search_astro:hover {
+	border:1px solid #eb2914;
+}
+
+.search_age {
+	height:26px;
+	width:90px;
+	border-radius:5px;
+	color:#999;
+	font-size:14px;
+	font-family:"Arial",  "微软雅黑", "黑体";
+	margin-top:15px;
+	border:1px solid #CCC;
+	background-color:#fff;
+	cursor:pointer;
+}
+
+.search_age:hover {
+	border:1px solid #eb2914;
+}
+
+.search_price {
+	height:24px;
+	width:130px;
+	border-radius:5px;
+	color:#999;
+	font-size:14px;
+	font-family:"Arial",  "微软雅黑", "黑体";
+	margin:0;
+	margin-top:15px;
+	padding:0;
+	border:1px solid #CCC;
+	background-color:#fff;
+	cursor:pointer;
+	text-align:center;
+}
+
+.search_price:hover {
+	border:1px solid #eb2914;
+}
+
+.search_price_enter {
+	height:30px;
+	width:42px;
+	border-radius:5px;
+	color:#444;
+	font-size:14px;
+	font-family:"Arial",  "微软雅黑", "黑体";
+	margin:0;
+	margin-top:15px;
+	padding:0;
+	border:1px solid #CCC;
+	background-color:#fff;
+	cursor:pointer;
+	text-align:center;
+}
+
+.search_price_enter:hover {
+	background-color:#eb2914;
+	color:#fff;
+}
+
+.search_price_enter:active {
+	background-color:#ff4733;
+	color:#fff;
+}
+
+.waterfall_blocks {
+	min-width:150px;
+}
+
+.waterfall_blocks_img {
+	border-radius:5px;
+}
+
+.waterfall_blocks_title {
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+	font-size:14px;
+	text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+	margin-bottom:5px;
+}
+
+.waterfall_blocks_tags_lay {
+	word-break: keep-all;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.waterfall_blocks_tags {
+	background-color:#f3f3f3;
+	color:#666;
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+	font-weight:normal;
+}
+
+.waterfall_blocks_price {
+	font-size:20px;
+	margin-top:5px;
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+	text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+	color:#ff4733;
+}
+
+.waterfall_blocks_location {
+	font-size:12px;
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+	text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+	padding-left:10px;
+	color:#999;
+}
+
+.waterfall_blocks_button {
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+}
+
+.waterfall_blocks_button_more:hover {
+	border:1px solid #ff4733;
+}
+
+.waterfall_blocks_button_sc:hover {
+	border:1px solid #ff4733;
+}
+
+.waterfall_blocks_button_xy:hover {
+	border:1px solid #ff4733;
+}
+
+.ls_input {
+	font-family:Arial, "MS Serif", "微软雅黑", "宋体";
+	text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}

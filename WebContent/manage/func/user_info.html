@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>拇指礼物-用户后台</title>
+<link type="text/css" rel="stylesheet" href="../css/uikit-muzhiliwu.css" />
+<link type="text/css" rel="stylesheet" href="../css/manage_user.css" />
+<link type="text/css" rel="stylesheet" href="../css/addons/uikit.almost-flat.addons.min.css" />
+<link type="text/css" rel="stylesheet" href="../css/jquery.Jcrop.min.css" />
+<script src="../js/jquery-2.0.2.min.js"></script>
+<script src="../js/uikit.min.js"></script>
+<script src="../js/manage_normal.js"></script>
+<script src="../js/addons/notify.min.js"></script>
+<script src="../js/addons/form-select.min.js"></script>
+<script src="../js/jquery.Jcrop.min.js"></script>
+</head>
+
+<body class="uk-height-1-1">
+<!--select user pic -->
+<div id="select_user_pic" class="uk-modal uk-vertical-align uk-text-center">
+    <div class="uk-modal-dialog uk-vertical-align-middle uk-container-center" style="width:350px;">
+		<div class="uk-panel uk-panel-box">
+			<img src="../imgs/user_pic.png" /> 
+			<div class="uk-width-1-1">
+				<div class="uk-form-file">
+					<button class="uk-button">上传头像</button>
+					<input type="file">
+				</div>
+			</div>
+			<div class="uk-width-1-1 uk-button-group uk-margin-top">
+				<button type="button" class="uk-button uk-modal-close">取消</button>
+				<button type="button" class="uk-button uk-button-success">提交</button>
+			</div>
+		</div>
+    </div>
+</div>
+
+<div class="uk-modal uk-vertical-align uk-text-center" id="change_user_psw">
+	<div class="uk-modal-dialog uk-vertical-align-middle uk-container-center" style="width:250px;">
+		<form class="uk-panel uk-panel-box uk-form" id="head_sign_form">
+			<a class="uk-modal-close uk-close uk-float-right"></a>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="password" placeholder="当前密码" fr="user.pass" name="form_input" maxlength="15">
+			</div>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="password" placeholder="请输入新密码" fr="user.pass" name="form_input" maxlength="15">
+			</div>
+			<div class="uk-form-row">
+				<input class="uk-width-1-1 uk-form-large ls_input" type="password" placeholder="重复密码" fr="repass" name="form_input" maxlength="15">
+			</div>
+			<div class="uk-form-row">
+				<a class="uk-width-1-1 uk-button uk-button-success uk-button-large ls_input" id="change_password">修改密码</a>
+			</div>
+		</form>
+	</div>
+</div>
+<!--select user pic over -->
+<!--head -->
+<nav class="uk-navbar uk-navbar-attached head_navbar_bg">
+	<div class="uk-container-center head_navbar">
+		<a class="uk-navbar-brand head_navbar_logo"><img src="../imgs/manage_logo.png" /></a>
+		<ul class="uk-navbar-nav uk-float-right">
+			<div class="head_navbar_guide head_navbar_guide_act"><span class="uk-icon-user"></span></div>
+			<a class="head_navbar_guide" href="#" id="head_logout">退出</a>
+		</ul>
+	</div>
+</nav>
+<!--head over -->
+<!--manage body -->
+<div class="manage_lay">
+	<div class="manage_left">
+		<!--function menu -->
+		<div class="main_menu_lay">
+			<div class="icon-stackoverflow" id="main_menu_title"></div>
+			<ul class="main_menu_ul">
+				<li id="basic_info" t="user_basic">
+					<p><a href="../user.html">基本信息</a></p>
+				</li>
+				<li id="my_social">
+					<p>我的圈子</p>
+					<ul class="main_menu_ul_s">
+						<li><a href="wish.html">许愿墙</a></li>
+					</ul>
+				</li>
+				<li id="gift_manage">
+					<p>礼品管理</p>
+					<ul class="main_menu_ul_s">
+						<li>收藏夹</li>
+					</ul>
+				</li>
+				<li id="id_manage">
+					<p>账号管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="user_info"><a href="user_info.html">个人信息</a></li>
+						<li t="user_location">地址管理</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<!--function menu over -->
+		<!--logout -->
+		<div class="main_menu_lay">
+			<p class="main_menu_logout" id="sidebar_logout">退出登录</p>
+		</div>
+		<!--logout over -->
+		<!--web info -->
+		<p class="web_info">Development and design by <br />www.rippletec.net<br />Copyrighted © 2014. <br />All rights reserved.</p>
+		<!--web info over -->
+	</div>
+	<div class="manage_right" id="manage_right">
+		<!--user info -->
+		<div class="manage_block_lay">
+			<div class="manage_block_title"><div class="manage_block_name">个人信息</div><div class="manage_block_line"></div></div>
+			<div class="manage_block_main">
+				<p class="user_info_title">~头像~</p>
+				<img src="../imgs/user_pic.png"  class="user_info_pic" id="user_info_pic" data-uk-tooltip title="点击上传新头像" data-uk-modal="{target:'#select_user_pic',bgclose:false}"/>
+				<div class="user_info_lay">
+					<div class="user_info_name">登录名</div>
+					<div class="user_info_value"></div>
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">密码</div>
+					<div class="user_info_value">******</div>
+					<input class="user_info_note" type="button" value="修改" data-uk-modal="{target:'#change_user_psw'}"/>
+				</div>
+				<p class="user_info_title">~个性信息（公开）~</p>
+				<div class="user_info_lay">
+					<div class="user_info_name">昵称</div>
+					<div class="user_info_value">菲儿</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">签名</div>
+					<div class="user_info_value">繁花落尽君辞去</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">情感状态</div>
+					<div class="user_info_value">单身</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<p class="user_info_title">~基本信息（半公开）~</p>
+				<div class="user_info_lay">
+					<div class="user_info_name">真实姓名</div>
+					<div class="user_info_value">徐静仪</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">性别</div>
+					<div class="user_info_value">女</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">生日</div>
+					<div class="user_info_value">12/23</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">星座</div>
+					<div class="user_info_value">魔蝎座</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<p class="user_info_title">~联系方式（半公开）~</p>
+				<div class="user_info_lay">
+					<div class="user_info_name">手机</div>
+					<div class="user_info_value">13247340557</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">QQ</div>
+					<div class="user_info_value">491553759</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">邮箱</div>
+					<div class="user_info_value">rolealiu@gmail.com</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">所在地</div>
+					<div class="user_info_value">广东省-广州市-番禺区-广州大学城</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+				<div class="user_info_lay">
+					<div class="user_info_name">就读院系</div>
+					<div class="user_info_value">广东工业大学-计算机学院-网络工程</div>
+					<input class="user_info_note" type="button" value="修改" />
+				</div>
+			</div>
+		</div>
+		<!--user info over -->
+	</div>
+</div>
+<!--manage body over -->
+</body>
+</html>

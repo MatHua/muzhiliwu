@@ -1,0 +1,131 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>拇指礼物-用户后台</title>
+<link type="text/css" rel="stylesheet" href="css/uikit-muzhiliwu.css" />
+<link type="text/css" rel="stylesheet" href="css/manage_user.css" />
+<link type="text/css" rel="stylesheet" href="css/addons/uikit.almost-flat.addons.min.css" />
+<script src="js/jquery-2.0.2.min.js"></script>
+<script src="js/uikit.min.js"></script>
+<script src="js/manage_normal.js"></script>
+<script src="js/addons/notify.min.js"></script>
+</head>
+
+<body class="uk-height-1-1">
+<!--head -->
+<nav class="uk-navbar uk-navbar-attached head_navbar_bg">
+	<div class="uk-container-center head_navbar">
+		<a class="uk-navbar-brand head_navbar_logo"><img src="imgs/manage_logo.png" /></a>
+		<ul class="uk-navbar-nav uk-float-right">
+			<div class="head_navbar_guide head_navbar_guide_act"><span class="uk-icon-user"></span></div>
+			<a class="head_navbar_guide" href="#" id="head_logout">退出</a>
+		</ul>
+	</div>
+</nav>
+<!--head over -->
+<!--manage body -->
+<div class="manage_lay uk-link-muted">
+	<div class="manage_left">
+		<!--user info -->
+		<div class="user_lay">
+			<div class="user_pic_lay">
+				<img class="user_pic" src="imgs/test_user_pic.jpg" id="sidebar_user_pic" />
+			</div>
+			<div class="user_name" id="sidebar_user_name"></div>
+			<div class="user_bar_bg">
+				<div class="user_bar_text" id="sidebar_user_pp"></div>
+			</div>
+			<div class="user_bar_bg" id="sidebar_user_coin"></div>
+		</div>
+		<!--user info -->
+		<!--function menu -->
+		<div class="main_menu_lay">
+			<div class="icon-stackoverflow" id="main_menu_title"></div>
+			<ul class="main_menu_ul">
+				<li id="basic_info">
+					<p><a href="user.html">基本信息</a></p>
+				</li>
+				<li id="my_social">
+					<p>我的圈子</p>
+					<ul class="main_menu_ul_s">
+						<li><a href="func/wish.html">许愿墙</a></li>
+					</ul>
+				</li>
+				<li id="gift_manage">
+					<p>礼品管理</p>
+					<ul class="main_menu_ul_s">
+						<li>收藏夹</li>
+					</ul>
+				</li>
+				<li id="id_manage">
+					<p>账号管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="user_info"><a href="func/user_info.html">个人信息</a></li>
+						<li t="user_location">地址管理</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<!--function menu over -->
+		<!--logout -->
+		<div class="main_menu_lay">
+			<p class="main_menu_logout" id="sidebar_logout">退出登录</p>
+		</div>
+		<!--logout over -->
+		<!--web info -->
+		<p class="web_info">Development and design by <br />www.rippletec.net<br />Copyrighted © 2014. <br />All rights reserved.</p>
+		<!--web info over -->
+	</div>
+	<div class="manage_right" id="manage_right">
+		<!--wishwall -->
+		<div class="manage_block_lay">
+			<div class="manage_block_title"><div class="manage_block_name">许愿墙</div><div class="manage_block_line"></div></div>
+			<div class="manage_block_main">
+				<div class="newest_wish_lay">
+					<div class="newest_wish">
+						<p class="newest_wish_title">最近许愿：</p>
+						<p class="newest_wish_t" title="希望今年的光棍节不要再一个人过了，有人来帮我实现这个愿望么？要是有的话我就送他一个礼物哦~" >希望今年的光棍节不要再一个人过了，有人来帮我实现这个愿望么？要是有的话我就送他一个礼物哦~</p>
+					</div>
+					<div class="newest_wish_p">
+						<p class="newest_wish_p_title">共有18人想要帮您实现愿望：</p>
+						<div class="newest_wish_p_list">
+							<img class="newest_wish_p_pic" src="imgs/test_wish_pic.jpg" />
+							<div class="newest_wish_p_more">...</div>
+						</div>
+					</div>
+				</div>
+				<div style="width:1px;height:162px;margin-left:18px;margin-right:18px;background-color:#e1e1e1;float:left;"></div>
+				<div class="newest_wish_button_g">我的愿望</div>
+				<div class="newest_wish_button_r">继续许愿</div>
+			</div>
+		</div>
+		<!--wishwall over -->
+		<!--AD -->
+		<a href=""><img class="manage_basic_banner_ad" src="imgs/test_banner.jpg" /></a>
+		<!--AD over -->
+		<!--shopping car -->
+		<div class="manage_block_lay">
+			<div class="manage_block_title"><div class="manage_block_name">收藏夹</div><div class="manage_block_line"></div></div>
+			<div class="manage_block_main">
+				<!--goods -->
+				<div class="shopping_gifts">
+					<a href=""><img class="shopping_gifts_pic" src="imgs/test_gifts.jpg" /></a>
+					<div class="shopping_gifts_info">
+						<p class="shopping_gifts_name"><a href="">夜空中的星星</a></p>
+						<p class="shopping_gifts_price">1234.56</p>
+					</div>
+					<div class="shopping_gifts_button">
+						<div class="shopping_gifts_button_buy">购买</div>
+						<div class="shopping_gifts_button_delete">删除</div>
+					</div>
+				</div>
+				<!--goods over -->
+			</div>
+		</div>
+		<!--shopping car over -->
+	</div>
+</div>
+<!--manage body over -->
+</body>
+</html>

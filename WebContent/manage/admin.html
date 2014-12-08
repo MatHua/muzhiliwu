@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>拇指礼物-用户后台</title>
+<link type="text/css" rel="stylesheet" href="css/uikit-muzhiliwu.css" />
+<link type="text/css" rel="stylesheet" href="css/manage_admin.css" />
+<link type="text/css" rel="stylesheet" href="css/addons/uikit.almost-flat.addons.min.css" />
+<script src="js/jquery-2.0.2.min.js"></script>
+<script src="js/uikit.min.js"></script>
+<script src="js/manage_normal.js"></script>
+<script src="js/addons/notify.min.js"></script>
+</head>
+
+<body class="uk-height-1-1">
+<!--head -->
+<nav class="uk-navbar uk-navbar-attached head_navbar_bg">
+	<div class="uk-container-center head_navbar">
+		<a class="uk-navbar-brand head_navbar_logo"><img src="imgs/manage_logo.png" /></a>
+		<ul class="uk-navbar-nav uk-float-right">
+			<div class="head_navbar_guide head_navbar_guide_act"><span class="uk-icon-user"></span></div>
+			<a class="head_navbar_guide" href="#" id="head_logout">退出</a>
+		</ul>
+	</div>
+</nav>
+<!--head over -->
+<!--manage body -->
+<div class="manage_lay uk-link-muted">
+	<div class="manage_left">
+		<!--user info -->
+		<div class="user_lay">
+			<div class="user_pic_lay">
+				<img class="user_pic" src="imgs/manage/manage_pic.gif" />
+			</div>
+			<div class="user_name">拇指礼物</div>
+			<div class="user_bar_bg">
+				<div class="user_bar_text" id="user_bar_gift_t">商户数量：17</div>
+			</div>
+			<div class="user_bar_bg">
+				<div class="user_bar_text" id="user_bar_fan_t">本月访问量：1521</div>
+			</div>
+			<div class="user_bar_bg" id="user_bar_coin">本月销售量：3213</div>
+		</div>
+		<!--user info -->
+		<!--function menu -->
+		<div class="main_menu_lay">
+			<div class="icon-stackoverflow" id="main_menu_title"></div>
+			<ul class="main_menu_ul">
+				<li id="basic_info" t="admin_basic">
+					<p>基本信息</p>
+				</li>
+				<li id="shop_manage">
+					<p>商家管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="admin_shop_manage">商家增删</li>
+						<li t="admin_shop_report">商家排行</li>
+					</ul>
+				</li>
+				<li id="goods_manage">
+					<p>商品管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="admin_goods_manage">商品增删</li>
+						<li t="admin_goods_report">销售排行</li>
+						<li t="admin_search_report">搜索排行</li>
+					</ul>
+				</li>
+				<li id="user_manage">
+					<p>用户管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="admin_user_manage">用户查改</li>
+					</ul>
+				</li>
+				<li id="content_manage">
+					<p>内容管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="admin_content_wish">许愿信息管理</li>
+					</ul>
+				</li>
+				<li id="website_manage">
+					<p>网站管理</p>
+					<ul class="main_menu_ul_s">
+						<li t="admin_ad_manage">广告信息查改</li>
+						<li t="admin_web_manage">网站信息修改</li>
+						<li t="admin_operation_history">操作记录</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<!--function menu over -->
+		<!--logout -->
+		<div class="main_menu_lay">
+			<p class="main_menu_logout">退出登录</p>
+		</div>
+		<!--logout over -->
+		<!--web info -->
+		<p class="web_info">Development and design by <br />www.rippletec.net<br />Copyrighted © 2014. <br />All rights reserved.</p>
+		<!--web info over -->
+	</div>
+	<div class="manage_right" id="manage_right">
+		
+	</div>
+</div>
+<!--manage body over -->
+</body>
+</html>
