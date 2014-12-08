@@ -1,13 +1,10 @@
 package com.muzhiliwu.service.gift;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Dao;
@@ -29,34 +26,11 @@ import com.muzhiliwu.utils.ActionMessage;
 import com.muzhiliwu.utils.DateUtils;
 import com.muzhiliwu.utils.FileFilter;
 import com.muzhiliwu.utils.MD5;
-import com.muzhiliwu.utils.NumGenerator;
 
 @IocBean
 public class ShopService {
 	@Inject
 	private Dao dao;
-
-	public String registShop(Shop shop) {
-
-		// 账号已被注册
-		if (!checkRepeat(shop.getCode())) {
-			return ActionMessage.fail;
-		}
-		// 一些系统自修改的信息
-		shop.setId(NumGenerator.getUuid());// 生成id
-		shop.setPass(MD5.toMD5(shop.getPass().trim()));// 密码加密
-		shop.setDate(DateUtils.now());// 注册时间
-
-		shop.setBusinessState(Shop.ShopOpen);
-		shop.setOkBusiness(Shop.CanBusiness);
-		dao.insert(shop);
-		return ActionMessage.success;
-	}
-
-	public boolean checkRepeat(String code) {
-		Shop shop = dao.fetch(Shop.class, Cnd.where("code", "=", code));
-		return shop == null ? true : false;
-	}
 
 	/**
 	 * 检查商户登录
@@ -150,10 +124,8 @@ public class ShopService {
 			cri.where().and("saleState", "=", Gift.NotSale);
 		}
 		List<Gift> gifts = dao.query(Gift.class, cri, page);
-		if (page == null) {
+		if (page == null)
 			page = new Pager();
-			page.setPageSize(-1);
-		}
 		page.setRecordCount(dao.count(Gift.class, cri));
 		return new QueryResult(gifts, page);
 	}
@@ -175,7 +147,7 @@ public class ShopService {
 		return ActionMessage.fail;
 	}
 
-	public String uploadPhoto(String code, TempFile tfs, String template) {
+	public boolean uploadPhoto(String code, TempFile tfs, String template) {
 		// 更新数据库信息
 		Shop shop = getShopByCode(code);
 
@@ -190,7 +162,7 @@ public class ShopService {
 		String fileExt = tfs.getFile().getAbsolutePath().substring(beginIndex);
 
 		// 删除原来存在的头像
-		String regx = code + "_pic" + ".*";
+		String regx = code + ".*";
 		File f2 = new File(template);
 		File[] s = f2.listFiles(new FileFilter(regx));
 		for (File file : s) {
@@ -198,62 +170,16 @@ public class ShopService {
 		}
 
 		// 上传新的头像文件
-		File f = new File(template + code + "_pic" + fileExt);
+		File f = new File(template + code + fileExt);
 		try {
 			Files.move(tfs.getFile(), f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		shop.setLogo("/shopLogo/" + code + "_pic" + fileExt);
+		shop.setLogo(template + code + fileExt);
 		dao.update(s);
-		return "/shopLogo/" + code + "_pic" + fileExt;
-	}
-
-	public String cutLogo(String code, String picPath, int top, int left,
-			int width, int height, String template) {
-		// 更新数据库信息
-		Shop s = getShopByCode(code);
-
-		File pic = new File(template + picPath);
-
-		// 如果对应的文件夹不存在,就创建该文件夹
-		Files.createDirIfNoExists(template);
-
-		// 获取文件后缀名
-		int beginIndex = pic.getAbsolutePath().lastIndexOf(".");
-		String fileExt = pic.getAbsolutePath().substring(beginIndex);
-
-		// 删除原来存在的头像
-		String regx = code + fileExt;
-		File f2 = new File(template + "/shopLogo/" + code + fileExt);
-		Files.deleteFile(f2);
-
-		// 上传新的头像文件
-		File f = new File(template + "/shopLogo/" + code + fileExt);
-		try {
-			BufferedImage img = (BufferedImage) ImageIO.read(pic);
-			height = Math.min(height, img.getHeight());
-			width = Math.min(width, img.getWidth());
-			if (height <= 0)
-				height = img.getHeight();
-			if (width <= 0)
-				width = img.getWidth();
-			top = Math.max(Math.max(0, top), img.getHeight() - height);
-			left = Math.min(Math.max(0, left), img.getWidth() - width);
-			BufferedImage cut = img.getSubimage(left, top, width, height);
-			ImageIO.write(cut, ".png".equals(fileExt) ? "png" : "jpeg", f);
-			// Files.move(tfs.getFile(), f);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		f2 = new File(template + picPath);
-		Files.deleteFile(f2);
-
-		s.setLogo(/* template */"/shopLogo/" + code + fileExt);
-		dao.update(s);
-		return "/shopLogo/" + code + fileExt;
+		return true;
 	}
 
 	public Shop getShopByCode(String code) {
