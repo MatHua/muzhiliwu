@@ -139,8 +139,8 @@ public class AdminModule {
 	@POST
 	public Object logout(HttpSession session, HttpServletRequest request,
 			HttpServletResponse response) {
-		if (session.getAttribute("s_shop") != null) {
-			session.removeAttribute("s_shop");
+		if (session.getAttribute("a_admin") != null) {
+			session.removeAttribute("a_admin");
 		}
 
 		ActionMessage am = new ActionMessage();
